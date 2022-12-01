@@ -31,9 +31,9 @@
   cursor: pointer;
 }
 
-.tokenListInfo:hover {
+/* .tokenListInfo:hover {
   background-color: #3A3A29;
-}
+} */
 .tokenName {
   font-family: 'Inter';
   font-style: normal;
