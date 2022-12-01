@@ -4,6 +4,7 @@ import {images} from "../../config/images"
 import style from './TokenList.module.css'
 
 export default function TokenList() {
+
   return (
     <Box className={style.tokenList}>
       <Input className = {style.tokenSearch} placeholder='Search' />

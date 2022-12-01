@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box } from "@chakra-ui/react"
+import { Box, useColorMode } from "@chakra-ui/react"
 import dynamic from 'next/dynamic'
 import style from './TokenChart.module.css'
 const AdvancedRealTimeChart = 
@@ -7,10 +7,13 @@ const AdvancedRealTimeChart =
   then(mod => mod.AdvancedRealTimeChart), {ssr: false})
 
 export default function TokenChart() {
+
+  const { colorMode } = useColorMode()
+
   return (
     <Box className={style.tokenChart}>
       <AdvancedRealTimeChart
-        theme='light'
+        theme={colorMode}
         width={"100%"}
         height={"100%"}
       />

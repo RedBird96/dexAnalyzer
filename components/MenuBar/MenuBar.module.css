@@ -6,7 +6,7 @@
   padding-bottom: 0.5rem;
   min-width: 50px;
   align-items:center;
-  background-color: white;
+  background-color: var(--chakra-colors-chakra-body-bg);
   background-clip: content-box;
 }
 

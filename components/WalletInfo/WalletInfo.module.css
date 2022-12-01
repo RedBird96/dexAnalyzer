@@ -2,7 +2,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background-color: white;
+  background-color: var(--chakra-colors-chakra-body-bg);
   background-clip: content-box;
   padding-bottom: 0.5rem;
 }
@@ -13,7 +13,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
-  background-color: rgb(244, 244, 244);
+  background-color: var(--chakra-colors-chakra-body-bg);
 }
 
 .walletBalance {

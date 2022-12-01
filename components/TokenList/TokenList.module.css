@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: white;
+  background-color: var(--chakra-colors-chakra-body-bg);
   background-clip: content-box;
   padding-bottom: 0.5rem;
 }
@@ -27,5 +27,5 @@
 }
 
 .tokenListInfo:hover {
-  background-color: rgb(244, 244, 244);
+  background-color:  var(--chakra-colors-chakra-select-bg);
 }

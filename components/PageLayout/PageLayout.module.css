@@ -1,9 +1,17 @@
-.mainBody{
+.mainBodylight{
   display:flex;
   flex-direction: row;
   border-style: solid;
   box-sizing: border-box;
   background-color: rgb(244, 244, 244);
+  height:100vh;
+}
+.mainBodyblack{
+  display:flex;
+  flex-direction: row;
+  border-style: solid;
+  box-sizing: border-box;
+  background-color: rgb(33, 33, 33);
   height:100vh;
 }
 .gridBox {
