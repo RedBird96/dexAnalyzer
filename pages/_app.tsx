@@ -3,7 +3,7 @@ import type { AppProps } from 'next/app'
 import { extendTheme, ChakraProvider } from '@chakra-ui/react'
 import { mode, StyleFunctionProps } from "@chakra-ui/theme-tools";
 import Layout from '../components/PageLayout'
-import theme from "./theme";
+import { theme } from "../themes/theme";
 
 // const dark = "#232323";
 // const light = "#f0f0f0";
