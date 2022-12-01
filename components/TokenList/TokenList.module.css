@@ -3,20 +3,25 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: var(--chakra-colors-chakra-body-bg);
   background-clip: content-box;
-  padding-bottom: 0.5rem;
 }
-
+.tokenListLight {
+  background-color: #FBFBFB;
+}
+.tokenListDark {
+  background-color: #232323;
+}
 .tokenSearch {
   width: 80% !important;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  height: 40px;
   border-radius: 1rem !important;
 }
 
 .tokenListInfo {
   display: flex;
+  max-height: 80px;
   flex-direction: row;
   align-items: center;
   width: 100%;
@@ -27,5 +32,21 @@
 }
 
 .tokenListInfo:hover {
-  background-color:  var(--chakra-colors-chakra-select-bg);
+  background-color: #3A3A29;
+}
+.tokenName {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  margin-bottom: 5px;
+}
+.tokenAddress {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 12px;
+
 }

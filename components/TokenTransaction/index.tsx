@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box } from "@chakra-ui/react"
+import { Box, useColorMode } from "@chakra-ui/react"
 import {
   Table,
   Thead,
@@ -14,8 +14,12 @@ import {
 import style from './TokenTransaction.module.css'
 
 export default function TokenTransaction() {
+  const { colorMode } = useColorMode()
+  const dark = style.tokenTransaction + " " + style.tokenTransactionDark;
+  const light = style.tokenTransaction + " " + style.tokenTransactionLight;
+
   return (
-    <Box className={style.tokenTransaction}>
+    <Box className={colorMode == "light" ? light : dark}>
       <TableContainer overflowY={"auto"} css={{
         '&::-webkit-scrollbar': {
           width: '4px',
@@ -28,9 +32,9 @@ export default function TokenTransaction() {
           borderRadius: '24px',
         },
       }}>
-        <Table variant="striped" colorScheme="teal">
+        <Table>
         <TableCaption>Transaction History</TableCaption>
-        <Thead>
+        <Thead color={"#7C7C7C"}>
           <Tr>
             <Th>Activity</Th>
             <Th>Tokens</Th>
@@ -39,7 +43,7 @@ export default function TokenTransaction() {
             <Th>Txn</Th>
           </Tr>
         </Thead>
-        <Tbody>
+        <Tbody color={"#00C414"}>
           <Tr>
             <Td>Buy</Td>
             <Td>59,034,543,124,564,247</Td>

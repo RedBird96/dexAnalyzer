@@ -2,8 +2,13 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background-color: var(--chakra-colors-chakra-body-bg);
-  background-clip: content-box;
+}
+
+.tokenInfoLight{
+  background-color: #FEFEFE;
+}
+.tokenInfoDark{
+  background-color: #1C1C1C;
 }
 
 .tokenSocialInfo {
@@ -12,6 +17,7 @@
   flex-direction: row;
   padding: 1rem;
   align-items: center;
+  max-height:80px;
 }
 
 .socialUrl {
@@ -19,4 +25,112 @@
   margin-left: 1rem;
   margin-right: 1rem;
   cursor: pointer;
+}
+
+.tokenName {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 19px;
+  margin-bottom: 5px;
+}
+
+.tokenBalance {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.tokenPrice {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 19px;
+  color: #00C514;  
+  margin-bottom: 5px;
+}
+
+.tokenBlance {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.totalSupply {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+  margin-bottom: 5px;
+}
+
+.tokenTotalSupply {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 17px;
+  margin-bottom: 10px;
+}
+
+.marketCap {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;
+  margin-bottom: 5px;
+}
+
+.tokenMarketCap {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;  
+  color: #00B112;
+}
+
+.tokenLPName {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;  
+  margin-bottom: 10px;
+}
+
+.tokenBNBAmount {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 17px;  
+  margin-bottom: 10px;
+}
+
+.tokenLPTokenHolder {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 17px;  
+}
+
+.tokenContract {
+  display: flex;
+  flex-direction: column;
+  margin-left: 3rem;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 17px;  
 }

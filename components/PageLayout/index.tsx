@@ -12,6 +12,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <Box >
       <Header/>
+      <nav><hr aria-orientation='horizontal'/></nav>
       <Box className={colorMode == "light" ? style.mainBodylight : style.mainBodyblack} >
         <MenuBar/>
         <TokenBody/>

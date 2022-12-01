@@ -2,18 +2,30 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background-color: var(--chakra-colors-chakra-body-bg);
   background-clip: content-box;
   padding-bottom: 0.5rem;
 }
 
+.walletInfoDark {
+  background-color: #232323;
+}
+.walletInfoLight {
+  background-color: #FBFBFB;
+}
 .walletTitle {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
-  background-color: var(--chakra-colors-chakra-body-bg);
+  height:80px;
+}
+.walletTitleDark {
+  background-color: #232222;
+}
+.walletTitleLight {
+  background-color: #FBFBFB;
+
 }
 
 .walletBalance {
@@ -33,4 +45,41 @@
   margin-top: 1rem;
   margin-bottom: 1rem;
   border-radius: 1rem !important;
+}
+
+.myWallet {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  margin-right: 5px;
+}
+
+.myBalance {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 19px;
+  color: #00C514;
+}
+
+.tokenName {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;
+  color: #969696;
+}
+
+.tokenBalance {
+  display: flex;
+  flex-direction: row;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 19px;  
 }

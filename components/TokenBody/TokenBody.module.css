@@ -7,10 +7,6 @@
 .tokenGrid {
   height: 100%;
   width: 100%;
-  gap: 0.5rem;
-  grid-template-rows: repeat(8, 1fr);
+  grid-template-rows: 100px repeat(7, 1fr);
   grid-template-columns: repeat(5, 1fr);
-  padding-left: 0.5rem;
-  padding-top: 0.5rem;
-  
 }
