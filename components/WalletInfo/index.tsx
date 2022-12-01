@@ -37,6 +37,7 @@ export default function WalletInfo() {
           <p style={{marginLeft:"5px"}}>Refresh</p>
         </Button>
       </Box>
+      <nav><hr aria-orientation='horizontal'></hr></nav>
       <Box className={style.walletData}>
         <Input className = {style.tokenSearch} placeholder='Search' />  
         <Box>

@@ -17,6 +17,7 @@ export default function Header() {
         marginLeft={"10px"}
         backgroundColor={"#0085FF"}
         borderRadius={"15px"}
+        color={"white"}
       >
         Connect Wallet        
       </Button>
