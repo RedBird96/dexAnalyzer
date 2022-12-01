@@ -1,0 +1,8 @@
+.tokenTransaction {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  background-clip: content-box;
+  padding-bottom: 0.5rem;
+}

@@ -1,0 +1,36 @@
+.walletInfo {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  background-clip: content-box;
+  padding-bottom: 0.5rem;
+}
+
+.walletTitle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: rgb(244, 244, 244);
+}
+
+.walletBalance {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.walletData {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tokenSearch {
+  width: 80% !important;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 1rem !important;
+}

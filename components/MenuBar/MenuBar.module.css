@@ -1,0 +1,19 @@
+.menuBar{
+  display:flex;
+  flex-direction: column;
+  padding-left: 0.5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  min-width: 50px;
+  align-items:center;
+  background-color: white;
+  background-clip: content-box;
+}
+
+.menuImg {
+  display: flex;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  width: 30px;
+}

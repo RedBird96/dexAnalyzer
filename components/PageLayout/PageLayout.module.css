@@ -1,0 +1,14 @@
+.mainBody{
+  display:flex;
+  flex-direction: row;
+  border-style: solid;
+  box-sizing: border-box;
+  background-color: rgb(244, 244, 244);
+  height:100vh;
+}
+.gridBox {
+  padding-left: 0.5rem;
+  padding-top: 0.5rem;
+  width: 100%;
+  
+}

@@ -1,0 +1,16 @@
+.tokenBody{
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+}
+
+.tokenGrid {
+  height: 100%;
+  width: 100%;
+  gap: 0.5rem;
+  grid-template-rows: repeat(8, 1fr);
+  grid-template-columns: repeat(5, 1fr);
+  padding-left: 0.5rem;
+  padding-top: 0.5rem;
+  
+}

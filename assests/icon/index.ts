@@ -1,0 +1,8 @@
+export {default as ColorMode} from './backgroundModeIcon.svg'
+export {default as Bridge} from './aboutBridgeIcon.svg'
+export {default as Moon} from './moonIcon.svg'
+export {default as TopMenuBar} from './menubar.svg'
+export {default as ChartMenuBar} from './menuchart.svg'
+export {default as WebSite} from './website.svg'
+export {default as Twitter} from './twitter.svg'
+export {default as FaceBook} from './facebook.svg'
