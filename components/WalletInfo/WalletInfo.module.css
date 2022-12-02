@@ -103,10 +103,18 @@
 // }
 */
 
-table.walletTokenDataDark th {
-  border-color: #404040;
+tbody.walletTokenBodyBorderDark th {
+  border-color: #303030;
 }
 
-table.walletTokenDataLight th {
+tbody.walletTokenBodyBorderLight th {
+  border-color: #EFEFEF;
+}
+
+thead.walletTokenHeadBorderDark th {
+  border-color: #505050;
+}
+
+thead.walletTokenHeadBorderLight th {
   border-color: #CFCFCF;
 }
