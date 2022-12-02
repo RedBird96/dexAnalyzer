@@ -13,5 +13,18 @@ export const theme = extendTheme({
         bg: mode(light, dark)(props)
       }
     })
-  }
+  },
+  // components: {
+  //   Table: {
+  //     parts: ['th', 'td'],
+  //     baseStyle: {
+  //       th: {
+  //         borderColor: '#404040',
+  //       },
+  //       td: {
+  //         borderColor: '#404040',
+  //       },
+  //     },
+  //   },
+  // },
 });

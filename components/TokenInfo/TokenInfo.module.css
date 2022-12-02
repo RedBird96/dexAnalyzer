@@ -1,5 +1,4 @@
 .tokenInfo {
-  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -17,7 +16,7 @@
   flex-direction: row;
   padding: 1rem;
   align-items: center;
-  max-height:80px;
+  height:80px;
 }
 
 .socialUrl {

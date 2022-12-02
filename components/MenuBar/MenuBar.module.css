@@ -1,14 +1,12 @@
 .menuBar{
   display:flex;
   flex-direction: column;
-  min-width: 80px;
+  width: 104px;
   align-items:center;
 }
 
 .menuImg {
   display: flex;
-  margin-top: 30px;
-  margin-bottom: 30px;
   cursor: pointer;
   align-items: center;
   width: 100%;

@@ -1,9 +1,17 @@
 .header {
+  width: 100%;
   display: flex;
-  max-height: 66px;
+  height: 66px;
   justify-content: flex-end;
-  margin: 1rem 2rem 1rem 1rem;
+  padding: 2rem;
   align-items: center;
+}
+
+.headerLight{
+  background-color: #FBFBFB;
+}
+.headerDark{
+  background-color: #202020;
 }
 
 .themeMode {

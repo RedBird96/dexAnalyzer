@@ -1,9 +1,9 @@
 .tokenList {
   height: 100%;
+  width: 519px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-clip: content-box;
 }
 .tokenListLight {
   background-color: #FBFBFB;
@@ -13,10 +13,18 @@
 }
 .tokenSearch {
   width: 80% !important;
-  margin-top: 30px;
-  margin-bottom: 30px;
+  margin-top: 20px;
+  margin-bottom: 20px;
   height: 40px;
   border-radius: 1rem !important;
+}
+.tokenSearchDark {
+  background-color: #424242 !important;
+  border-color: #424242 !important;
+}
+.tokenSearchLight {
+  background-color: #ffffff !important;
+  border-color: #CFCFCF !important;
 }
 
 .tokenListInfo {
