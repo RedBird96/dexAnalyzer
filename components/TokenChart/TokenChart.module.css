@@ -1,7 +1,5 @@
 .tokenChart {
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  width: 100%;
   background-color: var(--chakra-colors-chakra-body-bg);
-  background-clip: content-box;
 }
