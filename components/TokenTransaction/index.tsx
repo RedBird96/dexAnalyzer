@@ -35,7 +35,7 @@ export default function TokenTransaction() {
           borderRadius: '24px',
         },
       }}>
-        <Table variant='striped' colorScheme='gray'>
+        <Table variant='striped' colorScheme='blackAlpha'>
         <Thead>
           <Tr>
             <Th color={"#7C7C7C"}>Activity</Th>

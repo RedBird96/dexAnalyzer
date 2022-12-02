@@ -26,25 +26,25 @@ export default function Header() {
   const { colorMode, toggleColorMode  } = useColorMode()
 
   const connectWithMetamask = useMetamask()
-  const address = useAddress();
-  const network = useNetwork();
-  
-  if (address) {
-    console.log('Address',address, network);
-  }
 
   return (
     <Box className={menuClass}>
-        {
-        colorMode == "dark" ? 
-        <Sun className={style.themeMode} onClick={toggleColorMode}/>:
-        <Moon className={style.themeMode} onClick={toggleColorMode}/>
-        }
-        <Box className={style.connectBtn}>
-          <ConnectWallet
-            colorMode={colorMode}
-            accentColor='#0085FF'
-          />
+        <Box display={"flex"} flexDirection="row" alignItems={"center"}>
+        <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/74.png" width={"50px"}/>
+          <p style={{marginLeft:"1rem", fontSize:"1.5rem"}}>Site Title</p>
+        </Box>
+        <Box display={"flex"} flexDirection="row" alignItems={"center"}>
+          {
+            colorMode == "dark" ? 
+            <Sun className={style.themeMode} onClick={toggleColorMode}/>:
+            <Moon className={style.themeMode} onClick={toggleColorMode}/>
+          }
+          <Box className={style.connectBtn}>
+            <ConnectWallet
+              colorMode={colorMode}
+              accentColor='#0085FF'
+            />
+          </Box>
         </Box>
          
     </Box>

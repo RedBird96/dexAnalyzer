@@ -15,11 +15,11 @@
   background-color: #232323;
 }
 .tokenSearch {
-  width: 80% !important;
+  width: 90% !important;
   margin-top: 20px;
   margin-bottom: 20px;
   height: 40px;
-  border-radius: 1rem !important;
+  border-radius: 2rem !important;
 }
 .tokenSearchDark {
   background-color: #424242 !important;

@@ -10,6 +10,10 @@ import {
   Tbody,
   useColorModeValue
 } from "@chakra-ui/react"
+import {
+  useNetwork,
+  useAddress,
+} from '@thirdweb-dev/react'
 import {Refresh} from '../../assests/icon'
 import style from './WalletInfo.module.css'
 
@@ -29,6 +33,13 @@ export default function WalletInfo() {
 
   const tokenColor = useColorModeValue("#1C1C1C","#FFFFFF");
 
+  const address = useAddress();
+  const network = useNetwork();
+  
+  if (address) {
+    console.log('Address',address, network);
+  }
+  
   return (
     <Box className={walletClass}>
       <Box className={titleClass}>

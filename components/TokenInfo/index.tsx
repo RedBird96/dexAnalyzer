@@ -16,10 +16,10 @@ export default function TokenInfo() {
   return (
     <Box className={infoClass}>
       <Box className={style.tokenSocialInfo}>
-        <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/74.png" width={"60px"}/>
-        <Box display={"flex"} flexDirection={"row"} marginLeft={"1rem"} width={"50%"}>
-          <Box display={"flex"} flexDirection={"column"} marginRight={"1rem"}>
-            <p className={style.tokenName}>Doge Coin</p>
+        <Box display={"flex"} flexDirection={"row"} width={"50%"} alignItems={"center"}>
+          <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/74.png" width={"60px"}/>
+          <Box display={"flex"} flexDirection={"column"} padding={"1rem"}>
+            <p className={style.tokenName}>Doge Coin(DOGE/BNB)</p>
             <p className={style.tokenBalance}>Balance:</p>
           </Box>
           <Box display={"flex"} flexDirection={"column"}>
@@ -33,7 +33,6 @@ export default function TokenInfo() {
         <Box
          display={"flex"}
          flexDirection={"row"}
-         marginLeft={"3rem"}
          alignItems={"center"}
          width={"50%"}
         >
@@ -45,27 +44,29 @@ export default function TokenInfo() {
       <nav>
         <hr aria-orientation='horizontal'></hr>
       </nav>
-      <Box display={"flex"} flexDirection={"row"} padding={"0.5rem 1rem 0.5rem 1rem"} height={"107px"}>
+      <Box className={style.tokenMarktetInfo}>
         <Box display={"flex"} flexDirection={"column"} width={"50%"}>
           <p className={style.totalSupply}>Total Supply</p>
           <p className={style.tokenTotalSupply}>100,000,000,000,000,000,000,000,000,000,000,000,000</p>
           <p className={style.marketCap}>Market Cap</p>
           <p className={style.tokenMarketCap}>$365,825,830</p>
         </Box>
-        <Box display={"flex"} flexDirection={"column"} marginLeft={"3rem"} width={"20%"}>
-          <p className={style.tokenLPName}>Doge Coin/BNB (LP)</p>
-          <div style={{display:"flex", flexDirection:"row"}}>
-            <p className={style.tokenBNBAmount}>5439 BNB</p>
-            <p className={style.tokenBNBAmount} style={{color:"#00B112"}}>($75,325,830)</p>
-          </div>
-          <p className={style.tokenLPTokenHolder}>LP Token Holders</p>
-        </Box>      
-        <Box className={style.tokenContract} display={"flex"} flexDirection={"column"} marginLeft={"3rem"} width={"30%"}>
-          <p style={{marginBottom:"5px"}}>DOGE Contract</p>
-          <p style={{marginBottom:"5px"}}>DOGE Holders</p>
-          <p style={{marginBottom:"5px"}}>DOGE Transactions</p>
-          <Switch id='Show Trades'>Show Trade</Switch>
-        </Box>       
+        <Box display={"flex"} flexDirection={"row"} width={"50%"}>
+          <Box display={"flex"} flexDirection={"column"} width={"50%"}>
+            <p className={style.tokenLPName}>Doge Coin/BNB (LP)</p>
+            <div style={{display:"flex", flexDirection:"row"}}>
+              <p className={style.tokenBNBAmount}>5439 BNB</p>
+              <p className={style.tokenBNBAmount} style={{color:"#00B112"}}>($75,325,830)</p>
+            </div>
+            <p className={style.tokenLPTokenHolder}>LP Token Holders</p>
+          </Box>      
+          <Box className={style.tokenContract} display={"flex"} flexDirection={"column"} marginLeft={"3rem"} width={"50%"}>
+            <p style={{marginBottom:"5px"}}>DOGE Contract</p>
+            <p style={{marginBottom:"5px"}}>DOGE Holders</p>
+            <p style={{marginBottom:"5px"}}>DOGE Transactions</p>
+            <Switch id='Show Trades'>Show Trade</Switch>
+          </Box>       
+        </Box>
       </Box>
     </Box>
   );
