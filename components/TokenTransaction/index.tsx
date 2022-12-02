@@ -21,7 +21,7 @@ export default function TokenTransaction() {
 
   return (
     <Box className={transactionClass}>
-      <TableContainer overflowY={"auto"} height={"100%"} css={{
+      <TableContainer overflowY={"auto"} overflowX={"auto"} height={"100%"} css={{
         '&::-webkit-scrollbar': {
           width: '4px',
           height: '4px',
@@ -45,92 +45,92 @@ export default function TokenTransaction() {
             <Th>Txn</Th>
           </Tr>
         </Thead>
-        <Tbody color={"#00C414"}>
-          <Tr>
+        <Tbody>
+          <Tr color={"#00C414"}>
             <Td>Buy</Td>
             <Td>59,034,543,124,564,247</Td>
             <Td>$ 50.30 (0.2 BNB)</Td>
             <Td>Dec-01-2022 (04:35:49 PM + UTC)</Td>
             <Td>0xe2.....6f8</Td>
           </Tr>
-          <Tr>
+          <Tr color={"#00C414"}>
             <Td>Buy</Td>
             <Td>59,034,543,124,564,247</Td>
             <Td>$ 50.30 (0.2 BNB)</Td>
             <Td>Dec-01-2022 (04:35:49 PM + UTC)</Td>
             <Td>0xe2.....6f8</Td>
           </Tr>
-          <Tr>
+          <Tr color={"#00C414"}>
             <Td>Buy</Td>
             <Td>59,034,543,124,564,247</Td>
             <Td>$ 50.30 (0.2 BNB)</Td>
             <Td>Dec-01-2022 (04:35:49 PM + UTC)</Td>
             <Td>0xe2.....6f8</Td>
           </Tr>      
-          <Tr>
-            <Td>Buy</Td>
+          <Tr color={"#FF002E"}>
+            <Td>Sell</Td>
             <Td>59,034,543,124,564,247</Td>
             <Td>$ 50.30 (0.2 BNB)</Td>
             <Td>Dec-01-2022 (04:35:49 PM + UTC)</Td>
             <Td>0xe2.....6f8</Td>
           </Tr>          
-          <Tr>
+          <Tr color={"#00C414"}>
             <Td>Buy</Td>
             <Td>59,034,543,124,564,247</Td>
             <Td>$ 50.30 (0.2 BNB)</Td>
             <Td>Dec-01-2022 (04:35:49 PM + UTC)</Td>
             <Td>0xe2.....6f8</Td>
           </Tr>        
-          <Tr>
-            <Td>Buy</Td>
+          <Tr color={"#FF002E"}>
+            <Td>Sell</Td>
             <Td>59,034,543,124,564,247</Td>
             <Td>$ 50.30 (0.2 BNB)</Td>
             <Td>Dec-01-2022 (04:35:49 PM + UTC)</Td>
             <Td>0xe2.....6f8</Td>
           </Tr>        
-          <Tr>
-            <Td>Buy</Td>
+          <Tr color={"#FF002E"}>
+            <Td>Sell</Td>
             <Td>59,034,543,124,564,247</Td>
             <Td>$ 50.30 (0.2 BNB)</Td>
             <Td>Dec-01-2022 (04:35:49 PM + UTC)</Td>
             <Td>0xe2.....6f8</Td>
           </Tr>           
-          <Tr>
+          <Tr color={"#00C414"}>
             <Td>Buy</Td>
             <Td>59,034,543,124,564,247</Td>
             <Td>$ 50.30 (0.2 BNB)</Td>
             <Td>Dec-01-2022 (04:35:49 PM + UTC)</Td>
             <Td>0xe2.....6f8</Td>
           </Tr>               
-          <Tr>
+          <Tr color={"#00C414"}>
             <Td>Buy</Td>
             <Td>59,034,543,124,564,247</Td>
             <Td>$ 50.30 (0.2 BNB)</Td>
             <Td>Dec-01-2022 (04:35:49 PM + UTC)</Td>
             <Td>0xe2.....6f8</Td>
           </Tr>            
-          <Tr>
+          <Tr color={"#FF002E"}>
+            <Td>Sell</Td>
+            <Td>59,034,543,124,564,247</Td>
+            <Td>$ 50.30 (0.2 BNB)</Td>
+            <Td>Dec-01-2022 (04:35:49 PM + UTC)</Td>
+            <Td>0xe2.....6f8</Td>
+          </Tr>            
+          <Tr color={"#00C414"}>
             <Td>Buy</Td>
             <Td>59,034,543,124,564,247</Td>
             <Td>$ 50.30 (0.2 BNB)</Td>
             <Td>Dec-01-2022 (04:35:49 PM + UTC)</Td>
             <Td>0xe2.....6f8</Td>
           </Tr>            
-          <Tr>
+          <Tr color={"#00C414"}>
             <Td>Buy</Td>
             <Td>59,034,543,124,564,247</Td>
             <Td>$ 50.30 (0.2 BNB)</Td>
             <Td>Dec-01-2022 (04:35:49 PM + UTC)</Td>
             <Td>0xe2.....6f8</Td>
           </Tr>            
-          <Tr>
-            <Td>Buy</Td>
-            <Td>59,034,543,124,564,247</Td>
-            <Td>$ 50.30 (0.2 BNB)</Td>
-            <Td>Dec-01-2022 (04:35:49 PM + UTC)</Td>
-            <Td>0xe2.....6f8</Td>
-          </Tr>            
-          <Tr>
+          <Tr color={"#00C414"}>
             <Td>Buy</Td>
             <Td>59,034,543,124,564,247</Td>
             <Td>$ 50.30 (0.2 BNB)</Td>

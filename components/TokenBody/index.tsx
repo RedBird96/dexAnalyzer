@@ -12,6 +12,9 @@ export default function TokenBody() {
   return (
     <main className={style.tokenBody}>
       <TokenList/>
+      <nav>
+        <hr aria-orientation='vertical'></hr>
+      </nav>
       <Box style={{
         display: "flex", 
         flexDirection: "column", 
@@ -21,6 +24,9 @@ export default function TokenBody() {
         <TokenChart/>
         <TokenTransaction/>
       </Box>
+      <nav>
+        <hr aria-orientation='vertical'></hr>
+      </nav>
       <WalletInfo/>
     </main>
   );

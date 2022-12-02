@@ -12,21 +12,23 @@ export default function MenuBar() {
   );
   return (
     <Box className={menuClass}>
-      <div style={{
+      <Box style={{
         display: "flex", 
         justifyContent:"center", 
         height:"80px", 
         alignContent:"center",
-        cursor: "pointer"
+        cursor: "pointer",
+        flexDirection: "column"
       }}>
         <TopMenuBar/>
-      </div>
+      </Box>
       <div style={{
         display: "flex", 
         justifyContent:"center", 
         height:"80px", 
         alignContent:"center",
-        cursor: "pointer"
+        cursor: "pointer",
+        flexDirection: "column"
       }}>
         <ChartMenuBar/>
       </div>

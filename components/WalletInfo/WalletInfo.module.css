@@ -1,6 +1,6 @@
 .walletInfo {
   height: 100%;
-  width: 623px;
+  min-width: 623px;
   display: flex;
   flex-direction: column;
 }
