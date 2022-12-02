@@ -61,6 +61,7 @@
   font-weight: 300;
   font-size: 14px;
   line-height: 17px;
+  margin-right: 5px;
 }
 
 .totalSupply {
@@ -116,6 +117,7 @@
   font-size: 14px;
   line-height: 17px;  
   margin-bottom: 10px;
+  margin-right: 5px;
 }
 
 .tokenLPTokenHolder {

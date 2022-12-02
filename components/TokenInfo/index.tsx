@@ -24,7 +24,10 @@ export default function TokenInfo() {
           </Box>
           <Box display={"flex"} flexDirection={"column"}>
             <p className={style.tokenPrice}>$0.1800345029</p>
-            <p className={style.tokenBlance}>59,034,543,124 ($ 765,825)</p>            
+            <div style={{display:"flex", flexDirection:"row"}}>
+              <p className={style.tokenBlance}>59,034,543,124</p>            
+              <p className={style.tokenBlance} style={{color:"#00B112"}}>($ 765,825)</p>
+            </div>
           </Box>
         </Box>
         <Box
@@ -51,7 +54,10 @@ export default function TokenInfo() {
         </Box>
         <Box display={"flex"} flexDirection={"column"} marginLeft={"3rem"} width={"20%"}>
           <p className={style.tokenLPName}>Doge Coin/BNB (LP)</p>
-          <p className={style.tokenBNBAmount}>5439 BNB ($75,325,830)</p>
+          <div style={{display:"flex", flexDirection:"row"}}>
+            <p className={style.tokenBNBAmount}>5439 BNB</p>
+            <p className={style.tokenBNBAmount} style={{color:"#00B112"}}>($75,325,830)</p>
+          </div>
           <p className={style.tokenLPTokenHolder}>LP Token Holders</p>
         </Box>      
         <Box className={style.tokenContract} display={"flex"} flexDirection={"column"} marginLeft={"3rem"} width={"30%"}>
