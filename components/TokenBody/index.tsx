@@ -12,7 +12,11 @@ export default function TokenBody() {
   return (
     <main className={style.tokenBody}>
       <TokenList/>
-      <Box style={{display: "flex", flexDirection: "column"}}>
+      <Box style={{
+        display: "flex", 
+        flexDirection: "column", 
+        width:"100%"
+      }}>
         <TokenInfo/>
         <TokenChart/>
         <TokenTransaction/>
