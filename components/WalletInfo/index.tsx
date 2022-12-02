@@ -27,6 +27,8 @@ export default function WalletInfo() {
     style.tokenSearch + " " + style.tokenSearchDark,
   );
 
+  const tokenColor = useColorModeValue("#1C1C1C","#FFFFFF");
+
   return (
     <Box className={walletClass}>
       <Box className={titleClass}>
@@ -50,62 +52,62 @@ export default function WalletInfo() {
           <Table className={style.tableHead}>
             <Thead >
               <Tr>
-                <Th style={{width:"40%"}}>Token</Th>
-                <Th>Balance</Th>
+                <Th style={{width:"40%"}} color={"#7C7C7C"}>Token</Th>
+                <Th color={"#7C7C7C"}>Balance</Th>
               </Tr>
             </Thead>
             <Tbody className={style.tableHead}>
-              <Tr>
+            <Tr>
                 <Th>
-                  <p className={style.tokenName}>DOGE</p>
+                  <p className={style.tokenName} style={{color:tokenColor}}>DOGE</p>
                 </Th>
                 <Th>
                   <div className={style.tokenBalance}>
-                    <p style={{marginRight:"5px"}}>59,034,513,124</p>
+                    <p style={{marginRight:"5px", color:tokenColor}}>59,034,513,124</p>
                     <p style={{color:"#00C514"}}>($765,825)</p>
                   </div>
                 </Th>
               </Tr>
               <Tr>
                 <Th>
-                  <p className={style.tokenName}>DOGE</p>
+                  <p className={style.tokenName} style={{color:tokenColor}}>DOGE</p>
                 </Th>
                 <Th>
                   <div className={style.tokenBalance}>
-                    <p style={{marginRight:"5px"}}>59,034,513,124</p>
+                    <p style={{marginRight:"5px", color:tokenColor}}>59,034,513,124</p>
                     <p style={{color:"#00C514"}}>($765,825)</p>
                   </div>
                 </Th>
               </Tr>
               <Tr>
                 <Th>
-                  <p className={style.tokenName}>DOGE</p>
+                  <p className={style.tokenName} style={{color:tokenColor}}>DOGE</p>
                 </Th>
                 <Th>
                   <div className={style.tokenBalance}>
-                    <p style={{marginRight:"5px"}}>59,034,513,124</p>
+                    <p style={{marginRight:"5px", color:tokenColor}}>59,034,513,124</p>
                     <p style={{color:"#00C514"}}>($765,825)</p>
                   </div>
                 </Th>
               </Tr>
               <Tr>
                 <Th>
-                  <p className={style.tokenName}>DOGE</p>
+                  <p className={style.tokenName} style={{color:tokenColor}}>DOGE</p>
                 </Th>
                 <Th>
                   <div className={style.tokenBalance}>
-                    <p style={{marginRight:"5px"}}>59,034,513,124</p>
+                    <p style={{marginRight:"5px", color:tokenColor}}>59,034,513,124</p>
                     <p style={{color:"#00C514"}}>($765,825)</p>
                   </div>
                 </Th>
               </Tr>
               <Tr>
                 <Th>
-                  <p className={style.tokenName}>DOGE</p>
+                  <p className={style.tokenName} style={{color:tokenColor}}>DOGE</p>
                 </Th>
                 <Th>
                   <div className={style.tokenBalance}>
-                    <p style={{marginRight:"5px"}}>59,034,513,124</p>
+                    <p style={{marginRight:"5px", color:tokenColor}}>59,034,513,124</p>
                     <p style={{color:"#00C514"}}>($765,825)</p>
                   </div>
                 </Th>

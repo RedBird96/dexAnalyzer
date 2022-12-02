@@ -35,14 +35,14 @@ export default function TokenTransaction() {
           borderRadius: '24px',
         },
       }}>
-        <Table>
-        <Thead color={"#7C7C7C"}>
+        <Table variant='striped' colorScheme='gray'>
+        <Thead>
           <Tr>
-            <Th>Activity</Th>
-            <Th>Tokens</Th>
-            <Th>Amount</Th>
-            <Th>Date</Th>
-            <Th>Txn</Th>
+            <Th color={"#7C7C7C"}>Activity</Th>
+            <Th color={"#7C7C7C"}>Tokens</Th>
+            <Th color={"#7C7C7C"}>Amount</Th>
+            <Th color={"#7C7C7C"}>Date</Th>
+            <Th color={"#7C7C7C"}>Txn</Th>
           </Tr>
         </Thead>
         <Tbody>
