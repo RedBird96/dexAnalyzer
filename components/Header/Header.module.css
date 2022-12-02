@@ -1,3 +1,5 @@
+@import '../../styles/font.css';
+
 .header {
   width: 100%;
   display: flex;
@@ -17,4 +19,18 @@
 .themeMode {
   width: 30px;
   cursor: pointer;
+}
+.connectBtn {
+  margin-left: 10px;
+  border-radius: 15px;
+  color: white;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 17px;
+  
+  display: flex;
+  align-items: center;
+  text-align: center;  
 }

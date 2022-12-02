@@ -18,10 +18,8 @@ export default function Header() {
         <Moon className={style.themeMode} onClick={toggleColorMode}/>
         }
         <Button
-          marginLeft={"10px"}
+          className={style.connectBtn}
           backgroundColor={"#0085FF"}
-          borderRadius={"15px"}
-          color={"white"}
         >
           Connect Wallet        
         </Button>
