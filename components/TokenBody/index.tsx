@@ -13,7 +13,7 @@ export default function TokenBody() {
     <main className={style.tokenBody}>
       <TokenList/>
       <nav>
-        <hr aria-orientation='vertical' style={{width:"1px"}}></hr>
+        <hr aria-orientation='vertical' style={{width:"1px", color:"#313131"}}></hr>
       </nav>
       <Box style={{
         display: "flex", 
@@ -25,7 +25,7 @@ export default function TokenBody() {
         <TokenTransaction/>
       </Box>
       <nav>
-        <hr aria-orientation='vertical' style={{width:"1px"}}></hr>
+        <hr aria-orientation='vertical' style={{width:"1px", color:"#313131"}}></hr>
       </nav>
       <WalletInfo/>
     </main>

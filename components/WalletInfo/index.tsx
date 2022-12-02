@@ -32,7 +32,7 @@ export default function WalletInfo() {
   );
 
   const tokenColor = useColorModeValue("#1C1C1C","#FFFFFF");
-
+  const tableBorder = useColorModeValue(style.walletTokenDataLight,style.walletTokenDataDark);
   const address = useAddress();
   const network = useNetwork();
   
@@ -60,14 +60,14 @@ export default function WalletInfo() {
       <Box className={style.walletData}>
         <Input className = {searchClass} placeholder='Search' />  
         <Box style={{width:"80%"}}>
-          <Table className={style.tableHead}>
-            <Thead >
+          <Table className={tableBorder}>
+            <Thead>
               <Tr>
                 <Th style={{width:"40%"}} color={"#7C7C7C"}>Token</Th>
                 <Th color={"#7C7C7C"}>Balance</Th>
               </Tr>
             </Thead>
-            <Tbody className={style.tableHead}>
+            <Tbody>
             <Tr>
                 <Th>
                   <p className={style.tokenName} style={{color:tokenColor}}>DOGE</p>

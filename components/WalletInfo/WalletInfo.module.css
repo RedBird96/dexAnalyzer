@@ -92,6 +92,21 @@
   line-height: 17px;  
 }
 
-.tableHead {
-  width: 100%;
+/*
+// table.walletTokenData {
+//   th {
+//     border-color: white;
+//   }
+//   td {
+//     border-color: white;
+//   }
+// }
+*/
+
+table.walletTokenDataDark th {
+  border-color: #404040;
+}
+
+table.walletTokenDataLight th {
+  border-color: #CFCFCF;
 }

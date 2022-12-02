@@ -27,4 +27,14 @@ export const theme = extendTheme({
   //     },
   //   },
   // },
+  colors: {
+    borderColor: 'white',
+    transactionTable: {
+      100: '#F1F1F1',
+      700: '#262626',
+    },
+  },
+  borders: {
+    '2px': '2px solid gray.200'
+  }
 });
