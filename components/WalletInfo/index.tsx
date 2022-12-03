@@ -15,7 +15,7 @@ import {
   useAddress,
 } from '@thirdweb-dev/react'
 import {
-  getETHTokenFromWalletAddress
+  getContractInfoFromWalletAddress
 } from '../../api'
 import {ERC20Token} from '../../utils/type'
 import { 
@@ -93,7 +93,7 @@ export default function WalletInfo() {
     setInitTokensInfo(tempTokens);
   }
   const getTokensFromWallet = async() => {
-    const res = await getETHTokenFromWalletAddress(address!);
+    const res = await getContractInfoFromWalletAddress(address!);
     setTokensBalance(res);
   }
 

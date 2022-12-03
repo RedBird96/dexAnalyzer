@@ -5,9 +5,19 @@ import {
   FaceBook,
   Twitter
 } from "../../assests/icon"
+import {
+  useTokenInfo
+} from '../../utils/useTokenInfo'
+import { 
+  convertBalanceCurrency,
+  numberWithCommasTwoDecimals
+} from '../../utils'
 import style from './TokenInfo.module.css'
 
 export default function TokenInfo() {
+
+  const {tokenData} = useTokenInfo();
+
   const infoClass = useColorModeValue(
     style.tokenInfo + " " + style.tokenInfoLight,
     style.tokenInfo + " " + style.tokenInfoDark
@@ -17,13 +27,13 @@ export default function TokenInfo() {
     <Box className={infoClass}>
       <Box className={style.tokenSocialInfo}>
         <Box display={"flex"} flexDirection={"row"} width={"50%"} alignItems={"center"}>
-          <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/74.png" width={"60px"}/>
+          <img src={tokenData.image} width={"60px"}/>
           <Box display={"flex"} flexDirection={"column"} padding={"1rem"}>
-            <p className={style.tokenName}>Doge Coin(DOGE/BNB)</p>
+            <p className={style.tokenName}>{tokenData.name}</p>
             <p className={style.tokenBalance}>Balance:</p>
           </Box>
           <Box display={"flex"} flexDirection={"column"}>
-            <p className={style.tokenPrice}>$0.1800345029</p>
+            <p className={style.tokenPrice}>{convertBalanceCurrency(tokenData.price)}</p>
             <div style={{display:"flex", flexDirection:"row"}}>
               <p className={style.tokenBlance}>59,034,543,124</p>            
               <p className={style.tokenBlance} style={{color:"#00B112"}}>($ 765,825)</p>
@@ -47,9 +57,9 @@ export default function TokenInfo() {
       <Box className={style.tokenMarktetInfo}>
         <Box display={"flex"} flexDirection={"column"} width={"50%"}>
           <p className={style.totalSupply}>Total Supply</p>
-          <p className={style.tokenTotalSupply}>100,000,000,000,000,000,000,000,000,000,000,000,000</p>
+          <p className={style.tokenTotalSupply}>{numberWithCommasTwoDecimals(parseFloat(tokenData.totalSupply))}</p>
           <p className={style.marketCap}>Market Cap</p>
-          <p className={style.tokenMarketCap}>$365,825,830</p>
+          <p className={style.tokenMarketCap}>{convertBalanceCurrency(parseFloat(tokenData.marketCap))}</p>
         </Box>
         <Box display={"flex"} flexDirection={"row"} width={"50%"}>
           <Box display={"flex"} flexDirection={"column"} width={"50%"}>
