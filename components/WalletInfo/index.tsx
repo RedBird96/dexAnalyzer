@@ -143,7 +143,7 @@ export default function WalletInfo() {
                   if (token.price == 0)
                     return ;
                   return (
-                    <Tr>
+                    <Tr key={token.name}>
                         <Th>
                           <p className={style.tokenName} style={{color:tokenColor}}>
                             {token.symbol}
