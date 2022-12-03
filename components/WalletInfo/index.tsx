@@ -32,6 +32,8 @@ export default function WalletInfo() {
   );
 
   const tokenColor = useColorModeValue("#1C1C1C","#FFFFFF");
+  const refreshBtnBgColor = useColorModeValue("#FFFFFF","#1C1C1C");
+  const refreshBtnBorderColor = useColorModeValue("#CFCFCF","#5c5c5c");
   const tableBodyBorder = useColorModeValue(style.walletTokenBodyBorderLight,style.walletTokenBodyBorderDark);
   const tableHeadBorder = useColorModeValue(style.walletTokenHeadBorderLight,style.walletTokenHeadBorderDark);
   const address = useAddress();
@@ -50,8 +52,9 @@ export default function WalletInfo() {
         </Box>
         <Button
           border={'1px'}
-          borderColor={'blackAlpha.300'}
           borderRadius={'25px'}
+          borderColor={refreshBtnBorderColor}
+          backgroundColor={refreshBtnBgColor}
         >
           <Refresh/>
           <p style={{marginLeft:"5px"}}>Refresh</p>

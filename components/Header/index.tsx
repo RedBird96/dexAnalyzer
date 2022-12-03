@@ -30,7 +30,7 @@ export default function Header() {
   return (
     <Box className={menuClass}>
         <Box display={"flex"} flexDirection="row" alignItems={"center"}>
-        <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/74.png" width={"50px"}/>
+        <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/74.png" width={"40px"}/>
           <p style={{marginLeft:"1rem", fontSize:"1.5rem"}}>Site Title</p>
         </Box>
         <Box display={"flex"} flexDirection="row" alignItems={"center"}>
