@@ -36,7 +36,7 @@
   flex-direction: row;
   align-items: center;
   width: 100%;
-  padding:1rem 0rem 1rem 0rem;
+  padding:1rem 0rem 1rem 0.5rem;
   text-align: center;
   justify-content: space-around;
   cursor: pointer;

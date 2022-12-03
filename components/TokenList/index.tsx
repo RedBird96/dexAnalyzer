@@ -17,7 +17,7 @@ export default function TokenList() {
   return (
     <Box className={listClass}>
       <Input className = {searchClass} placeholder='Search' />
-      <Box style={{display:"flex", flexDirection:"column", width:"90%"}}>
+      <Box style={{display:"flex", flexDirection:"column", width:"100%"}}>
         <Box className= {style.tokenListInfo} _hover={{
           bg:hoverColor
         }}>
