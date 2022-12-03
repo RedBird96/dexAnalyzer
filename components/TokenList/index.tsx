@@ -1,7 +1,11 @@
 import React, { useEffect } from 'react'
 import { Box, Input, Button, useColorModeValue } from "@chakra-ui/react"
 import {
-  getTokenInfoFromWalletAddress
+  useAddress,
+} from '@thirdweb-dev/react'
+import {
+  getTokenInfoFromWalletAddress,
+  getContractInfoFromWalletAddress
 } from '../../api'
 import {
   useTokenInfo
@@ -22,11 +26,27 @@ export default function TokenList() {
   );
   const bnbColor = "#EEB500";
   const ethColor = "#";
+  const walletAddress = useAddress();
   const {setTokenData} = useTokenInfo();
 
   const setFunc1 = async () => {
     const address = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
     const res = await getTokenInfoFromWalletAddress(address);
+    let balance = 0;
+    let decimal = 0;
+    if (walletAddress != null){
+      const res1 = await getContractInfoFromWalletAddress(walletAddress!);
+      const tokenCnt = Object.keys(res1["tokens"]).length;
+      if (tokenCnt != 0) {
+        res1.tokens.forEach((value: any) => {
+          console.log('find',value.tokenInfo.address, address);
+          if (value.tokenInfo.address == address.toLowerCase()) {
+            balance = value.balance;
+            decimal = parseInt(value.tokenInfo.decimals);
+          }
+        });
+      }
+    }
     let token:ERC20Token;
     token={
       name: res.symbol,
@@ -35,6 +55,8 @@ export default function TokenList() {
       marketCap: res.price.marketCapUsd,
       totalSupply: res.totalSupply,
       holdersCount: res.holdersCount,
+      balance: balance,
+      decimals: decimal,
       image:"https://s2.coinmarketcap.com/static/img/coins/64x64/825.png"
     } as ERC20Token;
     setTokenData(token);
@@ -43,6 +65,20 @@ export default function TokenList() {
   const setFunc2 = async () => {
     const address = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
     const res = await getTokenInfoFromWalletAddress(address);
+    let balance = 0;
+    let decimal = 0;
+    if (walletAddress != null){
+      const res1 = await getContractInfoFromWalletAddress(walletAddress!);
+      const tokenCnt = Object.keys(res1["tokens"]).length;
+      if (tokenCnt != 0) {
+        res1.tokens.forEach((value: any) => {
+          if (value.tokenInfo.address == address.toLowerCase()) {
+            balance = value.balance;
+            decimal = parseInt(value.tokenInfo.decimals);
+          }
+        });
+      }
+    }
     let token:ERC20Token;
     token={
       name: res.symbol,
@@ -51,6 +87,8 @@ export default function TokenList() {
       marketCap: res.price.marketCapUsd,
       totalSupply: res.totalSupply,
       holdersCount: res.holdersCount,
+      balance: balance,
+      decimals: decimal,
       image:"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png"
     } as ERC20Token;
     setTokenData(token);
@@ -59,6 +97,20 @@ export default function TokenList() {
   const setFunc3 = async () => {
     const address = "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599";
     const res = await getTokenInfoFromWalletAddress(address);
+    let balance = 0;
+    let decimal = 0;
+    if (walletAddress != null){
+      const res1 = await getContractInfoFromWalletAddress(walletAddress!);
+      const tokenCnt = Object.keys(res1["tokens"]).length;
+      if (tokenCnt != 0) {
+        res1.tokens.forEach((value: any) => {
+          if (value.tokenInfo.address == address.toLowerCase()) {
+            balance = value.balance;
+            decimal = parseInt(value.tokenInfo.decimals);
+          }
+        });
+      }
+    }
     let token:ERC20Token;
     token={
       name: res.symbol,
@@ -67,6 +119,8 @@ export default function TokenList() {
       marketCap: res.price.marketCapUsd,
       totalSupply: res.totalSupply,
       holdersCount: res.holdersCount,
+      balance: balance,
+      decimals: decimal,
       image:"https://s2.coinmarketcap.com/static/img/coins/64x64/3717.png"
     } as ERC20Token;
     setTokenData(token);
@@ -75,6 +129,20 @@ export default function TokenList() {
   const setFunc4 = async () => {
     const address = "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984";
     const res = await getTokenInfoFromWalletAddress(address);
+    let balance = 0;
+    let decimal = 0;
+    if (walletAddress != null){
+      const res1 = await getContractInfoFromWalletAddress(walletAddress!);
+      const tokenCnt = Object.keys(res1["tokens"]).length;
+      if (tokenCnt != 0) {
+        res1.tokens.forEach((value: any) => {
+          if (value.tokenInfo.address == address.toLowerCase()) {
+            balance = value.balance;
+            decimal = parseInt(value.tokenInfo.decimals);
+          }
+        });
+      }
+    }
     let token:ERC20Token;
     token={
       name: res.symbol,
@@ -83,6 +151,8 @@ export default function TokenList() {
       marketCap: res.price.marketCapUsd,
       totalSupply: res.totalSupply,
       holdersCount: res.holdersCount,
+      balance: balance,
+      decimals: decimal,
       image:"https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png"
     } as ERC20Token;
     setTokenData(token);

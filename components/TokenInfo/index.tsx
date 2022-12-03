@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import { Box, Switch, useColorModeValue  } from "@chakra-ui/react"
 import {
   WebSite,
@@ -17,12 +17,26 @@ import style from './TokenInfo.module.css'
 export default function TokenInfo() {
 
   const {tokenData} = useTokenInfo();
+  const [balance, setBalance] = useState<number>(0);
+  const [balanceUSD, setBalanceUSD] = useState<number>(0);
 
   const infoClass = useColorModeValue(
     style.tokenInfo + " " + style.tokenInfoLight,
     style.tokenInfo + " " + style.tokenInfoDark
   );
 
+  useEffect(() => {
+    let balance_temp = 0;
+    let balanceUSD_temp = 0;
+    if (tokenData.decimals != 0 && tokenData.balance != 0) {
+      balance_temp = tokenData.balance! / Math.pow(10, tokenData.decimals);
+      balanceUSD_temp = balance_temp * tokenData.price;
+    }
+    setBalance(balance_temp);
+    setBalanceUSD(balanceUSD_temp);
+  }, [tokenData])
+  console.log('tokenData', tokenData);
+  
   return (
     <Box className={infoClass}>
       <Box className={style.tokenSocialInfo}>
@@ -35,8 +49,8 @@ export default function TokenInfo() {
           <Box display={"flex"} flexDirection={"column"}>
             <p className={style.tokenPrice}>{convertBalanceCurrency(tokenData.price)}</p>
             <div style={{display:"flex", flexDirection:"row"}}>
-              <p className={style.tokenBlance}>59,034,543,124</p>            
-              <p className={style.tokenBlance} style={{color:"#00B112"}}>($ 765,825)</p>
+              <p className={style.tokenBlance}>{numberWithCommasTwoDecimals((balance))}</p>            
+              <p className={style.tokenBlance} style={{color:"#00B112"}}>({convertBalanceCurrency(balanceUSD)})</p>
             </div>
           </Box>
         </Box>
