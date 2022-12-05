@@ -18,6 +18,7 @@ export default function TokenTransaction() {
     style.tokenTransaction + " " + style.tokenTransactionLight,
     style.tokenTransaction + " " + style.tokenTransactionDark
   );
+  const headerColor = useColorModeValue("#FFFFFF", "1C1C1C");
 
   return (
     <Box className={transactionClass}>
@@ -36,7 +37,7 @@ export default function TokenTransaction() {
         },
       }}>
         <Table variant='striped' colorScheme='transactionTable'>
-        <Thead position="sticky" top={0} zIndex="docked" backgroundColor={"#1C1C1C"}>
+        <Thead position="sticky" top={0} zIndex="docked" backgroundColor={headerColor}>
           <Tr>
             <Th color={"#7C7C7C"}>Activity</Th>
             <Th color={"#7C7C7C"}>Tokens</Th>

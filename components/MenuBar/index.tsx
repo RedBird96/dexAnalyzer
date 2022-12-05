@@ -10,6 +10,7 @@ export default function MenuBar() {
     style.menuBar + " " + style.menuBarLight,
     style.menuBar + " " + style.menuBarDark
   );
+  const chartSelectColor = useColorModeValue("#0067C6", "#2F2F2F");
   return (
     <Box className={menuClass}>
       <Box style={{
@@ -30,7 +31,7 @@ export default function MenuBar() {
         height:"5rem", 
         alignContent:"center",
         cursor: "pointer",
-        backgroundColor:"#2F2F2F",
+        backgroundColor:chartSelectColor,
         flexDirection: "column",
         width:"100%",
         alignItems:"center"
