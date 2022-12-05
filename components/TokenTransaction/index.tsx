@@ -36,7 +36,7 @@ export default function TokenTransaction() {
         },
       }}>
         <Table variant='striped' colorScheme='transactionTable'>
-        <Thead>
+        <Thead position="sticky" top={0} zIndex="docked" backgroundColor={"#1C1C1C"}>
           <Tr>
             <Th color={"#7C7C7C"}>Activity</Th>
             <Th color={"#7C7C7C"}>Tokens</Th>

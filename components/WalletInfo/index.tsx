@@ -109,7 +109,6 @@ export default function WalletInfo() {
         } as ERC20Token)
       });
     }
-    console.log('usdBalance', usdBalance);
     setTokensInfo(tempTokens);
     setInitTokensInfo(tempTokens);
     setWalletBalance(usdBalance);
