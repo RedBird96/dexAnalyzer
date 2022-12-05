@@ -18,7 +18,7 @@ export default function TokenTransaction() {
     style.tokenTransaction + " " + style.tokenTransactionLight,
     style.tokenTransaction + " " + style.tokenTransactionDark
   );
-  const headerColor = useColorModeValue("#FFFFFF", "1C1C1C");
+  const headerColor = useColorModeValue("#FFFFFF", "#1C1C1C");
 
   return (
     <Box className={transactionClass}>
