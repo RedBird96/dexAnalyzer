@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Box, Input, Button, useColorModeValue } from "@chakra-ui/react"
 import {
   useAddress,
@@ -28,6 +28,10 @@ export default function TokenList() {
   const ethColor = "#";
   const walletAddress = useAddress();
   const {setTokenData} = useTokenInfo();
+  const [selectUSDT, setSelectUSDT] = useState<Boolean>(true);
+  const [selectUSDC, setSelectUSDC] = useState<Boolean>(false);
+  const [selectWBTC, setSelectWBTC] = useState<Boolean>(false);
+  const [selectUNI, setSelectUNI] = useState<Boolean>(false);
 
   const setFunc1 = async () => {
     const address = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
@@ -60,6 +64,10 @@ export default function TokenList() {
       image:"https://s2.coinmarketcap.com/static/img/coins/64x64/825.png"
     } as ERC20Token;
     setTokenData(token);
+    setSelectUSDT(true);
+    setSelectUNI(false);
+    setSelectUSDC(false);
+    setSelectWBTC(false);
   }
 
   const setFunc2 = async () => {
@@ -92,6 +100,10 @@ export default function TokenList() {
       image:"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png"
     } as ERC20Token;
     setTokenData(token);
+    setSelectUSDT(false);
+    setSelectUNI(false);
+    setSelectUSDC(true);
+    setSelectWBTC(false);
   }
 
   const setFunc3 = async () => {
@@ -124,6 +136,10 @@ export default function TokenList() {
       image:"https://s2.coinmarketcap.com/static/img/coins/64x64/3717.png"
     } as ERC20Token;
     setTokenData(token);
+    setSelectUSDT(false);
+    setSelectUNI(false);
+    setSelectUSDC(false);
+    setSelectWBTC(true);
   }
 
   const setFunc4 = async () => {
@@ -156,6 +172,10 @@ export default function TokenList() {
       image:"https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png"
     } as ERC20Token;
     setTokenData(token);
+    setSelectUSDT(false);
+    setSelectUNI(true);
+    setSelectUSDC(false);
+    setSelectWBTC(false);
   }
 
   return (
@@ -165,6 +185,7 @@ export default function TokenList() {
         <Box className= {style.tokenListInfo} 
           _hover={{bg:hoverColor}}
           onClick={setFunc1}
+          backgroundColor={selectUSDT ? hoverColor:"#transparent"}
         >
           <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/825.png" width={"50rem"}/>
           <Box display={"flex"} flexDirection={"column"} textAlign={"start"}>
@@ -182,6 +203,7 @@ export default function TokenList() {
         <Box className= {style.tokenListInfo} 
           _hover={{bg:hoverColor}}
           onClick={setFunc2}
+          backgroundColor={selectUSDC ? hoverColor:"#transparent"}
         >
           <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png" width={"50rem"}/>
           <Box display={"flex"} flexDirection={"column"} textAlign={"start"}>
@@ -199,6 +221,7 @@ export default function TokenList() {
         <Box className= {style.tokenListInfo} 
           _hover={{bg:hoverColor}}
           onClick={setFunc3}
+          backgroundColor={selectWBTC ? hoverColor:"#transparent"}
         >
           <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3717.png" width={"50rem"}/>
           <Box display={"flex"} flexDirection={"column"} textAlign={"start"}>
@@ -216,6 +239,7 @@ export default function TokenList() {
         <Box className= {style.tokenListInfo} 
           _hover={{bg:hoverColor}}
           onClick={setFunc4}
+          backgroundColor={selectUNI ? hoverColor:"#transparent"}
         >
           <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png" width={"50rem"}/>
           <Box display={"flex"} flexDirection={"column"} textAlign={"start"}>
