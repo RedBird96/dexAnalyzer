@@ -101,6 +101,7 @@ export default function WalletInfo() {
           price: tokenPrice,
           balance: tokenBalance,
           usdBalance: tokenUSDBalance,
+          decimals: decimal,
           holdersCount: value.tokenInfo.holdersCount,
           image: value.tokenInfo.image,
           owner: value.tokenInfo.owner,
@@ -173,7 +174,7 @@ export default function WalletInfo() {
             <Tbody className={tableBodyBorder}>
               {
                 tokensInfo?.map((token) => {
-                  if (token.price == 0)
+                  if (Number.isNaN(token.decimals))
                     return ;
                   return (
                     <Tr key={token.name}>
