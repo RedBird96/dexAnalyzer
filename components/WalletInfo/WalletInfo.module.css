@@ -2,7 +2,7 @@
 
 .walletInfo {
   height: 100%;
-  min-width: 623px;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -17,8 +17,8 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
-  padding: 20px 60px 20px 60px;
+  justify-content: center;
+  width:100%;
   height:80px;
 }
 .walletTitleDark {
@@ -44,7 +44,6 @@
 .tokenSearch {
   width: 80% !important;
   margin-top: 1rem;
-  margin-bottom: 1rem;
   border-radius: 2rem !important;
 }
 .tokenSearchDark {
@@ -60,8 +59,8 @@
   font-family: 'Inter';
   font-style: normal;
   font-weight: 500;
-  font-size: 16px;
-  line-height: 19px;
+  font-size: calc(0.3rem + 0.6vw);
+  line-height: 1rem;
   margin-right: 20px;
 }
 
@@ -69,8 +68,8 @@
   font-family: 'Inter';
   font-style: normal;
   font-weight: 400;
-  font-size: 16px;
-  line-height: 19px;
+  font-size: calc(0.3rem + 0.6vw);
+  line-height: 1rem;
   color: #00C514;
 }
 
@@ -78,8 +77,8 @@
   font-family: 'Inter';
   font-style: normal;
   font-weight: 400;
-  font-size: 14px;
-  line-height: 17px;
+  font-size: calc(0.2rem + 0.5vw);
+  line-height: 1rem;
 }
 
 .tokenBalance {
@@ -87,9 +86,13 @@
   flex-direction: row;
   font-family: 'Inter';
   font-style: normal;
-  font-weight: 300;
-  font-size: 14px;
-  line-height: 17px;  
+  font-weight: 200;
+  font-size: calc(0.2rem + 0.5vw);
+  line-height: 1rem;  
+}
+
+.refreshBtn {
+  font-size: calc(0.2rem + 0.5vw);
 }
 
 /*

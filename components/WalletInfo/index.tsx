@@ -8,7 +8,8 @@ import {
   Tr,
   Th,
   Tbody,
-  useColorModeValue
+  useColorModeValue,
+  calc
 } from "@chakra-ui/react"
 import {
   useNetwork,
@@ -106,20 +107,27 @@ export default function WalletInfo() {
   return (
     <Box className={walletClass}>
       <Box className={titleClass}>
-        <Box className={style.walletBalance}>
-          <p className={style.myWallet}> My Wallet: </p>
-          <p className={style.myBalance}> {convertBalanceCurrency(walletBalance)} </p>
+        <Box style={{
+          display:"flex", 
+          width:"80%", 
+          flexDirection:"row", 
+          justifyContent:"space-between"
+        }}>
+          <Box className={style.walletBalance}>
+            <p className={style.myWallet}> My Wallet: </p>
+            <p className={style.myBalance}> {convertBalanceCurrency(walletBalance)} </p>
+          </Box>
+          <Button
+            border={'1px'}
+            borderRadius={'2rem'}
+            borderColor={refreshBtnBorderColor}
+            backgroundColor={refreshBtnBgColor}
+            onClick={getTokensFromWallet}
+          >
+            <Refresh/>
+            <p style={{marginLeft:"5px"}}>Refresh</p>
+          </Button>
         </Box>
-        <Button
-          border={'1px'}
-          borderRadius={'25px'}
-          borderColor={refreshBtnBorderColor}
-          backgroundColor={refreshBtnBgColor}
-          onClick={getTokensFromWallet}
-        >
-          <Refresh/>
-          <p style={{marginLeft:"5px"}}>Refresh</p>
-        </Button>
       </Box>
       <nav><hr aria-orientation='horizontal'></hr></nav>
       <Box className={style.walletData}>

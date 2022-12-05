@@ -15,20 +15,25 @@ export default function MenuBar() {
       <Box style={{
         display: "flex", 
         justifyContent:"center", 
-        height:"80px", 
+        height:"5rem", 
         alignContent:"center",
         cursor: "pointer",
-        flexDirection: "column"
+        flexDirection: "column",
+        width:"100%",
+        alignItems:"center"
       }}>
-        <TopMenuBar/>
+        <TopMenuBar className={"text-1x"}/>
       </Box>
       <div style={{
         display: "flex", 
         justifyContent:"center", 
-        height:"80px", 
+        height:"5rem", 
         alignContent:"center",
         cursor: "pointer",
-        flexDirection: "column"
+        backgroundColor:"#2F2F2F",
+        flexDirection: "column",
+        width:"100%",
+        alignItems:"center"
       }}>
         <ChartMenuBar/>
       </div>

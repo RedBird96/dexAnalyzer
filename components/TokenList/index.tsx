@@ -166,10 +166,10 @@ export default function TokenList() {
           _hover={{bg:hoverColor}}
           onClick={setFunc1}
         >
-          <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/825.png" width={"55px"}/>
+          <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/825.png" width={"50rem"}/>
           <Box display={"flex"} flexDirection={"column"} textAlign={"start"}>
             <p className={style.tokenName}>USDT</p>
-            <p className={style.tokenAddress} style={{fontSize:10}}>0xdAC17F958D2ee523a2206206994597C13D831ec7</p>
+            <p className={style.tokenAddress}>0xdAC17F958D2ee523a2206206994597C13D831ec7</p>
           </Box>
           <Button
             style={{border:"0.5px", borderRadius: "25px", width:"100px", height:"24px"}}
@@ -183,10 +183,10 @@ export default function TokenList() {
           _hover={{bg:hoverColor}}
           onClick={setFunc2}
         >
-          <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png" width={"55px"}/>
+          <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png" width={"50rem"}/>
           <Box display={"flex"} flexDirection={"column"} textAlign={"start"}>
             <p className={style.tokenName} >USDC</p>
-            <p className={style.tokenAddress} style={{fontSize:10}}>0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48</p>
+            <p className={style.tokenAddress}>0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48</p>
           </Box>
           <Button
             style={{border:"0.5px", borderRadius: "25px", width:"100px", height:"24px"}}
@@ -200,10 +200,10 @@ export default function TokenList() {
           _hover={{bg:hoverColor}}
           onClick={setFunc3}
         >
-          <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3717.png" width={"55px"}/>
+          <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3717.png" width={"50rem"}/>
           <Box display={"flex"} flexDirection={"column"} textAlign={"start"}>
             <p className={style.tokenName} >WBTC</p>
-            <p className={style.tokenAddress} style={{fontSize:10}}>0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599</p>
+            <p className={style.tokenAddress}>0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599</p>
           </Box>
           <Button
             style={{border:"0.5px", borderRadius: "25px", width:"100px", height:"24px"}}
@@ -217,10 +217,10 @@ export default function TokenList() {
           _hover={{bg:hoverColor}}
           onClick={setFunc4}
         >
-          <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png" width={"55px"}/>
+          <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png" width={"50rem"}/>
           <Box display={"flex"} flexDirection={"column"} textAlign={"start"}>
             <p className={style.tokenName} >UNI</p>
-            <p className={style.tokenAddress} style={{fontSize:10}}>0x1f9840a85d5af5bf1d1762f925bdaddc4201f984</p>
+            <p className={style.tokenAddress}>0x1f9840a85d5af5bf1d1762f925bdaddc4201f984</p>
           </Box>
           <Button
             style={{border:"0.5px", borderRadius: "25px", width:"100px", height:"24px"}}

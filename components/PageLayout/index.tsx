@@ -2,7 +2,6 @@ import dynamic from 'next/dynamic'
 import style from './PageLayout.module.css'
 import React from "react"
 import Header from "../Header"
-import MenuBar from "../MenuBar"
 import TokenBody from "../TokenBody"
 import { Box, useColorMode } from "@chakra-ui/react"
 
@@ -14,7 +13,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <Header/>
       <nav><hr aria-orientation='horizontal'/></nav>
       <Box className={colorMode == "light" ? style.mainBodylight : style.mainBodyblack} >
-        <MenuBar/>
         <TokenBody/>
       </Box> 
     </Box>

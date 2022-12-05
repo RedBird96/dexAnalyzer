@@ -1,7 +1,7 @@
 @import '../../styles/font.css';
 
 .tokenTransaction {
-  height: 422px;
+  height: 26rem;
   display: flex;
   flex-direction: column;
 }
@@ -11,4 +11,8 @@
 }
 .tokenTransactionDark{
   background-color: #1C1C1C;
+}
+.tbody{
+  font-size: calc(0.3rem + 0.5vw);
+  line-height: calc(0.1rem + 0.5vw); 
 }

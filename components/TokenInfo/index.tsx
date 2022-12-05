@@ -35,13 +35,12 @@ export default function TokenInfo() {
     setBalance(balance_temp);
     setBalanceUSD(balanceUSD_temp);
   }, [tokenData])
-  console.log('tokenData', tokenData);
   
   return (
     <Box className={infoClass}>
       <Box className={style.tokenSocialInfo}>
-        <Box display={"flex"} flexDirection={"row"} width={"50%"} alignItems={"center"}>
-          <img src={tokenData.image} width={"60px"}/>
+        <Box display={"flex"} flexDirection={"row"} width={"40%"} alignItems={"center"}>
+          <img src={tokenData.image} width={"50rem"}/>
           <Box display={"flex"} flexDirection={"column"} padding={"1rem"}>
             <p className={style.tokenName}>{tokenData.name}</p>
             <p className={style.tokenBalance}>Balance:</p>
@@ -58,7 +57,7 @@ export default function TokenInfo() {
          display={"flex"}
          flexDirection={"row"}
          alignItems={"center"}
-         width={"50%"}
+         width={"60%"}
         >
           <WebSite className={style.socialUrl}/>
           <FaceBook className={style.socialUrl}/>
@@ -69,13 +68,13 @@ export default function TokenInfo() {
         <hr aria-orientation='horizontal'></hr>
       </nav>
       <Box className={style.tokenMarktetInfo}>
-        <Box display={"flex"} flexDirection={"column"} width={"50%"}>
+        <Box display={"flex"} flexDirection={"column"} width={"40%"}>
           <p className={style.totalSupply}>Total Supply</p>
           <p className={style.tokenTotalSupply}>{numberWithCommasTwoDecimals(parseFloat(tokenData.totalSupply))}</p>
           <p className={style.marketCap}>Market Cap</p>
           <p className={style.tokenMarketCap}>{convertBalanceCurrency(parseFloat(tokenData.marketCap))}</p>
         </Box>
-        <Box display={"flex"} flexDirection={"row"} width={"50%"}>
+        <Box display={"flex"} flexDirection={"row"} width={"60%"}>
           <Box display={"flex"} flexDirection={"column"} width={"50%"}>
             <p className={style.tokenLPName}>Doge Coin/BNB (LP)</p>
             <div style={{display:"flex", flexDirection:"row"}}>
@@ -84,7 +83,13 @@ export default function TokenInfo() {
             </div>
             <p className={style.tokenLPTokenHolder}>LP Token Holders</p>
           </Box>      
-          <Box className={style.tokenContract} display={"flex"} flexDirection={"column"} marginLeft={"3rem"} width={"50%"}>
+          <Box 
+            className={style.tokenContract} 
+            display={"flex"} 
+            flexDirection={"column"} 
+            marginLeft={"3rem"} 
+            width={"50%"}
+          >
             <p style={{marginBottom:"5px"}}>DOGE Contract</p>
             <p style={{marginBottom:"5px"}}>DOGE Holders</p>
             <p style={{marginBottom:"5px"}}>DOGE Transactions</p>
