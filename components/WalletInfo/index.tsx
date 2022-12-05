@@ -67,21 +67,40 @@ export default function WalletInfo() {
     let tempTokens: ERC20Token[] = [];
     const ethBalance = text.ETH.balance;
     const ethPrice = text.ETH.price.rate;
-    const usdBalance = ethBalance * ethPrice;
-    setWalletBalance(usdBalance);
+    const usdETHBalance = ethBalance * ethPrice;
+    let usdBalance = 0;
+    tempTokens.push({
+      name:network[0].data.chain?.id == 1 ? "ETH" : "BNB",
+      symbol: network[0].data.chain?.id == 1 ? "ETH" : "BNB",
+      contractAddress: address,
+      price: ethPrice,
+      balance: ethBalance,
+      usdBalance: usdETHBalance,
+      holdersCount: 0,
+      image: "",
+      owner: address,
+      totalSupply: "",
+      marketCap: ""
+    } as ERC20Token)
+
+    usdBalance += usdETHBalance;
     const tokenCnt = Object.keys(text["tokens"]).length;
     if (tokenCnt != 0) {
       text.tokens.forEach((value: any) => {
         const tokenPrice = value.tokenInfo.price == false ? 0 : value.tokenInfo.price.rate;
         const decimal = parseInt(value.tokenInfo.decimals);
         const tokenBalance = decimal != 0 ? value.balance / Math.pow(10, decimal) : 0;
+        const tokenUSDBalance = tokenBalance * tokenPrice;
+        if (tokenPrice != 0){
+          usdBalance += tokenUSDBalance;
+        }
         tempTokens.push({
           name:value.tokenInfo.name,
           symbol: value.tokenInfo.symbol,
           contractAddress: value.tokenInfo.address,
           price: tokenPrice,
           balance: tokenBalance,
-          usdBalance: tokenBalance * tokenPrice,
+          usdBalance: tokenUSDBalance,
           holdersCount: value.tokenInfo.holdersCount,
           image: value.tokenInfo.image,
           owner: value.tokenInfo.owner,
@@ -90,19 +109,26 @@ export default function WalletInfo() {
         } as ERC20Token)
       });
     }
+    console.log('usdBalance', usdBalance);
     setTokensInfo(tempTokens);
     setInitTokensInfo(tempTokens);
+    setWalletBalance(usdBalance);
   }
   const getTokensFromWallet = async() => {
+    if (network[0].data.chain?.id == 1) {
     const res = await getContractInfoFromWalletAddress(address!);
     setTokensBalance(res);
+    }
   }
 
   useEffect(() => {
     if (address) {
       getTokensFromWallet();
+      setInitTokensInfo([]);
+      setTokensInfo([]);
+      setWalletBalance(0);
     }
-  }, [address]);
+  }, [address, network[0].data.chain?.id]);
 
   return (
     <Box className={walletClass}>
