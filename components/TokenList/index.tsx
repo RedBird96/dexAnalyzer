@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, KeyboardEvent } from 'react'
-import { Box, Input, Button, useColorModeValue } from "@chakra-ui/react"
+import { Box, Input, Button, useColorModeValue, useColorMode } from "@chakra-ui/react"
 import {
   useAddress,
 } from '@thirdweb-dev/react'
@@ -17,11 +17,14 @@ import {
   BNBIcon, 
   ETHIcon,
   PinIcon,
-  UnPinIcon
+  UnPinIcon,
+  PinLightIcon,
+  UnPinLightIcon
 } from '../../assests/icon';
 import style from './TokenList.module.css'
 
 export default function TokenList() {
+  const colorMode = useColorMode();
   const listClass = useColorModeValue(
     style.tokenList + " " + style.tokenListLight,
     style.tokenList + " " + style.tokenListDark
@@ -244,7 +247,9 @@ export default function TokenList() {
           </Box>
           <Box style={{display:"flex", flexDirection:"row", alignItems:"center", width:"3rem", justifyContent:"space-between"}}>
             <BNBIcon/>
-            <UnPinIcon/>
+            {
+              colorMode.colorMode == "light" ? <UnPinLightIcon/> : <UnPinIcon/>
+            }            
           </Box>
         </Box>
         <Box className= {style.tokenListInfo} 
@@ -261,7 +266,9 @@ export default function TokenList() {
           </Box>
           <Box style={{display:"flex", flexDirection:"row", alignItems:"center", width:"3rem", justifyContent:"space-between"}}>
             <ETHIcon/>
-            <UnPinIcon/>
+            {
+              colorMode.colorMode == "light" ? <UnPinLightIcon/> : <UnPinIcon/>
+            }     
           </Box>
         </Box> 
         <Box className= {style.tokenListInfo} 
@@ -278,7 +285,9 @@ export default function TokenList() {
           </Box>
           <Box style={{display:"flex", flexDirection:"row", alignItems:"center", width:"3rem", justifyContent:"space-between"}}>
             <ETHIcon/>
-            <UnPinIcon/>
+            {
+              colorMode.colorMode == "light" ? <UnPinLightIcon/> : <UnPinIcon/>
+            }     
           </Box>
         </Box> 
         <Box className= {style.tokenListInfo} 
@@ -295,7 +304,9 @@ export default function TokenList() {
           </Box>
           <Box style={{display:"flex", flexDirection:"row", alignItems:"center", width:"3rem", justifyContent:"space-between"}}>
             <ETHIcon/>
-            <UnPinIcon/>
+            {
+              colorMode.colorMode == "light" ? <UnPinLightIcon/> : <UnPinIcon/>
+            }     
           </Box>
         </Box> 
       </Box>

@@ -26,6 +26,8 @@ export default function TokenInfo() {
     style.tokenInfo + " " + style.tokenInfoDark
   );
 
+  const infoborderColorMode = useColorModeValue("#E2E8F0","#2B2A2A");
+
   useEffect(() => {
     let balance_temp = 0;
     let balanceUSD_temp = 0;
@@ -69,7 +71,7 @@ export default function TokenInfo() {
             <FaceBook className={style.socialUrl}/>
             <Twitter className={style.socialUrl}/>
           </Box>
-          <div className={style.border}/>
+          <div className={style.border} style={{borderColor:infoborderColorMode}}/>
           <Box
             display={"flex"}
             flexDirection={"column"}         
@@ -88,7 +90,7 @@ export default function TokenInfo() {
             <p className={style.marketCap}>Market Cap</p>
             <p className={style.tokenMarketCap}>{convertBalanceCurrency(parseFloat(tokenData.marketCap))}</p>
           </Box>
-          <div className={style.border}/>
+          <div className={style.border} style={{borderColor:infoborderColorMode}}/>
           <Box display={"flex"} flexDirection={"column"} >
             <p className={style.marketCap}>UNI / BNB (LP)</p>
             <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
@@ -97,7 +99,7 @@ export default function TokenInfo() {
             </Box>
           </Box>
         </Box>
-        <div className={style.border}/>
+        <div className={style.border} style={{borderColor:infoborderColorMode}}/>
         <Box display={"flex"} flexDirection={"row"} width={"50%"} alignItems={"center"}>
           <Box display={"flex"} flexDirection={"column"} width={"50%"}>
               <p className={style.marketCap}>Balance</p>
@@ -106,7 +108,7 @@ export default function TokenInfo() {
                 <p className={style.tokenMarketCap}>({convertBalanceCurrency(tokenData.balance! * tokenData.price)})</p>
               </Box>
             </Box>
-            <div className={style.border}/> 
+            <div className={style.border} style={{borderColor:infoborderColorMode}}/> 
             <Box display={"flex"} flexDirection={"row"} width={"50%"}>
               <Box display={"flex"} flexDirection={"column"} width={"50%"}>
                 <p className={style.marketCap}>Holders</p>
@@ -140,7 +142,7 @@ export default function TokenInfo() {
         <div style={{
           height:"90%",
           borderWidth:"1px",
-          borderColor:"#2B2A2A",
+          borderColor:{infoborderColorMode},
           marginRight:"1rem"
         }}/>
         <Box
