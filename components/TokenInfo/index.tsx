@@ -142,7 +142,7 @@ export default function TokenInfo() {
         <div style={{
           height:"90%",
           borderWidth:"1px",
-          borderColor:{infoborderColorMode},
+          borderColor:infoborderColorMode,
           marginRight:"1rem"
         }}/>
         <Box
