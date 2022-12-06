@@ -22,12 +22,12 @@ export async function getContractInfoFromWalletAddress(address:string) {
   let text: string;
   const response = await fetch(url);
   if (response.status != 200) {
-    throw new Error(`failed to read response text: ${response.status}`);
+    return "No results found";
   }
   try {
     text = await response.text();
   } catch (err:any) {
-    throw new Error(`failed to read response text: ${err.message}`);
+    return "No results found";
   }
   return JSON.parse(text);
 
@@ -45,12 +45,12 @@ export async function getTokenInfoFromWalletAddress(address:string) {
   let text: string;
   const response = await fetch(url);
   if (response.status != 200) {
-    throw new Error(`failed to read response text: ${response.status}`);
+    return "No results found";
   }
   try {
     text = await response.text();
   } catch (err:any) {
-    throw new Error(`failed to read response text: ${err.message}`);
+    return "No results found";
   }
   return JSON.parse(text);
 

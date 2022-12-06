@@ -27,7 +27,7 @@ export default function TokenInfo() {
   );
 
   const infoborderColorMode = useColorModeValue("#E2E8F0","#2B2A2A");
-
+  const whiteBlackMode = useColorModeValue('#FFFFFF', '#000000');
   useEffect(() => {
     let balance_temp = 0;
     let balanceUSD_temp = 0;
@@ -96,7 +96,7 @@ export default function TokenInfo() {
           <Box display={"flex"} flexDirection={"column"} width={"30%"} >
             <p className={style.marketCap}>UNI / BNB (LP)</p>
             <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
-              <p className={style.itemvalue} style={{marginRight:"1rem"}}>{numberWithCommasTwoDecimals(parseFloat(tokenData.marketCap))}</p>
+              <p className={style.itemvalue} color={whiteBlackMode} style={{marginRight:"1rem"}}>{numberWithCommasTwoDecimals(parseFloat(tokenData.marketCap))}</p>
               <p className={style.tokenMarketCap}>({convertBalanceCurrency(tokenData.balance! * tokenData.price)})</p>
             </Box>
           </Box>
@@ -104,7 +104,7 @@ export default function TokenInfo() {
           <Box display={"flex"} flexDirection={"column"} width={"40%"}>
               <p className={style.marketCap}>Balance</p>
               <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
-                <p className={style.itemvalue} style={{marginRight:"1rem"}}>{numberWithCommasTwoDecimals(tokenData.balance)}</p>
+                <p className={style.itemvalue} color={whiteBlackMode} style={{marginRight:"1rem"}}>{numberWithCommasTwoDecimals(tokenData.balance)}</p>
                 <p className={style.tokenMarketCap}>({convertBalanceCurrency(tokenData.balance! * tokenData.price)})</p>
               </Box>
           </Box>          
@@ -114,11 +114,11 @@ export default function TokenInfo() {
           <Box display={"flex"} flexDirection={"row"} width={"100%"}>
             <Box display={"flex"} flexDirection={"column"} width={"50%"}>
               <p className={style.marketCap}>Holders</p>
-              <p className={style.itemvalue}>{tokenData.holdersCount}</p>
+              <p className={style.itemvalue} color={whiteBlackMode}>{tokenData.holdersCount}</p>
             </Box>
             <Box>
               <p className={style.marketCap}>Transactions</p>
-              <p className={style.itemvalue}>{tokenData.holdersCount}</p>
+              <p className={style.itemvalue} color={whiteBlackMode}>{tokenData.holdersCount}</p>
             </Box>              
           </Box>        
         </Box>
@@ -153,10 +153,10 @@ export default function TokenInfo() {
           alignItems={"center"}   
           width={"25%"}
         >
-          <Box className={style.itemvalue} width={"50%"}>
+          <Box className={style.itemvalue} color={whiteBlackMode} width={"50%"}>
             <p>Buy 5%</p>
           </Box>
-          <Box className={style.itemvalue} width={"50%"}>
+          <Box className={style.itemvalue} color={whiteBlackMode} width={"50%"}>
             <p>Sell 5%</p>
           </Box>
         </Box>

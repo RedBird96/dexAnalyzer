@@ -161,7 +161,6 @@
   font-family: 'Inter';
   font-style: normal;
   font-size: calc(0.1rem + 0.5vw);
-  color:#FFFFFF;
   display: flex;
   flex-direction: row;
 }

@@ -49,9 +49,10 @@ export default function TokenList() {
     const findString = e.target.value.toLowerCase();
     setSearchQuery(findString);
     if (findString[0] == "0" && findString[1] == "x" && findString.length >= 42) {
-      const res1 = await getTokenInfoFromTokenName(findString);
-      // const res = await getTokenInfoFromWalletAddress(findString!);
-      // console.log('res', res);  
+      
+      //const res1 = await getTokenInfoFromTokenName(findString);
+      const res = await getTokenInfoFromWalletAddress(findString);
+      console.log('res', res);  
       // let token:ERC20Token;
       // token={
       //   name: res.symbol,
@@ -70,9 +71,11 @@ export default function TokenList() {
   };
   
   const handleEnter = useCallback(
-    (e: KeyboardEvent<HTMLInputElement>) => {
+    async (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
-
+        const s = debouncedQuery.toLowerCase().trim();
+        const res = await getTokenInfoFromWalletAddress(s);
+        console.log('res', res);  
       }
   }, [debouncedQuery])
 
@@ -226,6 +229,7 @@ export default function TokenList() {
         <Input 
           placeholder='Search'
           onChange={handleSearchChange} 
+          onKeyDown={handleEnter}
           fontSize='0.8rem'
           borderRadius={'2rem'}
           height='2rem'
