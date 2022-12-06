@@ -42,36 +42,38 @@ export default function TokenInfo() {
   return (
     <Box className={infoClass}>
       <Box className={style.tokenSocialInfo}>
-        <Box display={"flex"} flexDirection={"row"} width={"50%"} alignItems={"center"}>
-          <img src={tokenData.image} width={"40rem"}/>
-          <Box display={"flex"} flexDirection={"column"} paddingLeft={"1rem"}>
-            <Box display={"flex"} flexDirection={"row"}>
-              <p className={style.tokenName}>{tokenData.name}</p>
-              <p className={style.tokenPrice}>{convertBalanceCurrency(tokenData.price)}</p>
+        <Box display={"flex"} flexDirection={"row"} width={"75%"} alignItems={"center"}>
+          <Box display={"flex"} flexDirection={"row"} width={"60%"} alignItems={"center"}>
+            <img src={tokenData.image} width={"40rem"}/>
+            <Box display={"flex"} flexDirection={"column"} paddingLeft={"1rem"}>
+              <Box display={"flex"} flexDirection={"row"}>
+                <p className={style.tokenName}>{tokenData.name}</p>
+                <p className={style.tokenPrice}>{convertBalanceCurrency(tokenData.price)}</p>
+              </Box>
+              <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
+                <p className={style.tokenAddress}>{tokenData.contractAddress}</p>
+                <CopyAddressIcon cursor={"pointer"}/>
+              </Box>            
             </Box>
-            <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
-              <p className={style.tokenAddress}>{tokenData.contractAddress}</p>
-              <CopyAddressIcon cursor={"pointer"}/>
-            </Box>            
           </Box>
-        </Box>
-        <Box
-         display={"flex"}
-         flexDirection={"row"}
-         alignItems={"center"}
-         width={"50%"}
-        >
           <Box
             display={"flex"}
             flexDirection={"row"}
             alignItems={"center"}
-            width={"50%"}       
+            paddingLeft={"1rem"}
           >
             <WebSite className={style.socialUrl}/>
             <FaceBook className={style.socialUrl}/>
             <Twitter className={style.socialUrl}/>
           </Box>
-          <div className={style.border} style={{borderColor:infoborderColorMode}}/>
+        </Box>
+        <div className={style.border} style={{borderColor:infoborderColorMode}}/>
+        <Box
+         display={"flex"}
+         flexDirection={"row"}
+         alignItems={"center"}
+         width={"25%"}
+        >
           <Box
             display={"flex"}
             flexDirection={"column"}         
@@ -85,40 +87,40 @@ export default function TokenInfo() {
         <hr aria-orientation='horizontal'></hr>
       </nav>
       <Box className={style.tokenMarktetInfo} alignItems={"center"}>
-        <Box display={"flex"} flexDirection={"row"} width={"50%"} alignItems={"center"}>
-          <Box display={"flex"} flexDirection={"column"} width={"50%"} paddingLeft={"3.5rem"}>
+        <Box display={"flex"} flexDirection={"row"} width={"75%"} alignItems={"center"}>
+          <Box display={"flex"} flexDirection={"column"} width={"30%"} paddingLeft={"3.5rem"}>
             <p className={style.marketCap}>Market Cap</p>
             <p className={style.tokenMarketCap}>{convertBalanceCurrency(parseFloat(tokenData.marketCap))}</p>
           </Box>
           <div className={style.border} style={{borderColor:infoborderColorMode}}/>
-          <Box display={"flex"} flexDirection={"column"} >
+          <Box display={"flex"} flexDirection={"column"} width={"30%"} >
             <p className={style.marketCap}>UNI / BNB (LP)</p>
             <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
               <p className={style.itemvalue} style={{marginRight:"1rem"}}>{numberWithCommasTwoDecimals(parseFloat(tokenData.marketCap))}</p>
               <p className={style.tokenMarketCap}>({convertBalanceCurrency(tokenData.balance! * tokenData.price)})</p>
             </Box>
           </Box>
-        </Box>
-        <div className={style.border} style={{borderColor:infoborderColorMode}}/>
-        <Box display={"flex"} flexDirection={"row"} width={"50%"} alignItems={"center"}>
-          <Box display={"flex"} flexDirection={"column"} width={"50%"}>
+          <div className={style.border} style={{borderColor:infoborderColorMode}}/>
+          <Box display={"flex"} flexDirection={"column"} width={"40%"}>
               <p className={style.marketCap}>Balance</p>
               <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
                 <p className={style.itemvalue} style={{marginRight:"1rem"}}>{numberWithCommasTwoDecimals(tokenData.balance)}</p>
                 <p className={style.tokenMarketCap}>({convertBalanceCurrency(tokenData.balance! * tokenData.price)})</p>
               </Box>
+          </Box>          
+        </Box>
+        <div className={style.border} style={{borderColor:infoborderColorMode}}/>
+        <Box display={"flex"} flexDirection={"row"} width={"25%"} alignItems={"center"}>
+          <Box display={"flex"} flexDirection={"row"} width={"100%"}>
+            <Box display={"flex"} flexDirection={"column"} width={"50%"}>
+              <p className={style.marketCap}>Holders</p>
+              <p className={style.itemvalue}>{tokenData.holdersCount}</p>
             </Box>
-            <div className={style.border} style={{borderColor:infoborderColorMode}}/> 
-            <Box display={"flex"} flexDirection={"row"} width={"50%"}>
-              <Box display={"flex"} flexDirection={"column"} width={"50%"}>
-                <p className={style.marketCap}>Holders</p>
-                <p className={style.itemvalue}>{tokenData.holdersCount}</p>
-              </Box>
-              <Box>
-                <p className={style.marketCap}>Transactions</p>
-                <p className={style.itemvalue}>{tokenData.holdersCount}</p>
-              </Box>              
-            </Box>        
+            <Box>
+              <p className={style.marketCap}>Transactions</p>
+              <p className={style.itemvalue}>{tokenData.holdersCount}</p>
+            </Box>              
+          </Box>        
         </Box>
       </Box>
       <nav>
@@ -127,12 +129,12 @@ export default function TokenInfo() {
       <Box 
         display={"flex"}
         flexDirection={"row"}
-        padding={"0.5rem"}
+        padding={"0.5rem 0rem 0.5rem 1rem"}
         width={"100%"}
       >
         <Box
           display={"flex"}
-          width={"78%"}
+          width={"75%"}
           alignItems={"center"}
           justifyContent={"right"}
           paddingRight={"1rem"}
@@ -149,7 +151,7 @@ export default function TokenInfo() {
           display={"flex"}
           flexDirection={"row"}
           alignItems={"center"}   
-          width={"22%"}
+          width={"25%"}
         >
           <Box className={style.itemvalue} width={"50%"}>
             <p>Buy 5%</p>
