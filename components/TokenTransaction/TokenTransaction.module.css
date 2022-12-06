@@ -16,3 +16,11 @@
   font-size: calc(0.3rem + 0.5vw);
   line-height: calc(0.1rem + 0.5vw); 
 }
+
+@media only screen and (max-height: 900px) {
+  .tokenTransaction {
+    height: 15rem;
+    display: flex;
+    flex-direction: column;    
+  }
+}

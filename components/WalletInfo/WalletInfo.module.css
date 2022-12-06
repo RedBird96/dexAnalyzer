@@ -19,7 +19,7 @@
   align-items: center;
   justify-content: center;
   width:100%;
-  height:80px;
+  height:4rem;
 }
 .walletTitleDark {
   background-color: #121212;
@@ -59,7 +59,7 @@
   font-family: 'Inter';
   font-style: normal;
   font-weight: 500;
-  font-size: calc(0.3rem + 0.6vw);
+  font-size: calc(0.2rem + 0.6vw);
   line-height: 1rem;
   margin-right: 20px;
 }

@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import {
   getTokenInfoFromWalletAddress
 } from '../api'
-import { ERC20Token } from './type'
+import { ERC20Token } from '../utils/type'
 
 interface TokenInfoInterface {
   tokenData: ERC20Token;

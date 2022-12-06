@@ -3,11 +3,12 @@ import { Box, Switch, useColorModeValue  } from "@chakra-ui/react"
 import {
   WebSite,
   FaceBook,
-  Twitter
+  Twitter,
+  CopyAddressIcon
 } from "../../assests/icon"
 import {
   useTokenInfo
-} from '../../utils/useTokenInfo'
+} from '../../hooks/useTokenInfo'
 import { 
   convertBalanceCurrency,
   numberWithCommasTwoDecimals
@@ -39,62 +40,121 @@ export default function TokenInfo() {
   return (
     <Box className={infoClass}>
       <Box className={style.tokenSocialInfo}>
-        <Box display={"flex"} flexDirection={"row"} width={"40%"} alignItems={"center"}>
-          <img src={tokenData.image} width={"50rem"}/>
-          <Box display={"flex"} flexDirection={"column"} padding={"1rem"}>
-            <p className={style.tokenName}>{tokenData.name}</p>
-            <p className={style.tokenBalance}>Balance:</p>
-          </Box>
-          <Box display={"flex"} flexDirection={"column"}>
-            <p className={style.tokenPrice}>{convertBalanceCurrency(tokenData.price)}</p>
-            <div style={{display:"flex", flexDirection:"row"}}>
-              <p className={style.tokenBlance}>{numberWithCommasTwoDecimals((balance))}</p>            
-              <p className={style.tokenBlance} style={{color:"#00B112"}}>({convertBalanceCurrency(balanceUSD)})</p>
-            </div>
+        <Box display={"flex"} flexDirection={"row"} width={"50%"} alignItems={"center"}>
+          <img src={tokenData.image} width={"40rem"}/>
+          <Box display={"flex"} flexDirection={"column"} paddingLeft={"1rem"}>
+            <Box display={"flex"} flexDirection={"row"}>
+              <p className={style.tokenName}>{tokenData.name}</p>
+              <p className={style.tokenPrice}>{convertBalanceCurrency(tokenData.price)}</p>
+            </Box>
+            <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
+              <p className={style.tokenAddress}>{tokenData.contractAddress}</p>
+              <CopyAddressIcon cursor={"pointer"}/>
+            </Box>            
           </Box>
         </Box>
         <Box
          display={"flex"}
          flexDirection={"row"}
          alignItems={"center"}
-         width={"60%"}
+         width={"50%"}
         >
-          <WebSite className={style.socialUrl}/>
-          <FaceBook className={style.socialUrl}/>
-          <Twitter className={style.socialUrl}/>
+          <Box
+            display={"flex"}
+            flexDirection={"row"}
+            alignItems={"center"}
+            width={"50%"}       
+          >
+            <WebSite className={style.socialUrl}/>
+            <FaceBook className={style.socialUrl}/>
+            <Twitter className={style.socialUrl}/>
+          </Box>
+          <div className={style.border}/>
+          <Box
+            display={"flex"}
+            flexDirection={"column"}         
+          >
+            <p className={style.totalSupply}>Total Supply</p>
+            <p className={style.tokenTotalSupply}>{numberWithCommasTwoDecimals(parseFloat(tokenData.totalSupply))}</p>
+          </Box>
         </Box>
       </Box>
       <nav>
         <hr aria-orientation='horizontal'></hr>
       </nav>
-      <Box className={style.tokenMarktetInfo}>
-        <Box display={"flex"} flexDirection={"column"} width={"40%"}>
-          <p className={style.totalSupply}>Total Supply</p>
-          <p className={style.tokenTotalSupply}>{numberWithCommasTwoDecimals(parseFloat(tokenData.totalSupply))}</p>
-          <p className={style.marketCap}>Market Cap</p>
-          <p className={style.tokenMarketCap}>{convertBalanceCurrency(parseFloat(tokenData.marketCap))}</p>
+      <Box className={style.tokenMarktetInfo} alignItems={"center"}>
+        <Box display={"flex"} flexDirection={"row"} width={"50%"} alignItems={"center"}>
+          <Box display={"flex"} flexDirection={"column"} width={"50%"} paddingLeft={"3.5rem"}>
+            <p className={style.marketCap}>Market Cap</p>
+            <p className={style.tokenMarketCap}>{convertBalanceCurrency(parseFloat(tokenData.marketCap))}</p>
+          </Box>
+          <div className={style.border}/>
+          <Box display={"flex"} flexDirection={"column"} >
+            <p className={style.marketCap}>UNI / BNB (LP)</p>
+            <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
+              <p className={style.itemvalue} style={{marginRight:"1rem"}}>{numberWithCommasTwoDecimals(parseFloat(tokenData.marketCap))}</p>
+              <p className={style.tokenMarketCap}>({convertBalanceCurrency(tokenData.balance! * tokenData.price)})</p>
+            </Box>
+          </Box>
         </Box>
-        <Box display={"flex"} flexDirection={"row"} width={"60%"}>
+        <div className={style.border}/>
+        <Box display={"flex"} flexDirection={"row"} width={"50%"} alignItems={"center"}>
           <Box display={"flex"} flexDirection={"column"} width={"50%"}>
-            <p className={style.tokenLPName}>Doge Coin/BNB (LP)</p>
-            <div style={{display:"flex", flexDirection:"row"}}>
-              <p className={style.tokenBNBAmount}>5439 BNB</p>
-              <p className={style.tokenBNBAmount} style={{color:"#00B112"}}>($75,325,830)</p>
-            </div>
-            <p className={style.tokenLPTokenHolder}>LP Token Holders</p>
-          </Box>      
-          <Box 
-            className={style.tokenContract} 
-            display={"flex"} 
-            flexDirection={"column"} 
-            marginLeft={"3rem"} 
-            width={"50%"}
-          >
-            <p style={{marginBottom:"5px"}}>DOGE Contract</p>
-            <p style={{marginBottom:"5px"}}>DOGE Holders</p>
-            <p style={{marginBottom:"5px"}}>DOGE Transactions</p>
-            <Switch id='Show Trades'>Show Trade</Switch>
-          </Box>       
+              <p className={style.marketCap}>Balance</p>
+              <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
+                <p className={style.itemvalue} style={{marginRight:"1rem"}}>{numberWithCommasTwoDecimals(tokenData.balance)}</p>
+                <p className={style.tokenMarketCap}>({convertBalanceCurrency(tokenData.balance! * tokenData.price)})</p>
+              </Box>
+            </Box>
+            <div className={style.border}/> 
+            <Box display={"flex"} flexDirection={"row"} width={"50%"}>
+              <Box display={"flex"} flexDirection={"column"} width={"50%"}>
+                <p className={style.marketCap}>Holders</p>
+                <p className={style.itemvalue}>{tokenData.holdersCount}</p>
+              </Box>
+              <Box>
+                <p className={style.marketCap}>Transactions</p>
+                <p className={style.itemvalue}>{tokenData.holdersCount}</p>
+              </Box>              
+            </Box>        
+        </Box>
+      </Box>
+      <nav>
+        <hr aria-orientation='horizontal'></hr>
+      </nav>
+      <Box 
+        display={"flex"}
+        flexDirection={"row"}
+        padding={"0.5rem"}
+        width={"100%"}
+      >
+        <Box
+          display={"flex"}
+          width={"78%"}
+          alignItems={"center"}
+          justifyContent={"right"}
+          paddingRight={"1rem"}
+        >
+          <Switch className={style.switch}>Show Trade</Switch>
+        </Box>
+        <div style={{
+          height:"90%",
+          borderWidth:"1px",
+          borderColor:"#2B2A2A",
+          marginRight:"1rem"
+        }}/>
+        <Box
+          display={"flex"}
+          flexDirection={"row"}
+          alignItems={"center"}   
+          width={"22%"}
+        >
+          <Box className={style.itemvalue} width={"50%"}>
+            <p>Buy 5%</p>
+          </Box>
+          <Box className={style.itemvalue} width={"50%"}>
+            <p>Sell 5%</p>
+          </Box>
         </Box>
       </Box>
     </Box>

@@ -16,7 +16,7 @@ export default function MenuBar() {
       <Box style={{
         display: "flex", 
         justifyContent:"center", 
-        height:"5rem", 
+        height:"4rem", 
         alignContent:"center",
         cursor: "pointer",
         flexDirection: "column",
@@ -28,7 +28,7 @@ export default function MenuBar() {
       <div style={{
         display: "flex", 
         justifyContent:"center", 
-        height:"5rem", 
+        height:"4rem", 
         alignContent:"center",
         cursor: "pointer",
         backgroundColor:chartSelectColor,

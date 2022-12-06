@@ -36,5 +36,9 @@ export const theme = extendTheme({
   },
   borders: {
     '2px': '2px solid gray.200'
+  },
+  sizes: {
+    4: '0.6rem',
+    10: '2rem',
   }
 });

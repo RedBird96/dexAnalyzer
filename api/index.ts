@@ -1,4 +1,5 @@
 import EtherscanClient, {Action} from './ethers/etherscan-client';
+import { CoinGeckoClient } from './CoinGeckoClient';
 import fetch from 'cross-fetch';
 
 const ETH_MAINNET_API_URL = 'https://api.etherscan.io/api';
@@ -55,3 +56,12 @@ export async function getTokenInfoFromWalletAddress(address:string) {
 
 }
 
+export async function getTokenInfoFromTokenName(name: string) {
+  const client = new CoinGeckoClient();
+  // const list = await client.coinList({ include_platform: true });
+  const list = await client.coinMarket({
+    vs_currency: "usd",
+    ids: "bitcoin",
+  }); 
+  console.log('list', list);
+}

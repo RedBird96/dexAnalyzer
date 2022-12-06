@@ -15,10 +15,9 @@
 }
 .tokenSearch {
   width: 90% !important;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  height: 40px;
-  border-radius: 2rem !important;
+  display:flex;
+  align-items: center;
+  height: 4rem;
 }
 .tokenSearchDark {
   background-color: #424242 !important;
@@ -31,13 +30,13 @@
 
 .tokenListInfo {
   display: flex;
-  max-height: 5rem;
+  max-height: 4rem;
   flex-direction: row;
   align-items: center;
   width: 100%;
-  padding:1rem 0rem 1rem 0.5rem;
+  padding:1rem;
   text-align: center;
-  justify-content: space-around;
+  justify-content: space-between;
   cursor: pointer;
 }
 /* .tokenListInfo:hover {
@@ -47,15 +46,10 @@
   font-family: 'Inter';
   font-style: normal;
   font-weight: 500;
-  font-size: calc(0.3rem + 0.5vw);
-  line-height: calc(0.5rem + 0.5vw);
-  margin-bottom: 5px;
+  font-size: calc(0.2rem + 0.5vw);
 }
 .tokenAddress {
   font-family: 'Inter';
   font-style: normal;
-  font-weight: 400;
-  font-size: calc(0.1rem + 0.3vw);
-  line-height: calc(0.1rem + 0.3vw);
-
+  font-size: calc(0.2rem + 0.3vw);
 }

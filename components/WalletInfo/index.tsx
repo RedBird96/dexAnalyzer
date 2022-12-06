@@ -25,6 +25,7 @@ import {
 } from '../../utils'
 import {Refresh} from '../../assests/icon'
 import style from './WalletInfo.module.css'
+import { fontFamily } from '@thirdweb-dev/react/dist/declarations/src/evm/components/theme'
 
 export default function WalletInfo() {
   const titleClass = useColorModeValue(
@@ -40,6 +41,7 @@ export default function WalletInfo() {
     style.tokenSearch + " " + style.tokenSearchDark,
   );
 
+  const selectBtnColor = useColorModeValue("#0070D7","#1C1C1C");
   const tokenColor = useColorModeValue("#1C1C1C","#FFFFFF");
   const refreshBtnBgColor = useColorModeValue("#FFFFFF","#1C1C1C");
   const refreshBtnBorderColor = useColorModeValue("#CFCFCF","#5c5c5c");
@@ -151,11 +153,48 @@ export default function WalletInfo() {
             onClick={getTokensFromWallet}
           >
             <Refresh/>
-            <p style={{marginLeft:"5px"}}>Refresh</p>
+            <p style={{marginLeft:"5px", fontSize:"0.8rem"}}>Refresh</p>
           </Button>
         </Box>
       </Box>
       <nav><hr aria-orientation='horizontal'></hr></nav>
+      <Box style={{
+          display:"flex", 
+          flexDirection:"row", 
+          alignItems:"center",
+          justifyContent:"center"
+        }}
+      >
+        <Button
+          style={{
+            marginTop:"1rem",
+            fontSize:"0.8rem",
+            fontFamily:"Inter"
+          }}
+          _hover={{
+            backgroundColor:"transparent"
+          }}
+          width={"40%"}
+          borderRadius={"2rem 0rem 0rem 2rem"}
+          backgroundColor={selectBtnColor}
+        >
+          TRADE
+        </Button>
+        <Button
+          style={{
+            marginTop:"1rem",
+            fontSize:"0.8rem",
+            fontFamily:"Inter"
+          }}
+          _hover={{
+            backgroundColor:"transparent"
+          }}
+          width={"40%"}
+          borderRadius={"0rem 2rem 2rem 0rem"}
+        >
+          WALLET
+        </Button>
+      </Box>
       <Box className={style.walletData}>
         <Input 
           className = {searchClass} 

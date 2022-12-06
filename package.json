@@ -20,6 +20,7 @@
     "@types/react-dom": "18.0.9",
     "@zeit/next-css": "^1.0.1",
     "@zeit/next-less": "^1.0.1",
+    "coinmarketcap-api": "^3.1.1",
     "cross-fetch": "^3.1.5",
     "eslint": "8.28.0",
     "eslint-config-next": "13.0.5",
