@@ -153,11 +153,11 @@ export default function TokenInfo() {
           alignItems={"center"}   
           width={"25%"}
         >
-          <Box className={style.itemvalue} color={whiteBlackMode} width={"50%"}>
-            <p>Buy 5%</p>
+          <Box className={style.itemvalue} width={"50%"}>
+            <p color={whiteBlackMode}>Buy 5%</p>
           </Box>
-          <Box className={style.itemvalue} color={whiteBlackMode} width={"50%"}>
-            <p>Sell 5%</p>
+          <Box className={style.itemvalue} width={"50%"}>
+            <p color={whiteBlackMode}>Sell 5%</p>
           </Box>
         </Box>
       </Box>
