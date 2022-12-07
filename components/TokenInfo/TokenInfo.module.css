@@ -18,12 +18,12 @@
   flex-direction: row;
   padding-left: 1rem;
   align-items: center;
-  height:4rem;
+  height:5rem;
 }
 
 .tokenMarktetInfo {
   width: 100%;
-  height: 4rem;
+  height: 5rem;
   display: flex;
   flex-direction: row;
   padding:0.5rem 0rem 0.5rem 1rem;
@@ -145,7 +145,7 @@
 }
 
 .border {
-  height: 2.5rem;
+  height: 70%;
   border-width: 1px;
   margin-right: 1rem;
 }

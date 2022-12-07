@@ -133,6 +133,7 @@ export default function TokenInfo() {
         flexDirection={"row"}
         padding={"0.5rem 0rem 0.5rem 1rem"}
         width={"100%"}
+        height={"2.5rem"}
       >
         <Box
           display={"flex"}
