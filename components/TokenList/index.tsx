@@ -244,6 +244,7 @@ export default function TokenList() {
           onKeyDown={handleEnter}
           fontSize='0.8rem'
           borderRadius={'2rem'}
+          height='2.5rem'
           className={searchClass}
         />
       </Box>
@@ -256,7 +257,7 @@ export default function TokenList() {
         >
           <Box display={"flex"} flexDirection={"row"} alignItems={"center"} width={"90%"} justifyContent={"space-between"}>
             <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
-              <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/825.png" width={"40rem"} />
+              <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/825.png" width={"50rem"} />
               <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
                 <p className={style.tokenName}>USDT</p>
                 <p className={style.tokenAddress}>0xdAC17F9......7C13D831ec7</p>
@@ -278,7 +279,7 @@ export default function TokenList() {
         >
           <Box display={"flex"} flexDirection={"row"} alignItems={"center"} width={"90%"} justifyContent={"space-between"}>
             <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
-              <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png" width={"40rem"}/>
+              <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png" width={"50rem"}/>
               <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
                 <p className={style.tokenName} >USDC</p>
                 <p className={style.tokenAddress}>0xdAC17F9......7C13D831ec7</p>
@@ -300,7 +301,7 @@ export default function TokenList() {
         >
           <Box display={"flex"} flexDirection={"row"} alignItems={"center"} width={"90%"} justifyContent={"space-between"}>
             <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
-              <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3717.png" width={"40rem"}/>
+              <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3717.png" width={"50rem"}/>
               <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
                 <p className={style.tokenName} >WBTC</p>
                 <p className={style.tokenAddress}>0xdAC17F9......7C13D831ec7</p>
@@ -322,7 +323,7 @@ export default function TokenList() {
         >
           <Box display={"flex"} flexDirection={"row"} alignItems={"center"} width={"90%"} justifyContent={"space-between"}>
             <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
-              <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png" width={"40rem"}/>
+              <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png" width={"50rem"}/>
               <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
                 <p className={style.tokenName} >UNI</p>
                 <p className={style.tokenAddress}>0xdAC17F9......7C13D831ec7</p>

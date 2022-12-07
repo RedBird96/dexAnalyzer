@@ -41,7 +41,8 @@ export default function WalletInfo() {
     style.tokenSearch + " " + style.tokenSearchDark,
   );
 
-  const selectBtnColor = useColorModeValue("#0070D7","#1C1C1C");
+  const selectBtnColor = useColorModeValue("#0070D7","#494949");
+  const notSelectBtnColor = useColorModeValue("#E0E0E0","#1C1C1C");
   const tokenColor = useColorModeValue("#1C1C1C","#FFFFFF");
   const refreshBtnBgColor = useColorModeValue("#FFFFFF","#1C1C1C");
   const refreshBtnBorderColor = useColorModeValue("#CFCFCF","#5c5c5c");
@@ -137,7 +138,7 @@ export default function WalletInfo() {
       <Box className={titleClass}>
         <Box style={{
           display:"flex", 
-          width:"80%", 
+          width:"78%", 
           flexDirection:"row", 
           justifyContent:"space-between"
         }}>
@@ -168,31 +169,35 @@ export default function WalletInfo() {
         <Button
           style={{
             marginTop:"1rem",
-            fontSize:"0.7rem",
+            fontSize:"1rem",
             fontFamily:"Inter",
             fontWeight:"500"
           }}
           _hover={{
             backgroundColor:"transparent"
           }}
-          width={"40%"}
+          width={"39%"}
           borderRadius={"0.7rem 0rem 0rem 0.7rem"}
-          backgroundColor={selectBtnColor}
+          height={"2.8rem"}
+          backgroundColor={notSelectBtnColor}
         >
           TRADE
         </Button>
         <Button
           style={{
             marginTop:"1rem",
-            fontSize:"0.7rem",
+            fontSize:"1rem",
             fontFamily:"Inter",
             fontWeight:"500"
           }}
           _hover={{
             backgroundColor:"transparent"
           }}
-          width={"40%"}
+          width={"39%"}
+          height={"2.8rem"}
           borderRadius={"0rem 0.7rem 0.7rem 0rem"}
+          backgroundColor={selectBtnColor}
+          color={"#FFFFFF"}
         >
           WALLET
         </Button>
@@ -204,8 +209,9 @@ export default function WalletInfo() {
           fontSize='0.8rem'
           onChange={handleSearchChange}
           value={searchContext}
+          height='2.5rem'
         />  
-        <Box style={{width:"80%"}}>
+        <Box style={{width:"78%"}}>
           <Table>
             <Thead className={tableHeadBorder}>
               <Tr>

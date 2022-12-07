@@ -39,13 +39,13 @@ export const theme = extendTheme({
   },
   sizes: {
     4: '0.6rem',
-    10: '1.9rem',
+    10: '2.2rem',
   },
   fontSizes: {
-    sm: '0.8rem',
-    xs: '0.6rem'
+    sm: '0.9rem',
+    xs: '0.8rem'
   },
   lineHeights: {
-    4: '1.2rem',
+    4: '1.5rem',
   }
 });

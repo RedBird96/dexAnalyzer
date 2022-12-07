@@ -23,17 +23,18 @@ export default function TokenChart() {
         style={{
         display:"flex",
         alignItems:"center", 
-        marginTop:"1rem", 
         justifyContent:"center",
         }}
-        position={"absolute"}
         width={"100%"}
         cursor={"row-resize"}
         bottom={"0rem"}
-        height={"0.5rem"}
+        height={"1rem"}
         backgroundColor={headerColor}
         //onMouseMove={}
       >
+        <nav>
+          <hr aria-orientation='horizontal' style={{width:"100%", height:"1px", color:"#313131"}}></hr>
+        </nav>
         <ResizerLight/>
       </Box>
     </Box>

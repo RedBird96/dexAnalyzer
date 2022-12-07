@@ -26,7 +26,7 @@ export default function TokenBody() {
       <Box style={{
         display: "flex", 
         flexDirection: "column", 
-        width: "56.4%"
+        width: "56.5%"
       }}>
         <TokenInfo/>
         <TokenChart/>
