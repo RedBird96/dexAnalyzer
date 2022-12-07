@@ -39,11 +39,11 @@ export default function TokenTransaction() {
         <Table variant='striped' colorScheme='transactionTable' size={"sm"}>
         <Thead position="sticky" top={0} zIndex="docked" backgroundColor={headerColor}>
           <Tr>
-            <Th color={"#7C7C7C"}>Activity</Th>
-            <Th color={"#7C7C7C"}>Tokens</Th>
-            <Th color={"#7C7C7C"}>Amount</Th>
-            <Th color={"#7C7C7C"}>Date</Th>
-            <Th color={"#7C7C7C"}>Txn</Th>
+            <Th color={"#7C7C7C"} width={"5%"} textTransform={"initial"}>Activity</Th>
+            <Th color={"#7C7C7C"} width={"30%"} textTransform={"initial"}>Tokens</Th>
+            <Th color={"#7C7C7C"} width={"40%"} textTransform={"initial"}>Amount</Th>
+            <Th color={"#7C7C7C"} width={"20%"} textTransform={"initial"}>Date</Th>
+            <Th color={"#7C7C7C"} width={"5%"} textTransform={"initial"}>Txn</Th>
           </Tr>
         </Thead>
         <Tbody className={style.tbody}>

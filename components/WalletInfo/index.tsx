@@ -168,14 +168,15 @@ export default function WalletInfo() {
         <Button
           style={{
             marginTop:"1rem",
-            fontSize:"0.8rem",
-            fontFamily:"Inter"
+            fontSize:"0.7rem",
+            fontFamily:"Inter",
+            fontWeight:"500"
           }}
           _hover={{
             backgroundColor:"transparent"
           }}
           width={"40%"}
-          borderRadius={"2rem 0rem 0rem 2rem"}
+          borderRadius={"0.7rem 0rem 0rem 0.7rem"}
           backgroundColor={selectBtnColor}
         >
           TRADE
@@ -183,14 +184,15 @@ export default function WalletInfo() {
         <Button
           style={{
             marginTop:"1rem",
-            fontSize:"0.8rem",
-            fontFamily:"Inter"
+            fontSize:"0.7rem",
+            fontFamily:"Inter",
+            fontWeight:"500"
           }}
           _hover={{
             backgroundColor:"transparent"
           }}
           width={"40%"}
-          borderRadius={"0rem 2rem 2rem 0rem"}
+          borderRadius={"0rem 0.7rem 0.7rem 0rem"}
         >
           WALLET
         </Button>
@@ -199,6 +201,7 @@ export default function WalletInfo() {
         <Input 
           className = {searchClass} 
           placeholder='Search' 
+          fontSize='0.8rem'
           onChange={handleSearchChange}
           value={searchContext}
         />  
@@ -206,8 +209,8 @@ export default function WalletInfo() {
           <Table>
             <Thead className={tableHeadBorder}>
               <Tr>
-                <Th style={{width:"40%"}} color={"#7C7C7C"}>Token</Th>
-                <Th color={"#7C7C7C"}>Balance</Th>
+                <Th style={{width:"40%", paddingBottom:"0rem", paddingLeft:"0rem"}} textTransform={"initial"} color={"#7C7C7C"}>Token</Th>
+                <Th style={{paddingBottom:"0rem", paddingLeft:"0rem"}} textTransform={"initial"} color={"#7C7C7C"}>Balance</Th>
               </Tr>
             </Thead>
             <Tbody className={tableBodyBorder}>
@@ -217,12 +220,12 @@ export default function WalletInfo() {
                     return ;
                   return (
                     <Tr key={token.name}>
-                        <Th>
+                        <Th style={{paddingLeft:"0rem"}}>
                           <p className={style.tokenName} style={{color:tokenColor}}>
                             {token.symbol}
                           </p>
                         </Th>
-                        <Th>
+                        <Th style={{paddingLeft:"0rem"}}>
                           <div className={style.tokenBalance}>
                             <p style={{marginRight:"5px", color:tokenColor}}>
                               {numberWithCommasTwoDecimals(token.balance)}

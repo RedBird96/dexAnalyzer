@@ -1,7 +1,7 @@
 @import '../../styles/font.css';
 
 .tokenTransaction {
-  height: 26rem;
+  height: 12rem;
   display: flex;
   flex-direction: column;
 }
@@ -19,7 +19,6 @@
 
 @media only screen and (max-height: 900px) {
   .tokenTransaction {
-    height: 15rem;
     display: flex;
     flex-direction: column;    
   }

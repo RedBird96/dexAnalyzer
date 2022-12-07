@@ -244,7 +244,6 @@ export default function TokenList() {
           onKeyDown={handleEnter}
           fontSize='0.8rem'
           borderRadius={'2rem'}
-          height='2rem'
           className={searchClass}
         />
       </Box>

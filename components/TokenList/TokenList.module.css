@@ -2,7 +2,7 @@
 
 .tokenList {
   height: 100%;
-  width: 83.4%;
+  width:81.5%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -11,13 +11,13 @@
   background-color: #FBFBFB;
 }
 .tokenListDark {
-  background-color: #232323;
+  background-color: #262626;
 }
 .tokenSearch {
   width: 90% !important;
   display:flex;
   align-items: center;
-  height: 4rem;
+  height: 3.5rem;
 }
 .tokenSearchDark {
   background-color: #424242 !important;
@@ -30,7 +30,7 @@
 
 .tokenListInfo {
   display: flex;
-  height: 4rem;
+  height: 3.6rem;
   flex-direction: row;
   align-items: center;
   width: 100%;

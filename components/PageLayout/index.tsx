@@ -9,7 +9,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const { colorMode } = useColorMode()
 
   return (
-    <Box >
+    <Box display="flex" flexDirection="column" height="100vh">
       <Header/>
       <nav><hr aria-orientation='horizontal'/></nav>
       <Box className={colorMode == "light" ? style.mainBodylight : style.mainBodyblack} >

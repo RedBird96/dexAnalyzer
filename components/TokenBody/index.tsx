@@ -15,7 +15,7 @@ export default function TokenBody() {
       <Box style={{
         display: "flex", 
         flexDirection: "row", 
-        width: "20%"
+        width: "21.7%"
       }}>
         <MenuBar/>
         <TokenList/>
@@ -26,7 +26,7 @@ export default function TokenBody() {
       <Box style={{
         display: "flex", 
         flexDirection: "column", 
-        width: "55%"
+        width: "56.4%"
       }}>
         <TokenInfo/>
         <TokenChart/>
@@ -37,7 +37,7 @@ export default function TokenBody() {
       </nav>
       <Box style={{
         display: "flex", 
-        width: "25%"
+        width: "21.8%"
       }}>
       <WalletInfo/>
       </Box>      

@@ -8,7 +8,7 @@
 }
 
 .walletInfoDark {
-  background-color: #232323;
+  background-color: #262626;
 }
 .walletInfoLight {
   background-color: #FBFBFB;
@@ -19,7 +19,7 @@
   align-items: center;
   justify-content: center;
   width:100%;
-  height:4rem;
+  height:3.5rem;
 }
 .walletTitleDark {
   background-color: #121212;
@@ -43,7 +43,7 @@
 
 .tokenSearch {
   width: 80% !important;
-  margin-top: 1rem;
+  margin-top: 0.8rem;
   border-radius: 2rem !important;
 }
 .tokenSearchDark {
@@ -59,16 +59,16 @@
   font-family: 'Inter';
   font-style: normal;
   font-weight: 500;
-  font-size: calc(0.2rem + 0.6vw);
+  font-size: 0.8rem;
   line-height: 1rem;
-  margin-right: 20px;
+  margin-right: 0.6rem;
 }
 
 .myBalance {
   font-family: 'Inter';
   font-style: normal;
   font-weight: 400;
-  font-size: calc(0.3rem + 0.6vw);
+  font-size: 0.8rem;
   line-height: 1rem;
   color: #00C514;
 }
@@ -77,8 +77,8 @@
   font-family: 'Inter';
   font-style: normal;
   font-weight: 400;
-  font-size: calc(0.2rem + 0.5vw);
-  line-height: 1rem;
+  font-size: 0.7rem;
+  line-height: 0.5rem;
 }
 
 .tokenBalance {
@@ -87,8 +87,8 @@
   font-family: 'Inter';
   font-style: normal;
   font-weight: 200;
-  font-size: calc(0.2rem + 0.5vw);
-  line-height: 1rem;  
+  font-size: 0.7rem;
+  line-height: 0.4rem;  
 }
 
 .refreshBtn {

@@ -40,14 +40,13 @@ export default function TokenInfo() {
     setBalance(balance_temp);
     setBalanceUSD(balanceUSD_temp);
   }, [tokenData])
-  console.log('tokenData', tokenData);
   return (
     <Box className={infoClass}>
       <Box className={style.tokenSocialInfo}>
-        <Box display={"flex"} flexDirection={"row"} width={"75%"} alignItems={"center"}>
-          <Box display={"flex"} flexDirection={"row"} width={"60%"} alignItems={"center"}>
-            <img src={tokenData.image} width={"40rem"}/>
-            <Box display={"flex"} flexDirection={"column"} paddingLeft={"1rem"}>
+        <Box display={"flex"} flexDirection={"row"} width={"83%"} alignItems={"center"}>
+          <Box display={"flex"} flexDirection={"row"} width={"59%"} alignItems={"center"}>
+            <img src={tokenData.image} width={"38rem"}/>
+            <Box display={"flex"} flexDirection={"column"} paddingLeft={"0.6rem"}>
               <Box display={"flex"} flexDirection={"row"}>
                 <p className={style.tokenName}>{tokenData.name}</p>
                 <p className={style.tokenPrice}>{convertBalanceCurrency(tokenData.price)}</p>
@@ -62,7 +61,6 @@ export default function TokenInfo() {
             display={"flex"}
             flexDirection={"row"}
             alignItems={"center"}
-            paddingLeft={"1rem"}
           >
             <WebSite className={style.socialUrl}/>
             <FaceBook className={style.socialUrl}/>
@@ -89,13 +87,13 @@ export default function TokenInfo() {
         <hr aria-orientation='horizontal'></hr>
       </nav>
       <Box className={style.tokenMarktetInfo} alignItems={"center"}>
-        <Box display={"flex"} flexDirection={"row"} width={"75%"} alignItems={"center"}>
-          <Box display={"flex"} flexDirection={"column"} width={"30%"} paddingLeft={"3.5rem"}>
+        <Box display={"flex"} flexDirection={"row"} width={"83%"} height={"100%"} alignItems={"center"}>
+          <Box display={"flex"} flexDirection={"column"} width={"28%"} paddingLeft={"3.2rem"}>
             <p className={style.marketCap}>Market Cap</p>
             <p className={style.tokenMarketCap}>{convertBalanceCurrency(parseFloat(tokenData.marketCap))}</p>
           </Box>
           <div className={style.border} style={{borderColor:infoborderColorMode}}/>
-          <Box display={"flex"} flexDirection={"column"} width={"30%"} >
+          <Box display={"flex"} flexDirection={"column"} width={"27%"} >
             <p className={style.marketCap}>UNI / BNB (LP)</p>
             <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
               <p className={style.itemvalue} color={whiteBlackMode} style={{marginRight:"1rem"}}>{numberWithCommasTwoDecimals(parseFloat(tokenData.marketCap))}</p>
@@ -103,7 +101,7 @@ export default function TokenInfo() {
             </Box>
           </Box>
           <div className={style.border} style={{borderColor:infoborderColorMode}}/>
-          <Box display={"flex"} flexDirection={"column"} width={"40%"}>
+          <Box display={"flex"} flexDirection={"column"} width={"39%"}>
               <p className={style.marketCap}>Balance</p>
               <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
                 <p className={style.itemvalue} color={whiteBlackMode} style={{marginRight:"1rem"}}>{numberWithCommasTwoDecimals(tokenData.balance)}</p>
@@ -133,11 +131,11 @@ export default function TokenInfo() {
         flexDirection={"row"}
         padding={"0.5rem 0rem 0.5rem 1rem"}
         width={"100%"}
-        height={"2.5rem"}
+        height={"1.8rem"}
       >
         <Box
           display={"flex"}
-          width={"75%"}
+          width={"83%"}
           alignItems={"center"}
           justifyContent={"right"}
           paddingRight={"1rem"}
