@@ -96,22 +96,22 @@ export default function TokenInfo() {
         <Box display={"flex"} flexDirection={"row"} width={"83%"} height={"100%"} alignItems={"center"}>
           <Box display={"flex"} flexDirection={"column"} width={"28%"} paddingLeft={"4rem"}>
             <p className={style.marketCap} style={{color:textColor}} >Market Cap</p>
-            <p className={style.tokenMarketCap}>{convertBalanceCurrency(parseFloat(tokenData.marketCap))}</p>
+            <p className={style.tokenMarketCap} style={{color:"#00B112"}}>{convertBalanceCurrency(parseFloat(tokenData.marketCap))}</p>
           </Box>
           <div className={style.border} style={{borderColor:infoborderColorMode}}/>
           <Box display={"flex"} flexDirection={"column"} width={"28%"} paddingLeft={"0.2rem"}>
             <p className={style.marketCap} style={{color:textColor}}>UNI / BNB (LP)</p>
             <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
-              <p className={style.itemvalue} color={whiteBlackMode} style={{marginRight:"1rem"}}>{numberWithCommasTwoDecimals(parseFloat(tokenData.marketCap))}</p>
-              <p className={style.tokenMarketCap}>({convertBalanceCurrency(tokenData.balance! * tokenData.price)})</p>
+              <p className={style.tokenMarketCap} style={{marginRight:"1rem"}}  color={whiteBlackMode}>{numberWithCommasTwoDecimals(parseFloat(tokenData.marketCap))}</p>
+              <p className={style.tokenMarketCap} style={{color:"#00B112"}}>({convertBalanceCurrency(tokenData.balance! * tokenData.price)})</p>
             </Box>
           </Box>
           <div className={style.border} style={{borderColor:infoborderColorMode}}/>
           <Box display={"flex"} flexDirection={"column"} width={"39%"}>
               <p className={style.marketCap} style={{color:textColor}}>Balance</p>
               <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
-                <p className={style.itemvalue} color={whiteBlackMode} style={{marginRight:"1rem"}}>{numberWithCommasTwoDecimals(tokenData.balance)}</p>
-                <p className={style.tokenMarketCap}>({convertBalanceCurrency(tokenData.balance! * tokenData.price)})</p>
+                <p className={style.tokenMarketCap} style={{marginRight:"1rem"}} color={whiteBlackMode}>{numberWithCommasTwoDecimals(tokenData.balance)}</p>
+                <p className={style.tokenMarketCap} style={{color:"#00B112"}}>({convertBalanceCurrency(tokenData.balance! * tokenData.price)})</p>
               </Box>
           </Box>          
         </Box>
