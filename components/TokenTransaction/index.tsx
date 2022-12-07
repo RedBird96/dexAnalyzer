@@ -24,7 +24,7 @@ export default function TokenTransaction() {
     <Box className={transactionClass}>
       <TableContainer overflowY={"auto"} overflowX={"auto"} height={"100%"} css={{
         '&::-webkit-scrollbar': {
-          width: '4px',
+          width: '10px',
           height: '4px',
         },
         '&::-webkit-scrollbar-track': {
