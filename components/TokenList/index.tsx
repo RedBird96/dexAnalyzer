@@ -274,6 +274,7 @@ export default function TokenList() {
           _hover={{bg:hoverColor, color:"#FFFFFF"}}
           onClick={setFunc2}
           backgroundColor={selectUSDC ? hoverColor:"#transparent"}
+          color={selectUSDC?"#FFFFFF":whiteColor}
         >
           <Box display={"flex"} flexDirection={"row"} alignItems={"center"} width={"90%"} justifyContent={"space-between"}>
             <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
@@ -295,6 +296,7 @@ export default function TokenList() {
           _hover={{bg:hoverColor, color:"#FFFFFF"}}
           onClick={setFunc3}
           backgroundColor={selectWBTC ? hoverColor:"#transparent"}
+          color={selectWBTC?"#FFFFFF":whiteColor}
         >
           <Box display={"flex"} flexDirection={"row"} alignItems={"center"} width={"90%"} justifyContent={"space-between"}>
             <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
@@ -316,6 +318,7 @@ export default function TokenList() {
           _hover={{bg:hoverColor, color:"#FFFFFF"}}
           onClick={setFunc4}
           backgroundColor={selectUNI ? hoverColor:"#transparent"}
+          color={selectUNI?"#FFFFFF":whiteColor}
         >
           <Box display={"flex"} flexDirection={"row"} alignItems={"center"} width={"90%"} justifyContent={"space-between"}>
             <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
