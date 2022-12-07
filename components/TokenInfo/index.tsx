@@ -129,7 +129,7 @@ export default function TokenInfo() {
       <Box 
         display={"flex"}
         flexDirection={"row"}
-        padding={"0.5rem 0rem 0.5rem 1rem"}
+        padding={"0.5rem 0rem 0.5rem 4rem"}
         width={"100%"}
         height={"1.8rem"}
       >
@@ -137,7 +137,6 @@ export default function TokenInfo() {
           display={"flex"}
           width={"83%"}
           alignItems={"center"}
-          justifyContent={"right"}
           paddingRight={"1rem"}
         >
           <Switch className={style.switch}>Show Trade</Switch>
