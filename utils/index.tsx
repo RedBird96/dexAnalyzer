@@ -20,7 +20,6 @@ export function numberWithCommasNoDecimals(x :any) {
     return "";
   }
   return x
-    .toFixed(0)
     .toString()
     .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
@@ -41,4 +40,10 @@ export function numberWithCommasNoDecimals(x :any) {
 
 export function convertBalanceCurrency(x :any) {
   return '$'+numberWithCommasTwoDecimals(x);
+}
+
+export function makeShortAddress(address: string): string {
+  if (address.length > 7)
+    return address.substring(0, 7) + "...." + address.substring(20, address.length);
+  return "";
 }

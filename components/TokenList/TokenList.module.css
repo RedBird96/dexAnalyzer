@@ -30,13 +30,12 @@
 
 .tokenListInfo {
   display: flex;
-  max-height: 4rem;
+  height: 4rem;
   flex-direction: row;
   align-items: center;
   width: 100%;
-  padding:1rem;
   text-align: center;
-  justify-content: space-between;
+  justify-content: center;
   cursor: pointer;
 }
 /* .tokenListInfo:hover {

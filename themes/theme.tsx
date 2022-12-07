@@ -40,5 +40,11 @@ export const theme = extendTheme({
   sizes: {
     4: '0.6rem',
     10: '2rem',
+  },
+  fontSizes: {
+    sm: '0.8rem',
+  },
+  lineHeights: {
+    4: '1.2rem',
   }
 });

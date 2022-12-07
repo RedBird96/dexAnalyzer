@@ -20,7 +20,9 @@ import {
   UnPinIcon,
   PinLightIcon,
   UnPinLightIcon
-} from '../../assests/icon';
+} from '../../assests/icon'
+import * as constant from '../../utils/constant'
+import TokenListItem from './TokenListItem'
 import style from './TokenList.module.css'
 
 export default function TokenList() {
@@ -34,8 +36,6 @@ export default function TokenList() {
     style.tokenSearchLight,
     style.tokenSearchDark,
   );
-  const bnbColor = "#EEB500";
-  const ethColor = "#";
   const walletAddress = useAddress();
   const {setTokenData} = useTokenInfo();
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -45,39 +45,50 @@ export default function TokenList() {
   const [selectWBTC, setSelectWBTC] = useState<Boolean>(false);
   const [selectUNI, setSelectUNI] = useState<Boolean>(false);
 
+  const [foundToken, setFoundToken] = useState<ERC20Token>();
+ 
+  const searchToken = async() => {
+    if (debouncedQuery[0] == "0" && debouncedQuery[1] == "x") {
+      const res = await getTokenInfoFromWalletAddress(debouncedQuery);
+      if (res != constant.NOT_FOUND_TOKEN) {
+        const token = {
+          name: res.symbol,
+          contractAddress: res.address,
+          price: res.price.rate,
+          marketCap: res.price.marketCapUsd,
+          totalSupply: res.totalSupply,
+          holdersCount: res.holdersCount,
+          balance: 0,
+          image: ""
+        } as ERC20Token;
+        setFoundToken(token);
+      } else {
+        setFoundToken(undefined);
+      }
+    } else {
+      const res = await getTokenInfoFromTokenName(debouncedQuery);
+      if (res != constant.NOT_FOUND_TOKEN) {
+      } else {
+        setFoundToken(undefined);
+      }
+    }
+  }
+
   const handleSearchChange = async (e: { target: { value: string; }; }) => {
     const findString = e.target.value.toLowerCase();
     setSearchQuery(findString);
-    if (findString[0] == "0" && findString[1] == "x" && findString.length >= 42) {
-      
-      //const res1 = await getTokenInfoFromTokenName(findString);
-      const res = await getTokenInfoFromWalletAddress(findString);
-      console.log('res', res);  
-      // let token:ERC20Token;
-      // token={
-      //   name: res.symbol,
-      //   contractAddress: res.address,
-      //   price: res.price.rate,
-      //   marketCap: res.price.marketCapUsd,
-      //   totalSupply: res.totalSupply,
-      //   holdersCount: res.holdersCount,
-      //   balance: 0,
-      //   decimals: 0,
-      //   image:"https://s2.coinmarketcap.com/static/img/coins/64x64/825.png"
-      // } as ERC20Token;    
-    } else {
-
-    }
   };
   
   const handleEnter = useCallback(
     async (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
-        const s = debouncedQuery.toLowerCase().trim();
-        const res = await getTokenInfoFromWalletAddress(s);
-        console.log('res', res);  
+        searchToken();
       }
   }, [debouncedQuery])
+
+  useEffect(() => {
+    searchToken();
+  }, [debouncedQuery]);
 
   const setFunc1 = async () => {
     const address = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
@@ -242,18 +253,20 @@ export default function TokenList() {
           onClick={setFunc1}
           backgroundColor={selectUSDT ? hoverColor:"#transparent"}
         >
-          <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
-            <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/825.png" width={"40rem"} />
-            <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
-              <p className={style.tokenName}>USDT</p>
-              <p className={style.tokenAddress}>0xdAC17F958D2ee......97C13D831ec7</p>
+          <Box display={"flex"} flexDirection={"row"} alignItems={"center"} width={"90%"} justifyContent={"space-between"}>
+            <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
+              <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/825.png" width={"40rem"} />
+              <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
+                <p className={style.tokenName}>USDT</p>
+                <p className={style.tokenAddress}>0xdAC17F9......7C13D831ec7</p>
+              </Box>
             </Box>
-          </Box>
-          <Box style={{display:"flex", flexDirection:"row", alignItems:"center", width:"3rem", justifyContent:"space-between"}}>
-            <BNBIcon/>
-            {
-              colorMode.colorMode == "light" ? <UnPinLightIcon/> : <UnPinIcon/>
-            }            
+            <Box style={{display:"flex", flexDirection:"row", alignItems:"center", width:"3rem", justifyContent:"space-between"}}>
+              <BNBIcon/>
+              {
+                colorMode.colorMode == "light" ? <UnPinLightIcon/> : <UnPinIcon/>
+              }            
+            </Box>
           </Box>
         </Box>
         <Box className= {style.tokenListInfo} 
@@ -261,59 +274,71 @@ export default function TokenList() {
           onClick={setFunc2}
           backgroundColor={selectUSDC ? hoverColor:"#transparent"}
         >
-          <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
-            <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png" width={"40rem"}/>
-            <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
-              <p className={style.tokenName} >USDC</p>
-              <p className={style.tokenAddress}>0xdAC17F958D2ee......97C13D831ec7</p>
+          <Box display={"flex"} flexDirection={"row"} alignItems={"center"} width={"90%"} justifyContent={"space-between"}>
+            <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
+              <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png" width={"40rem"}/>
+              <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
+                <p className={style.tokenName} >USDC</p>
+                <p className={style.tokenAddress}>0xdAC17F9......7C13D831ec7</p>
+              </Box>
             </Box>
-          </Box>
-          <Box style={{display:"flex", flexDirection:"row", alignItems:"center", width:"3rem", justifyContent:"space-between"}}>
-            <ETHIcon/>
-            {
-              colorMode.colorMode == "light" ? <UnPinLightIcon/> : <UnPinIcon/>
-            }     
-          </Box>
+            <Box style={{display:"flex", flexDirection:"row", alignItems:"center", width:"3rem", justifyContent:"space-between"}}>
+              <ETHIcon/>
+              {
+                colorMode.colorMode == "light" ? <UnPinLightIcon/> : <UnPinIcon/>
+              }     
+            </Box>
+          </Box>          
         </Box> 
         <Box className= {style.tokenListInfo} 
           _hover={{bg:hoverColor}}
           onClick={setFunc3}
           backgroundColor={selectWBTC ? hoverColor:"#transparent"}
         >
-          <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
-            <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3717.png" width={"40rem"}/>
-            <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
-              <p className={style.tokenName} >WBTC</p>
-              <p className={style.tokenAddress}>0xdAC17F958D2ee......97C13D831ec7</p>
+          <Box display={"flex"} flexDirection={"row"} alignItems={"center"} width={"90%"} justifyContent={"space-between"}>
+            <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
+              <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/3717.png" width={"40rem"}/>
+              <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
+                <p className={style.tokenName} >WBTC</p>
+                <p className={style.tokenAddress}>0xdAC17F9......7C13D831ec7</p>
+              </Box>
             </Box>
-          </Box>
-          <Box style={{display:"flex", flexDirection:"row", alignItems:"center", width:"3rem", justifyContent:"space-between"}}>
-            <ETHIcon/>
-            {
-              colorMode.colorMode == "light" ? <UnPinLightIcon/> : <UnPinIcon/>
-            }     
-          </Box>
+            <Box style={{display:"flex", flexDirection:"row", alignItems:"center", width:"3rem", justifyContent:"space-between"}}>
+              <ETHIcon/>
+              {
+                colorMode.colorMode == "light" ? <UnPinLightIcon/> : <UnPinIcon/>
+              }     
+            </Box>
+          </Box>          
         </Box> 
         <Box className= {style.tokenListInfo} 
           _hover={{bg:hoverColor}}
           onClick={setFunc4}
           backgroundColor={selectUNI ? hoverColor:"#transparent"}
         >
-          <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
-            <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png" width={"40rem"}/>
-            <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
-              <p className={style.tokenName} >UNI</p>
-              <p className={style.tokenAddress}>0xdAC17F958D2ee......97C13D831ec7</p>
+          <Box display={"flex"} flexDirection={"row"} alignItems={"center"} width={"90%"} justifyContent={"space-between"}>
+            <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
+              <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/7083.png" width={"40rem"}/>
+              <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
+                <p className={style.tokenName} >UNI</p>
+                <p className={style.tokenAddress}>0xdAC17F9......7C13D831ec7</p>
+              </Box>
             </Box>
-          </Box>
-          <Box style={{display:"flex", flexDirection:"row", alignItems:"center", width:"3rem", justifyContent:"space-between"}}>
-            <ETHIcon/>
-            {
-              colorMode.colorMode == "light" ? <UnPinLightIcon/> : <UnPinIcon/>
-            }     
-          </Box>
+            <Box style={{display:"flex", flexDirection:"row", alignItems:"center", width:"3rem", justifyContent:"space-between"}}>
+              <ETHIcon/>
+              {
+                colorMode.colorMode == "light" ? <UnPinLightIcon/> : <UnPinIcon/>
+              }     
+            </Box>
+          </Box>          
         </Box> 
-      </Box>
+        {
+          foundToken != undefined && 
+          <TokenListItem
+            tokenData = {foundToken}
+          />
+        }
+        </Box>
     </Box>
   );
 }

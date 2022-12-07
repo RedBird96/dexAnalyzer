@@ -36,7 +36,7 @@ export default function TokenTransaction() {
           borderRadius: '24px',
         },
       }}>
-        <Table variant='striped' colorScheme='transactionTable'>
+        <Table variant='striped' colorScheme='transactionTable' size={"sm"}>
         <Thead position="sticky" top={0} zIndex="docked" backgroundColor={headerColor}>
           <Tr>
             <Th color={"#7C7C7C"}>Activity</Th>
@@ -47,7 +47,7 @@ export default function TokenTransaction() {
           </Tr>
         </Thead>
         <Tbody className={style.tbody}>
-          <Tr color={"#00C414"} paddingTop={"1rem !important"}>
+          <Tr color={"#00C414"}>
             <Td>Buy</Td>
             <Td>59,034,543,124,564,247</Td>
             <Td>$ 50.30 (0.2 BNB)</Td>

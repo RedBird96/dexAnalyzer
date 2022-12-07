@@ -1,0 +1,20 @@
+.tokenListInfo {
+  display: flex;
+  height: 4rem;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  padding:1rem;
+  text-align: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.tokenAddress {
+  font-family: 'Inter';
+  font-style: normal;
+  font-size: calc(0.1rem + 0.4vw);
+  line-height: 0.8rem;
+  color: #A7A7A7;  
+  margin-right:0.2rem;
+}

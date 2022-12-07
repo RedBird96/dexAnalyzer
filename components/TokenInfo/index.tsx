@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import { Box, Switch, useColorModeValue  } from "@chakra-ui/react"
+import {BigNumber} from 'bignumber.js'
 import {
   WebSite,
   FaceBook,
@@ -11,7 +12,8 @@ import {
 } from '../../hooks/useTokenInfo'
 import { 
   convertBalanceCurrency,
-  numberWithCommasTwoDecimals
+  numberWithCommasTwoDecimals,
+  numberWithCommasNoDecimals
 } from '../../utils'
 import style from './TokenInfo.module.css'
 
@@ -38,7 +40,7 @@ export default function TokenInfo() {
     setBalance(balance_temp);
     setBalanceUSD(balanceUSD_temp);
   }, [tokenData])
-  
+  console.log('tokenData', tokenData);
   return (
     <Box className={infoClass}>
       <Box className={style.tokenSocialInfo}>
@@ -79,7 +81,7 @@ export default function TokenInfo() {
             flexDirection={"column"}         
           >
             <p className={style.totalSupply}>Total Supply</p>
-            <p className={style.tokenTotalSupply}>{numberWithCommasTwoDecimals(parseFloat(tokenData.totalSupply))}</p>
+            <p className={style.tokenTotalSupply}>{numberWithCommasNoDecimals(BigInt(tokenData.totalSupply))}</p>
           </Box>
         </Box>
       </Box>
