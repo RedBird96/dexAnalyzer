@@ -31,6 +31,7 @@ export default function TokenList() {
     style.tokenList + " " + style.tokenListLight,
     style.tokenList + " " + style.tokenListDark
   );
+  const whiteColor = useColorModeValue("#000000","#FFFFFF");
   const hoverColor = useColorModeValue("#005CE5","#3A3A29");
   const searchClass = useColorModeValue(
     style.tokenSearchLight,
@@ -249,9 +250,10 @@ export default function TokenList() {
       </Box>
       <Box style={{display:"flex", flexDirection:"column", width:"100%"}}>
         <Box className= {style.tokenListInfo} 
-          _hover={{bg:hoverColor}}
+          _hover={{bg:hoverColor, color:"#FFFFFF"}}
           onClick={setFunc1}
           backgroundColor={selectUSDT ? hoverColor:"#transparent"}
+          color={selectUSDT?"#FFFFFF":whiteColor}
         >
           <Box display={"flex"} flexDirection={"row"} alignItems={"center"} width={"90%"} justifyContent={"space-between"}>
             <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
@@ -270,7 +272,7 @@ export default function TokenList() {
           </Box>
         </Box>
         <Box className= {style.tokenListInfo} 
-          _hover={{bg:hoverColor}}
+          _hover={{bg:hoverColor, color:"#FFFFFF"}}
           onClick={setFunc2}
           backgroundColor={selectUSDC ? hoverColor:"#transparent"}
         >
@@ -291,7 +293,7 @@ export default function TokenList() {
           </Box>          
         </Box> 
         <Box className= {style.tokenListInfo} 
-          _hover={{bg:hoverColor}}
+          _hover={{bg:hoverColor, color:"#FFFFFF"}}
           onClick={setFunc3}
           backgroundColor={selectWBTC ? hoverColor:"#transparent"}
         >
@@ -312,7 +314,7 @@ export default function TokenList() {
           </Box>          
         </Box> 
         <Box className= {style.tokenListInfo} 
-          _hover={{bg:hoverColor}}
+          _hover={{bg:hoverColor, color:"#FFFFFF"}}
           onClick={setFunc4}
           backgroundColor={selectUNI ? hoverColor:"#transparent"}
         >
