@@ -37,9 +37,10 @@ const TokenListItem = ({
   const hoverColor = useColorModeValue("#005CE5","#3A3A29");
   const [pinToken, setPinToken] = useState<Boolean>(isPined);
   const [isActive, setIsActive] = useState<Boolean>(false);
+  console.log('pin', pinToken, isPined);
   useEffect(() => {
       setIsActive(activeToken == tokenData);
-  }, [activeToken]);
+  }, [activeToken, tokenData]);
   const setPinIcon = () => {
     if (!pinToken){   //pin token
       setPinToken(true);

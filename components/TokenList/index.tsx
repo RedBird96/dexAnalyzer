@@ -25,9 +25,15 @@ import {
   PinLightIcon,
   UnPinLightIcon
 } from '../../assests/icon'
+import {
+  setCookie,
+  getCookie,
+  deleteCookie
+} from '../../utils'
 import * as constant from '../../utils/constant'
 import TokenListItem from './TokenListItem'
 import style from './TokenList.module.css'
+import { BigNumber } from 'ethers'
 
 export default function TokenList() {
   const colorMode = useColorMode();
@@ -52,6 +58,7 @@ export default function TokenList() {
   const [selectFoundToken, setSelectFoundToken] = useState<Boolean>(false);
   const network = useNetwork();
 
+  const [showPinedToken, setShowPinedToken] = useState<Boolean>();
   const [activeToken, setActiveToken] = useState<ERC20Token>();
   const [foundToken, setFoundToken] = useState<ERC20Token>();
   const [pinedTokens, setPinedTokens] = useState<ERC20Token[]>([]);
@@ -68,7 +75,7 @@ export default function TokenList() {
           contractAddress: debouncedQuery,
           price: 0,
           marketCap: "",
-          totalSupply: res_eth[3],
+          totalSupply: "0",
           holdersCount: 0,
           balance: 0,
           symbol: res_eth[1],
@@ -83,7 +90,7 @@ export default function TokenList() {
           contractAddress: debouncedQuery,
           price: 0,
           marketCap: "",
-          totalSupply: res_bsc[3],
+          totalSupply: "0",
           holdersCount: 0,
           symbol: res_bsc[1],
           balance: 0,
@@ -114,6 +121,7 @@ export default function TokenList() {
 
   useEffect(() => {
     searchToken();
+    setShowPinedToken(debouncedQuery.length == 0);
   }, [debouncedQuery]);
 
   const setFunc1 = async () => {
@@ -268,14 +276,58 @@ export default function TokenList() {
     setSelectFoundToken(false);
   }
 
+  useEffect(() => {
+    const cookieString = getCookie("PinedToken");
+    const tokenString = cookieString?.split("&");
+    let cookieToken:ERC20Token[] = [];
+    tokenString?.forEach((jsonToken)=>{
+      if (jsonToken.length < 2)
+        return;
+      const obj = JSON.parse(jsonToken);
+      const token = {
+        name:obj["name"],
+        symbol:obj["symbol"],
+        balance:obj["balance"],
+        contractAddress:obj["contractAddress"],
+        holdersCount:obj["holdersCount"],
+        image:obj["image"],
+        marketCap:obj["marketCap"],
+        network:obj["network"],
+        price:obj["price"],
+        totalSupply:obj["totalSupply"]
+      } as ERC20Token;
+      cookieToken.push(token);
+    });
+    setPinedTokens(cookieToken); 
+  }, []);
+
   const addPinTokenHandler = (token:ERC20Token) => {
     setPinedTokens(pinedTokens.filter(item => item != token)); 
     setPinedTokens(tokens => [...tokens, token]);
+    const obj = JSON.stringify(token);
+    const savedCookieString = getCookie("PinedToken");
+    let cookieString:string;
+    if (savedCookieString != undefined){
+      cookieString = savedCookieString + obj+ "&";
+    } else {
+      cookieString = obj+ "&";
+    }
+
+    setCookie("PinedToken", cookieString);
   }
 
   const removePinTokenHandler = (token:ERC20Token) => {
-    setPinedTokens(pinedTokens.filter(item => item !== token));
+    const filterTokens = pinedTokens.filter(item => item !== token);
+    setPinedTokens(filterTokens);
+    let newCookieString = "";
+    filterTokens.forEach((token) => {
+      const obj = JSON.stringify(token);
+      newCookieString += obj;
+      newCookieString += "&";
+    });
+    setCookie("PinedToken", newCookieString);
   }
+
 
   const setFuncFoundToken = (token:ERC20Token) => {
     setTokenData(token);
@@ -393,7 +445,7 @@ export default function TokenList() {
           </Box>          
         </Box>  */}
           {
-            foundToken != undefined ? 
+            foundToken != undefined && 
             <TokenListItem
               tokenData = {foundToken}
               isPined = {false}
@@ -401,7 +453,10 @@ export default function TokenList() {
               activeTokenHandler = {setActiveTokenHandler}
               pinTokenHandler = {addPinTokenHandler}
               unPinTokenHandler = {removePinTokenHandler}
-            /> :
+            /> 
+          }
+          {
+            showPinedToken &&
             pinedTokens.map((token) => {
               if (token == foundToken)
                 return;
