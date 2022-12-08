@@ -15,4 +15,5 @@ export interface ERC20Token {
   website?: string;
   facebook?: string;
   twitter?: string;
+  pinSetting: boolean;
 }

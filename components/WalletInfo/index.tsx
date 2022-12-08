@@ -21,6 +21,7 @@ import {
 import {ERC20Token} from '../../utils/type'
 import { 
   convertBalanceCurrency,
+  deleteCookie,
   numberWithCommasTwoDecimals
 } from '../../utils'
 import {Refresh} from '../../assests/icon'

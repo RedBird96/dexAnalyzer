@@ -18,37 +18,26 @@ import * as constant from '../../../utils/constant'
 
 const TokenListItem = ({
   tokenData,
-  isPined,
   activeToken,
   activeTokenHandler,
   pinTokenHandler,
-  unPinTokenHandler,
 }:{
-  tokenData?: ERC20Token,
-  isPined: Boolean,
+  tokenData: ERC20Token,
   activeToken: ERC20Token,
   activeTokenHandler: (x?: any) => void,
   pinTokenHandler: (x?: any) => void,
-  unPinTokenHandler: (x?: any) => void,
 }) => {
 
   const colorMode = useColorMode();
   const whiteColor = useColorModeValue("#000000","#FFFFFF");
   const hoverColor = useColorModeValue("#005CE5","#3A3A29");
-  const [pinToken, setPinToken] = useState<Boolean>(isPined);
   const [isActive, setIsActive] = useState<Boolean>(false);
-  console.log('pin', pinToken, isPined);
   useEffect(() => {
       setIsActive(activeToken == tokenData);
   }, [activeToken, tokenData]);
   const setPinIcon = () => {
-    if (!pinToken){   //pin token
-      setPinToken(true);
-      pinTokenHandler(tokenData);
-    } else {          //unpin token
-      setPinToken(false);
-      unPinTokenHandler(tokenData);
-    }
+    tokenData.pinSetting = !tokenData.pinSetting;
+    pinTokenHandler(tokenData);
   }
   const setActiveToken = () => {
     activeTokenHandler(tokenData);
@@ -77,8 +66,8 @@ const TokenListItem = ({
           <Box onClick={setPinIcon}>
           {
             colorMode.colorMode == "light" ? 
-            pinToken == false ? <UnPinLightIcon/> : <PinLightIcon/> : 
-            pinToken == false ? <UnPinIcon/> : <PinIcon/>
+            tokenData?.pinSetting == false ? <UnPinLightIcon/> : <PinLightIcon/> : 
+            tokenData?.pinSetting == false ? <UnPinIcon/> : <PinIcon/>
           }    
           </Box>        
         </Box>
