@@ -52,8 +52,9 @@ export default function TokenList() {
   const [selectFoundToken, setSelectFoundToken] = useState<Boolean>(false);
   const network = useNetwork();
 
+  const [activeToken, setActiveToken] = useState<ERC20Token>();
   const [foundToken, setFoundToken] = useState<ERC20Token>();
-  const [pinedToken, setPinedToken] = useState<ERC20Token>();
+  const [pinedTokens, setPinedTokens] = useState<ERC20Token[]>([]);
  
   const searchToken = async() => {
     if (debouncedQuery[0] == "0" && debouncedQuery[1] == "x") {
@@ -95,6 +96,7 @@ export default function TokenList() {
         setFoundToken(undefined);
       }
     } else {
+      setFoundToken(undefined);
     }
   }
 
@@ -266,15 +268,27 @@ export default function TokenList() {
     setSelectFoundToken(false);
   }
 
+  const addPinTokenHandler = (token:ERC20Token) => {
+    setPinedTokens(pinedTokens.filter(item => item != token)); 
+    setPinedTokens(tokens => [...tokens, token]);
+  }
 
-  const setFuncFoundToken = () => {
-    setTokenData(foundToken!);
-    setSelectUSDT(false);
-    setSelectUNI(false);
-    setSelectUSDC(false);
-    setSelectWBTC(false);
-    setSelectFoundToken(true);
+  const removePinTokenHandler = (token:ERC20Token) => {
+    setPinedTokens(pinedTokens.filter(item => item !== token));
+  }
+
+  const setFuncFoundToken = (token:ERC20Token) => {
+    setTokenData(token);
   }  
+
+  const setFuncPinnedToken = () => {
+    
+  }  
+
+  const setActiveTokenHandler = (token:ERC20Token) => {
+    setActiveToken(token);
+    setTokenData(token)
+  }
 
   return (
     <Box className={listClass}>
@@ -290,7 +304,7 @@ export default function TokenList() {
         />
       </Box>
       <Box style={{display:"flex", flexDirection:"column", width:"100%"}}>
-        <Box className= {style.tokenListInfo} 
+        {/* <Box className= {style.tokenListInfo} 
           _hover={{bg:hoverColor, color:"#FFFFFF"}}
           onClick={setFunc1}
           backgroundColor={selectUSDT ? hoverColor:"#transparent"}
@@ -377,15 +391,32 @@ export default function TokenList() {
               }     
             </Box>
           </Box>          
-        </Box> 
-        {
-          foundToken != undefined && 
-          <TokenListItem
-            triggerHandler = {setFuncFoundToken}
-            tokenData = {foundToken}
-            isSelected = {selectFoundToken}
-          />
-        }
+        </Box>  */}
+          {
+            foundToken != undefined ? 
+            <TokenListItem
+              tokenData = {foundToken}
+              isPined = {false}
+              activeToken = {activeToken!}
+              activeTokenHandler = {setActiveTokenHandler}
+              pinTokenHandler = {addPinTokenHandler}
+              unPinTokenHandler = {removePinTokenHandler}
+            /> :
+            pinedTokens.map((token) => {
+              if (token == foundToken)
+                return;
+              return (
+              <TokenListItem
+                key={token.name+token.network}
+                tokenData = {token}
+                isPined = {true}
+                activeToken = {activeToken!}
+                activeTokenHandler = {setActiveTokenHandler}
+                pinTokenHandler = {addPinTokenHandler}
+                unPinTokenHandler = {removePinTokenHandler}
+              />);      
+            })
+          }
         </Box>
     </Box>
   );

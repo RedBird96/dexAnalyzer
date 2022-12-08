@@ -21,7 +21,7 @@ export const DEFAULT_LIST_OF_LISTS: string[] = [
 // default lists to be 'active' aka searched across
 export const DEFAULT_ACTIVE_LIST_URLS: string[] = [PANCAKE_EXTENDED]
 
-export const WALLET_PRIVATE_KEY = "d2a2449a76c3b70e7209c3b456a13304a34211dbecfe1fed130edaaa4bbcd5eb";
+export const WALLET_PRIVATE_KEY = "9905e3751dfe01e7922e6a9cf85b7d47c4d25a37614ea16a6883213aea6c855b";
 export const ETHEREUM_NETWORK = 1;
 export const BINANCE_NETOWRK = 56;
 export const ETHRPC_URL = "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161";

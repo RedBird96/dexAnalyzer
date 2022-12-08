@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import { 
   BNBIcon, 
   ETHIcon,
@@ -16,34 +16,52 @@ import {makeShortAddress} from '../../../utils'
 import { ERC20Token } from '../../../utils/type'
 import * as constant from '../../../utils/constant'
 
-interface TokenListItem {
-  tokenData: ERC20Token;
-}
-
-export default function TokenListItem({
-  triggerHandler,
+const TokenListItem = ({
   tokenData,
-  isSelected
+  isPined,
+  activeToken,
+  activeTokenHandler,
+  pinTokenHandler,
+  unPinTokenHandler,
 }:{
-  triggerHandler?: (x?: any) => void,
   tokenData?: ERC20Token,
-  isSelected: Boolean
-}) {
+  isPined: Boolean,
+  activeToken: ERC20Token,
+  activeTokenHandler: (x?: any) => void,
+  pinTokenHandler: (x?: any) => void,
+  unPinTokenHandler: (x?: any) => void,
+}) => {
 
   const colorMode = useColorMode();
   const whiteColor = useColorModeValue("#000000","#FFFFFF");
   const hoverColor = useColorModeValue("#005CE5","#3A3A29");
-
+  const [pinToken, setPinToken] = useState<Boolean>(isPined);
+  const [isActive, setIsActive] = useState<Boolean>(false);
+  useEffect(() => {
+      setIsActive(activeToken == tokenData);
+  }, [activeToken]);
+  const setPinIcon = () => {
+    if (!pinToken){   //pin token
+      setPinToken(true);
+      pinTokenHandler(tokenData);
+    } else {          //unpin token
+      setPinToken(false);
+      unPinTokenHandler(tokenData);
+    }
+  }
+  const setActiveToken = () => {
+    activeTokenHandler(tokenData);
+  }
   return(
     <Box className= {style.tokenListInfo} 
       _hover={{bg:hoverColor}}
-      onClick={triggerHandler}
-      backgroundColor={isSelected ? hoverColor:"#transparent"}
-      color={isSelected?"#FFFFFF":whiteColor}
+      onClick={setActiveToken}
+      backgroundColor={isActive ? hoverColor:"#transparent"}
+      color={isActive?"#FFFFFF":whiteColor}
     >
       <Box display={"flex"} flexDirection={"row"} alignItems={"center"} width={"90%"} justifyContent={"space-between"}>
         <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
-          <img src={tokenData?.image} width={"50rem"} />
+          <img src={tokenData?.image} width={"50rem"}/>
           <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
             <p className={style.tokenName}>{tokenData?.symbol}</p>
             <p className={style.tokenAddress}>{makeShortAddress(tokenData?.contractAddress!)}</p>
@@ -55,11 +73,17 @@ export default function TokenListItem({
             <ETHIcon/> :
             <BNBIcon/>
           }
+          <Box onClick={setPinIcon}>
           {
-            colorMode.colorMode == "light" ? <UnPinLightIcon/> : <UnPinIcon/>
-          }            
+            colorMode.colorMode == "light" ? 
+            pinToken == false ? <UnPinLightIcon/> : <PinLightIcon/> : 
+            pinToken == false ? <UnPinIcon/> : <PinIcon/>
+          }    
+          </Box>        
         </Box>
       </Box>
     </Box>
   );
 }
+
+export default TokenListItem;
