@@ -5,7 +5,7 @@ export const initialState = {
   lastInitializedDefaultListOfLists: DEFAULT_LIST_OF_LISTS,
   byUrl: {
     ...DEFAULT_LIST_OF_LISTS.concat(...UNSUPPORTED_LIST_URLS).reduce((memo, listUrl) => {
-      memo[listUrl] = NEW_LIST_STATE
+      // memo[listUrl] = NEW_LIST_STATE
       return memo
     }, {}),
   },

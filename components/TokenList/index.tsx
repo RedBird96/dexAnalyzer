@@ -131,7 +131,6 @@ export default function TokenList() {
         });
       }
     }
-    console.log('res', res);
     let token:ERC20Token;
     token={
       name: res.name,
