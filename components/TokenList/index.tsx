@@ -17,14 +17,6 @@ import {
   useDebounce
 } from '../../hooks'
 import {ERC20Token} from '../../utils/type'
-import { 
-  BNBIcon, 
-  ETHIcon,
-  PinIcon,
-  UnPinIcon,
-  PinLightIcon,
-  UnPinLightIcon
-} from '../../assests/icon'
 import {
   setCookie,
   getCookie,
@@ -41,8 +33,6 @@ export default function TokenList() {
     style.tokenList + " " + style.tokenListLight,
     style.tokenList + " " + style.tokenListDark
   );
-  const whiteColor = useColorModeValue("#000000","#FFFFFF");
-  const hoverColor = useColorModeValue("#005CE5","#3A3A29");
   const searchClass = useColorModeValue(
     style.tokenSearchLight,
     style.tokenSearchDark,
@@ -51,11 +41,6 @@ export default function TokenList() {
   const {setTokenData} = useTokenInfo();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const debouncedQuery = useDebounce(searchQuery, 200);
-  const [selectUSDT, setSelectUSDT] = useState<Boolean>(true);
-  const [selectUSDC, setSelectUSDC] = useState<Boolean>(false);
-  const [selectWBTC, setSelectWBTC] = useState<Boolean>(false);
-  const [selectUNI, setSelectUNI] = useState<Boolean>(false);
-  const [selectFoundToken, setSelectFoundToken] = useState<Boolean>(false);
   const network = useNetwork();
 
   const [showPinedToken, setShowPinedToken] = useState<Boolean>();
@@ -75,7 +60,6 @@ export default function TokenList() {
         return;
       }
       const res_eth = await getTokenNameWithAddress(debouncedQuery, constant.ETHEREUM_NETWORK);
-      const res_bsc = await getTokenNameWithAddress(debouncedQuery, constant.BINANCE_NETOWRK);
       let token;
       if (res_eth != constant.NOT_FOUND_TOKEN) {
         const logo = await getTokenLogoURL(debouncedQuery, constant.ETHEREUM_NETWORK);
@@ -93,25 +77,27 @@ export default function TokenList() {
           pinSetting: false,
         } as ERC20Token;
         setFoundToken(token);
-      } else if (res_bsc != constant.NOT_FOUND_TOKEN) {
-        const logo = await getTokenLogoURL(debouncedQuery, constant.BINANCE_NETOWRK);
-        token = {
-          name: res_bsc[0],
-          contractAddress: debouncedQuery,
-          price: 0,
-          marketCap: "",
-          totalSupply: "0",
-          holdersCount: 0,
-          symbol: res_bsc[1],
-          balance: 0,
-          image: logo,
-          network: constant.BINANCE_NETOWRK,
-          pinSetting: false,
-        } as ERC20Token;
-        setFoundToken(token);        
-      }
-      else {
-        setFoundToken(undefined);
+      } else {
+        const res_bsc = await getTokenNameWithAddress(debouncedQuery, constant.BINANCE_NETOWRK);
+        if (res_bsc != constant.NOT_FOUND_TOKEN) {
+          const logo = await getTokenLogoURL(debouncedQuery, constant.BINANCE_NETOWRK);
+          token = {
+            name: res_bsc[0],
+            contractAddress: debouncedQuery,
+            price: 0,
+            marketCap: "",
+            totalSupply: "0",
+            holdersCount: 0,
+            symbol: res_bsc[1],
+            balance: 0,
+            image: logo,
+            network: constant.BINANCE_NETOWRK,
+            pinSetting: false,
+          } as ERC20Token;
+          setFoundToken(token);        
+        } else {
+          setFoundToken(undefined);
+        }
       }
     } else {
       setFoundToken(undefined);
@@ -153,7 +139,8 @@ export default function TokenList() {
         marketCap:obj["marketCap"],
         network:obj["network"],
         price:obj["price"],
-        totalSupply:obj["totalSupply"]
+        totalSupply:obj["totalSupply"],
+        pinSetting:obj["pinSetting"]
       } as ERC20Token;
       cookieToken.push(token);
     });
@@ -161,43 +148,21 @@ export default function TokenList() {
   }, []);
 
   const addPinTokenHandler = (token:ERC20Token) => {
+    const filterTokens = pinedTokens.filter(item => item.contractAddress !== token.contractAddress);
     if (token.pinSetting) {
-      setPinedTokens(pinedTokens.filter(item => item != token)); 
-      setPinedTokens(tokens => [...tokens, token]);
-      const obj = JSON.stringify(token);
-      const savedCookieString = getCookie("PinedToken");
-      let cookieString:string;
-      if (savedCookieString != undefined){
-        cookieString = savedCookieString + obj+ "&";
-      } else {
-        cookieString = obj+ "&";
-      }
-
-      setCookie("PinedToken", cookieString);
+      filterTokens.push(token);
+      setPinedTokens(filterTokens); 
     } else {
-      const filterTokens = pinedTokens.filter(item => item !== token);
       setPinedTokens(filterTokens);
-      let newCookieString = "";
-      filterTokens.forEach((token) => {
-        const obj = JSON.stringify(token);
-        newCookieString += obj;
-        newCookieString += "&";
-      });
-      setCookie("PinedToken", newCookieString);      
     }
-
-  }
-
-  const removePinTokenHandler = (token:ERC20Token) => {
-    const filterTokens = pinedTokens.filter(item => item !== token);
-    setPinedTokens(filterTokens);
     let newCookieString = "";
     filterTokens.forEach((token) => {
       const obj = JSON.stringify(token);
       newCookieString += obj;
       newCookieString += "&";
     });
-    setCookie("PinedToken", newCookieString);
+    setCookie("PinedToken", newCookieString);         
+
   }
 
   const setActiveTokenHandler = (token:ERC20Token) => {
