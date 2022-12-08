@@ -2,11 +2,15 @@ import React, { useEffect, useState, useCallback, KeyboardEvent } from 'react'
 import { Box, Input, Button, useColorModeValue, useColorMode } from "@chakra-ui/react"
 import {
   useAddress,
+  useNetwork,
 } from '@thirdweb-dev/react'
 import {
   getTokenInfoFromWalletAddress,
   getContractInfoFromWalletAddress,
-  getTokenInfoFromTokenName
+  getTokenInfoFromTokenName,
+  getTokenNameWithAddress,
+  wrappedCurrency,
+  getTokenLogoURL
 } from '../../api'
 import {
   useTokenInfo,
@@ -45,33 +49,52 @@ export default function TokenList() {
   const [selectUSDC, setSelectUSDC] = useState<Boolean>(false);
   const [selectWBTC, setSelectWBTC] = useState<Boolean>(false);
   const [selectUNI, setSelectUNI] = useState<Boolean>(false);
+  const [selectFoundToken, setSelectFoundToken] = useState<Boolean>(false);
+  const network = useNetwork();
 
   const [foundToken, setFoundToken] = useState<ERC20Token>();
+  const [pinedToken, setPinedToken] = useState<ERC20Token>();
  
   const searchToken = async() => {
     if (debouncedQuery[0] == "0" && debouncedQuery[1] == "x") {
-      const res = await getTokenInfoFromWalletAddress(debouncedQuery);
-      if (res != constant.NOT_FOUND_TOKEN) {
-        const token = {
-          name: res.symbol,
-          contractAddress: res.address,
-          price: res.price.rate,
-          marketCap: res.price.marketCapUsd,
-          totalSupply: res.totalSupply,
-          holdersCount: res.holdersCount,
+      const res_eth = await getTokenNameWithAddress(debouncedQuery, constant.ETHEREUM_NETWORK);
+      const res_bsc = await getTokenNameWithAddress(debouncedQuery, constant.BINANCE_NETOWRK);
+      let token;
+      if (res_eth != constant.NOT_FOUND_TOKEN) {
+        const logo = await getTokenLogoURL(debouncedQuery, constant.ETHEREUM_NETWORK);
+        token = {
+          name: res_eth[0],
+          contractAddress: debouncedQuery,
+          price: 0,
+          marketCap: "",
+          totalSupply: res_eth[3],
+          holdersCount: 0,
           balance: 0,
-          image: ""
+          symbol: res_eth[1],
+          image: logo,
+          network: constant.ETHEREUM_NETWORK
         } as ERC20Token;
         setFoundToken(token);
-      } else {
+      } else if (res_bsc != constant.NOT_FOUND_TOKEN) {
+        const logo = await getTokenLogoURL(debouncedQuery, constant.BINANCE_NETOWRK);
+        token = {
+          name: res_bsc[0],
+          contractAddress: debouncedQuery,
+          price: 0,
+          marketCap: "",
+          totalSupply: res_bsc[3],
+          holdersCount: 0,
+          symbol: res_bsc[1],
+          balance: 0,
+          image: logo,
+          network: constant.BINANCE_NETOWRK
+        } as ERC20Token;
+        setFoundToken(token);        
+      }
+      else {
         setFoundToken(undefined);
       }
     } else {
-      const res = await getTokenInfoFromTokenName(debouncedQuery);
-      if (res != constant.NOT_FOUND_TOKEN) {
-      } else {
-        setFoundToken(undefined);
-      }
     }
   }
 
@@ -108,9 +131,11 @@ export default function TokenList() {
         });
       }
     }
+    console.log('res', res);
     let token:ERC20Token;
     token={
-      name: res.symbol,
+      name: res.name,
+      symbol: res.symbol,
       contractAddress: res.address,
       price: res.price.rate,
       marketCap: res.price.marketCapUsd,
@@ -125,6 +150,7 @@ export default function TokenList() {
     setSelectUNI(false);
     setSelectUSDC(false);
     setSelectWBTC(false);
+    setSelectFoundToken(false);
   }
 
   const setFunc2 = async () => {
@@ -146,7 +172,8 @@ export default function TokenList() {
     }
     let token:ERC20Token;
     token={
-      name: res.symbol,
+      name: res.name,
+      symbol: res.symbol,
       contractAddress: res.address,
       price: res.price.rate,
       marketCap: res.price.marketCapUsd,
@@ -161,6 +188,7 @@ export default function TokenList() {
     setSelectUNI(false);
     setSelectUSDC(true);
     setSelectWBTC(false);
+    setSelectFoundToken(false);
   }
 
   const setFunc3 = async () => {
@@ -182,7 +210,8 @@ export default function TokenList() {
     }
     let token:ERC20Token;
     token={
-      name: res.symbol,
+      name: res.name,
+      symbol: res.symbol,
       contractAddress: res.address,
       price: res.price.rate,
       marketCap: res.price.marketCapUsd,
@@ -197,6 +226,7 @@ export default function TokenList() {
     setSelectUNI(false);
     setSelectUSDC(false);
     setSelectWBTC(true);
+    setSelectFoundToken(false);
   }
 
   const setFunc4 = async () => {
@@ -218,7 +248,8 @@ export default function TokenList() {
     }
     let token:ERC20Token;
     token={
-      name: res.symbol,
+      name: res.name,
+      symbol: res.symbol,
       contractAddress: res.address,
       price: res.price.rate,
       marketCap: res.price.marketCapUsd,
@@ -233,7 +264,18 @@ export default function TokenList() {
     setSelectUNI(true);
     setSelectUSDC(false);
     setSelectWBTC(false);
+    setSelectFoundToken(false);
   }
+
+
+  const setFuncFoundToken = () => {
+    setTokenData(foundToken!);
+    setSelectUSDT(false);
+    setSelectUNI(false);
+    setSelectUSDC(false);
+    setSelectWBTC(false);
+    setSelectFoundToken(true);
+  }  
 
   return (
     <Box className={listClass}>
@@ -266,7 +308,7 @@ export default function TokenList() {
             <Box style={{display:"flex", flexDirection:"row", alignItems:"center", width:"3rem", justifyContent:"space-between"}}>
               <BNBIcon/>
               {
-                colorMode.colorMode == "light" ? <UnPinLightIcon/> : <UnPinIcon/>
+                colorMode.colorMode == "light" ? <PinLightIcon/> : <PinIcon/>
               }            
             </Box>
           </Box>
@@ -288,7 +330,7 @@ export default function TokenList() {
             <Box style={{display:"flex", flexDirection:"row", alignItems:"center", width:"3rem", justifyContent:"space-between"}}>
               <ETHIcon/>
               {
-                colorMode.colorMode == "light" ? <UnPinLightIcon/> : <UnPinIcon/>
+                colorMode.colorMode == "light" ? <PinLightIcon/> : <PinIcon/>
               }     
             </Box>
           </Box>          
@@ -310,7 +352,7 @@ export default function TokenList() {
             <Box style={{display:"flex", flexDirection:"row", alignItems:"center", width:"3rem", justifyContent:"space-between"}}>
               <ETHIcon/>
               {
-                colorMode.colorMode == "light" ? <UnPinLightIcon/> : <UnPinIcon/>
+                colorMode.colorMode == "light" ? <PinLightIcon/> : <PinIcon/>
               }     
             </Box>
           </Box>          
@@ -332,7 +374,7 @@ export default function TokenList() {
             <Box style={{display:"flex", flexDirection:"row", alignItems:"center", width:"3rem", justifyContent:"space-between"}}>
               <ETHIcon/>
               {
-                colorMode.colorMode == "light" ? <UnPinLightIcon/> : <UnPinIcon/>
+                colorMode.colorMode == "light" ? <PinLightIcon/> : <PinIcon/>
               }     
             </Box>
           </Box>          
@@ -340,7 +382,9 @@ export default function TokenList() {
         {
           foundToken != undefined && 
           <TokenListItem
+            triggerHandler = {setFuncFoundToken}
             tokenData = {foundToken}
+            isSelected = {selectFoundToken}
           />
         }
         </Box>

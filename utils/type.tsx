@@ -1,6 +1,7 @@
 export interface ERC20Token {
   name: string;
   symbol: string;
+  network: number;
   contractAddress: string;
   price: number;
   balance?: number;

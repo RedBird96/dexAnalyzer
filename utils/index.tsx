@@ -44,6 +44,6 @@ export function convertBalanceCurrency(x :any) {
 
 export function makeShortAddress(address: string): string {
   if (address.length > 7)
-    return address.substring(0, 7) + "...." + address.substring(20, address.length);
+    return address.substring(0, 9) + "......." + address.substring(31, address.length);
   return "";
 }

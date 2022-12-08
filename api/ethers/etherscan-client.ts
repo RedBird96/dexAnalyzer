@@ -12,6 +12,7 @@ export enum Action {
   contract_getabi = 'contract_getabi',
   transaction_getstatus = 'transaction_getstatus',
   transaction_gettxreceiptstatus = 'transaction_gettxreceiptstatus',
+  token_tokenholderlist = 'token_tokenholderlist',
   block_getblockreward = 'block_getblockreward',
   logs_getLogs = 'logs_getLogs',
   stats_ethsupply = 'stats_ethsupply',

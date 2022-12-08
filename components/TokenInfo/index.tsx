@@ -51,7 +51,7 @@ export default function TokenInfo() {
             <img src={tokenData.image} width={"50rem"}/>
             <Box display={"flex"} flexDirection={"column"} paddingLeft={"1rem"}>
               <Box display={"flex"} flexDirection={"row"}>
-                <p className={style.tokenName}>{tokenData.name}</p>
+                <p className={style.tokenName}>{tokenData.symbol}</p>
                 <p className={style.tokenPrice}>{convertBalanceCurrency(tokenData.price)}</p>
               </Box>
               <Box display={"flex"} flexDirection={"row"} alignItems={"center"} justifyContent={"center"}>
