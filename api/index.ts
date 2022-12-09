@@ -102,7 +102,7 @@ export async function getTokenSymbol(address: string, network: number) {
     TokenContract = new ethers.Contract(address, BEP20TokenABI, signer)
   }
   try {
-//    decimal = await TokenContract!.decimals()
+    decimal = await TokenContract!.decimals()
     symbol = await TokenContract!.symbol()
     name = await TokenContract!.name()
   } catch (err:any) {
