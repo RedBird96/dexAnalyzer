@@ -176,7 +176,9 @@ export default function TokenList() {
       foundToken != undefined && 
       token.contractAddress == foundToken.contractAddress) {
       setSearchQuery("");
-      setListTokens(listTokens.filter(item => item.contractAddress != token.contractAddress)); 
+      setListTokens(
+        listTokens.filter(item => item.contractAddress != token.contractAddress && 
+        item.pinSetting == true)); 
       setListTokens(tokens => [...tokens, token]);
     } else if (token.pinSetting == true && listTokens.length >= 2){
       const last = listTokens.at(-1);
