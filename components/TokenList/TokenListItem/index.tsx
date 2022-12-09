@@ -12,7 +12,7 @@ import {
 } from '../../../hooks'
 import { Box, Input, Button, useColorModeValue, useColorMode } from "@chakra-ui/react"
 import style from './TokenListItem.module.css'
-import {makeShortAddress} from '../../../utils'
+import {makeShortAddress, makeShortTokenName} from '../../../utils'
 import { ERC20Token } from '../../../utils/type'
 import * as constant from '../../../utils/constant'
 
@@ -55,8 +55,8 @@ const TokenListItem = ({
           <img src={tokenData?.image} width={"50rem"}/>
           <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
             <Box display={"flex"} flexDirection={"row"} >
-              <p className={style.tokenName}>{tokenData?.name}</p>
-              <p className={style.tokenName} style={{color:textColor}}>&nbsp;({tokenData?.symbol})</p>
+              <p className={style.tokenName}>{makeShortTokenName(tokenData?.name, 10)}</p>
+              <p className={style.tokenName} style={{color:textColor}}>&nbsp;({makeShortTokenName(tokenData?.symbol, 4)})</p>
             </Box>
             <p className={style.tokenAddress}>{makeShortAddress(tokenData?.contractAddress!)}</p>
           </Box>
