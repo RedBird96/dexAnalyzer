@@ -58,10 +58,12 @@ export default function TokenList() {
         return;
       }
       setSearchStatus(SearchStatus.searching);
+      let foundFlag = false;
       const res_eth = await getTokenSymbol(debouncedQuery, constant.ETHEREUM_NETWORK);
       let token;
       if (res_eth != constant.NOT_FOUND_TOKEN) {
-        const logo = await getTokenLogoURL(debouncedQuery, constant.ETHEREUM_NETWORK);
+        foundFlag = true;
+        const logo = await getTokenLogoURL(debouncedQuery, constant.ETHEREUM_NETWORK, res_eth[1]);
         token = {
           name: res_eth[0],
           contractAddress: debouncedQuery,
@@ -75,31 +77,32 @@ export default function TokenList() {
           network: constant.ETHEREUM_NETWORK,
           pinSetting: false,
         } as ERC20Token;
-        setFoundToken(token);
-        setSearchStatus(SearchStatus.founddata);    
+        setFoundToken(token);  
+      }
+      const res_bsc = await getTokenSymbol(debouncedQuery, constant.BINANCE_NETOWRK);
+      if (res_bsc != constant.NOT_FOUND_TOKEN) {
+        foundFlag = true;
+        const logo = await getTokenLogoURL(debouncedQuery, constant.BINANCE_NETOWRK, res_bsc[1]);
+        token = {
+          name: res_bsc[0],
+          contractAddress: debouncedQuery,
+          price: 0,
+          marketCap: "",
+          totalSupply: "0",
+          holdersCount: 0,
+          symbol: res_bsc[1],
+          balance: 0,
+          image: logo,
+          network: constant.BINANCE_NETOWRK,
+          pinSetting: false,
+        } as ERC20Token;
+        setFoundToken(token);   
+      } 
+      if(foundFlag == true){
+        setSearchStatus(SearchStatus.founddata);     
       } else {
-        const res_bsc = await getTokenSymbol(debouncedQuery, constant.BINANCE_NETOWRK);
-        if (res_bsc != constant.NOT_FOUND_TOKEN) {
-          const logo = await getTokenLogoURL(debouncedQuery, constant.BINANCE_NETOWRK);
-          token = {
-            name: res_bsc[0],
-            contractAddress: debouncedQuery,
-            price: 0,
-            marketCap: "",
-            totalSupply: "0",
-            holdersCount: 0,
-            symbol: res_bsc[1],
-            balance: 0,
-            image: logo,
-            network: constant.BINANCE_NETOWRK,
-            pinSetting: false,
-          } as ERC20Token;
-          setFoundToken(token);   
-          setSearchStatus(SearchStatus.founddata);     
-        } else {
-          setFoundToken(undefined);
-          setSearchStatus(SearchStatus.notsearch);
-        }
+        setFoundToken(undefined);
+        setSearchStatus(SearchStatus.notsearch);
       }
     } else {
       setFoundToken(undefined);

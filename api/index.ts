@@ -91,7 +91,7 @@ export function wrappedCurrency(chainId: ChainId | undefined): Token | undefined
 
 export async function getTokenSymbol(address: string, network: number) {
 
-  let name, symbol;
+  let name, symbol, decimal;
   let TokenContract:ethers.Contract;
   if (network == constant.ETHEREUM_NETWORK) {
     const provider = new ethers.providers.JsonRpcProvider(constant.ETHRPC_URL, constant.ETHEREUM_NETWORK);
@@ -103,6 +103,7 @@ export async function getTokenSymbol(address: string, network: number) {
     TokenContract = new ethers.Contract(address, BEP20TokenABI, signer)
   }
   try {
+    decimal = await TokenContract!.decimals()
     symbol = await TokenContract!.symbol()
     name = await TokenContract!.name()
   } catch (err:any) {
@@ -111,22 +112,28 @@ export async function getTokenSymbol(address: string, network: number) {
   return [name, symbol];
 }
 
-const getTokenId = async (address: string): Promise<string | undefined> => {
+const getTokenId = async (address: string): Promise<string[] | undefined> => {
   const response = await fetch(`${CMC_ENDPOINT}${address}`)
 
   if (response.ok) {
-    return (await response.json()).data.id
+    const obj = await response.json();
+    return [obj.data.id, obj.data.symbol]
   }
   return undefined
 }
 
-export async function getTokenLogoURL(address: string, network:number) {
-  const id = await getTokenId(address);
+export async function getTokenLogoURL(address: string, network:number, symbol: string) {
   const eth_default_url = "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png";
   const bnb_default_url = "https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png";
-  if (id != undefined) {
-    const url = "https://s2.coinmarketcap.com/static/img/coins/64x64/" + id + ".png";
-    return url;
+  const res = await getTokenId(address);
+  if (res != undefined) {
+    const id = res[0];
+    const api_symbol = res[1];
+    console.log('symbol', api_symbol, symbol);
+    if (id != undefined && api_symbol.toLowerCase() == symbol.toLowerCase()) {
+      const url = "https://s2.coinmarketcap.com/static/img/coins/64x64/" + id + ".png";
+      return url;
+    }
   }
   return network == constant.ETHEREUM_NETWORK ? eth_default_url : bnb_default_url;
 }
