@@ -5,18 +5,14 @@ import {
   useNetwork,
 } from '@thirdweb-dev/react'
 import {
-  getTokenInfoFromWalletAddress,
-  getContractInfoFromWalletAddress,
-  getTokenInfoFromTokenName,
   getTokenNameWithAddress,
-  wrappedCurrency,
   getTokenLogoURL
 } from '../../api'
 import {
   useTokenInfo,
   useDebounce
 } from '../../hooks'
-import {ERC20Token} from '../../utils/type'
+import {ERC20Token, SearchStatus} from '../../utils/type'
 import {
   setCookie,
   getCookie,
@@ -43,22 +39,25 @@ export default function TokenList() {
   const debouncedQuery = useDebounce(searchQuery, 200);
   const network = useNetwork();
 
-  const [showPinedToken, setShowPinedToken] = useState<Boolean>();
+  const [showListToken, setShowListToken] = useState<Boolean>();
   const [activeToken, setActiveToken] = useState<ERC20Token>();
   const [foundToken, setFoundToken] = useState<ERC20Token>();
-  const [pinedTokens, setPinedTokens] = useState<ERC20Token[]>([]);
+  const [listTokens, setListTokens] = useState<ERC20Token[]>([]);
+  const [searchStatus, setSearchStatus] = useState<SearchStatus>(SearchStatus.notsearch);
  
   const searchToken = async() => {
     if (debouncedQuery[0] == "0" && debouncedQuery[1] == "x") {
       let existToken = undefined;
-      const found = pinedTokens.find((element) => {
+      const found = listTokens.find((element) => {
         existToken = element;
         return (element.contractAddress) === (debouncedQuery);
       });
       if (found && existToken != undefined){
         setFoundToken(existToken);
+        setSearchStatus(SearchStatus.founddata);     
         return;
       }
+      setSearchStatus(SearchStatus.searching);
       const res_eth = await getTokenNameWithAddress(debouncedQuery, constant.ETHEREUM_NETWORK);
       let token;
       if (res_eth != constant.NOT_FOUND_TOKEN) {
@@ -77,6 +76,7 @@ export default function TokenList() {
           pinSetting: false,
         } as ERC20Token;
         setFoundToken(token);
+        setSearchStatus(SearchStatus.founddata);     
       } else {
         const res_bsc = await getTokenNameWithAddress(debouncedQuery, constant.BINANCE_NETOWRK);
         if (res_bsc != constant.NOT_FOUND_TOKEN) {
@@ -94,13 +94,16 @@ export default function TokenList() {
             network: constant.BINANCE_NETOWRK,
             pinSetting: false,
           } as ERC20Token;
-          setFoundToken(token);        
+          setFoundToken(token);   
+          setSearchStatus(SearchStatus.founddata);     
         } else {
           setFoundToken(undefined);
+          setSearchStatus(SearchStatus.notsearch);
         }
       }
     } else {
       setFoundToken(undefined);
+      setSearchStatus(SearchStatus.notsearch);
     }
   }
 
@@ -118,7 +121,7 @@ export default function TokenList() {
 
   useEffect(() => {
     searchToken();
-    setShowPinedToken(debouncedQuery.length == 0);
+    setShowListToken(debouncedQuery.length == 0);
   }, [debouncedQuery]);
 
   useEffect(() => {
@@ -142,18 +145,20 @@ export default function TokenList() {
         totalSupply:obj["totalSupply"],
         pinSetting:obj["pinSetting"]
       } as ERC20Token;
+      if (token.pinSetting == false)
+        return;
       cookieToken.push(token);
     });
-    setPinedTokens(cookieToken); 
+    setListTokens(cookieToken); 
   }, []);
 
   const addPinTokenHandler = (token:ERC20Token) => {
-    const filterTokens = pinedTokens.filter(item => item.contractAddress !== token.contractAddress);
+    const filterTokens = listTokens.filter(item => item.contractAddress !== token.contractAddress);
     if (token.pinSetting) {
       filterTokens.push(token);
-      setPinedTokens(filterTokens); 
+      setListTokens(filterTokens); 
     } else {
-      setPinedTokens(filterTokens);
+      setListTokens(filterTokens);
     }
     let newCookieString = "";
     filterTokens.forEach((token) => {
@@ -161,19 +166,30 @@ export default function TokenList() {
       newCookieString += obj;
       newCookieString += "&";
     });
-    setCookie("PinedToken", newCookieString);         
-
+    setCookie("PinedToken", newCookieString);
   }
 
   const setActiveTokenHandler = (token:ERC20Token) => {
     setActiveToken(token);
-    setTokenData(token)
+    setTokenData(token);
+    if (
+      foundToken != undefined && 
+      token.contractAddress == foundToken.contractAddress) {
+      setSearchQuery("");
+      setListTokens(listTokens.filter(item => item.contractAddress != token.contractAddress)); 
+      setListTokens(tokens => [...tokens, token]);
+    } else if (token.pinSetting == true && listTokens.length >= 2){
+      const last = listTokens.at(-1);
+      if (last?.pinSetting == false)
+        setListTokens(listTokens.filter(item => item.contractAddress != last!.contractAddress));
+    }
   }
 
   return (
     <Box className={listClass}>
       <Box className = {style.tokenSearch}>
         <Input 
+          id='SearchId'
           placeholder='Search'
           onChange={handleSearchChange} 
           onKeyDown={handleEnter}
@@ -181,21 +197,60 @@ export default function TokenList() {
           borderRadius={'2rem'}
           height='2.5rem'
           className={searchClass}
+          value={searchQuery}
         />
       </Box>
       <Box style={{display:"flex", flexDirection:"column", width:"100%"}}>
           {
-            foundToken != undefined && 
-            <TokenListItem
-              tokenData = {foundToken}
-              activeToken = {activeToken!}
-              activeTokenHandler = {setActiveTokenHandler}
-              pinTokenHandler = {addPinTokenHandler}
-            /> 
+            searchStatus == SearchStatus.searching &&
+            <Box width = "100%" style={{display:"flex", justifyContent:"center"}}>
+              Searching...
+            </Box>
           }
           {
-            showPinedToken &&
-            pinedTokens.map((token) => {
+            foundToken != undefined && searchStatus == SearchStatus.founddata ? (
+            <Box 
+              width = "100%" 
+              style={{
+                display:"flex", 
+                justifyContent:"center", 
+                flexDirection:"column"
+              }}>
+              <p style={{display:"flex", justifyContent:"center", width:"90%"}}> Search Result </p>
+              <TokenListItem
+                tokenData = {foundToken}
+                activeToken = {activeToken!}
+                activeTokenHandler = {setActiveTokenHandler}
+                pinTokenHandler = {addPinTokenHandler}
+              />
+            </Box>
+            ):(
+              debouncedQuery.length > 0 && searchStatus == SearchStatus.notsearch &&
+              <Box 
+                width = "100%" 
+                style={{
+                  display:"flex", 
+                  justifyContent:"center", 
+                  flexDirection:"column", 
+                alignItems:"center"
+              }}>
+                <p style={{display:"flex", justifyContent:"center", width:"90%"}}>Search Result</p>
+                <Box style={{
+                  display:"flex", 
+                  justifyContent:"center", 
+                  alignItems:"center"
+                  }}
+                  width="90%" 
+                  height="4.8rem"
+                >
+                  <p>No Data Found</p>
+                </Box>
+              </Box>
+            )
+          }
+          {
+            showListToken &&
+            listTokens.map((token) => {
               if (token == foundToken)
                 return;
               return (

@@ -17,3 +17,10 @@ export interface ERC20Token {
   twitter?: string;
   pinSetting: boolean;
 }
+
+export enum SearchStatus {
+  notsearch,
+  searching,
+  nodata,
+  founddata,
+}
