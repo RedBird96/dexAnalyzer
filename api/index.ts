@@ -54,7 +54,6 @@ export async function getTokenInfoFromWalletAddress(address:string) {
   }
   try {
     text = await response.text();
-    console.log('text', text);
   } catch (err:any) {
     return constant.NOT_FOUND_TOKEN;
   }
@@ -103,7 +102,7 @@ export async function getTokenSymbol(address: string, network: number) {
     TokenContract = new ethers.Contract(address, BEP20TokenABI, signer)
   }
   try {
-    decimal = await TokenContract!.decimals()
+//    decimal = await TokenContract!.decimals()
     symbol = await TokenContract!.symbol()
     name = await TokenContract!.name()
   } catch (err:any) {
@@ -129,7 +128,6 @@ export async function getTokenLogoURL(address: string, network:number, symbol: s
   if (res != undefined) {
     const id = res[0];
     const api_symbol = res[1];
-    console.log('symbol', api_symbol, symbol);
     if (id != undefined && api_symbol.toLowerCase() == symbol.toLowerCase()) {
       const url = "https://s2.coinmarketcap.com/static/img/coins/64x64/" + id + ".png";
       return url;

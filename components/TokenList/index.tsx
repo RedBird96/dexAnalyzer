@@ -41,71 +41,114 @@ export default function TokenList() {
 
   const [showListToken, setShowListToken] = useState<Boolean>();
   const [activeToken, setActiveToken] = useState<ERC20Token>();
-  const [foundToken, setFoundToken] = useState<ERC20Token>();
+  const [foundToken, setFoundToken] = useState<ERC20Token[]>([]);
   const [listTokens, setListTokens] = useState<ERC20Token[]>([]);
   const [searchStatus, setSearchStatus] = useState<SearchStatus>(SearchStatus.notsearch);
  
   const searchToken = async() => {
     if (debouncedQuery[0] == "0" && debouncedQuery[1] == "x") {
-      let existToken = undefined;
-      const found = listTokens.find((element) => {
-        existToken = element;
-        return (element.contractAddress) === (debouncedQuery);
-      });
-      if (found && existToken != undefined){
-        setFoundToken(existToken);
-        setSearchStatus(SearchStatus.founddata);     
-        return;
-      }
-      setSearchStatus(SearchStatus.searching);
       let foundFlag = false;
-      const res_eth = await getTokenSymbol(debouncedQuery, constant.ETHEREUM_NETWORK);
-      let token;
-      if (res_eth != constant.NOT_FOUND_TOKEN) {
-        foundFlag = true;
-        const logo = await getTokenLogoURL(debouncedQuery, constant.ETHEREUM_NETWORK, res_eth[1]);
-        token = {
-          name: res_eth[0],
-          contractAddress: debouncedQuery,
-          price: 0,
-          marketCap: "",
-          totalSupply: "0",
-          holdersCount: 0,
-          balance: 0,
-          symbol: res_eth[1],
-          image: logo,
-          network: constant.ETHEREUM_NETWORK,
-          pinSetting: false,
-        } as ERC20Token;
-        setFoundToken(token);  
+      let foundEthToken:ERC20Token={
+        contractAddress: "0x00",
+        name: '',
+        symbol: '',
+        network: 0,
+        price: 0,
+        usdBalance: 0,
+        decimals: 0,
+        holdersCount: 0,
+        image: '',
+        owner: '',
+        totalSupply: '',
+        marketCap: '',
+        pinSetting: false
+      };
+      let foundBscToken:ERC20Token={
+        contractAddress: "0x00",
+        name: '',
+        symbol: '',
+        network: 0,
+        price: 0,
+        usdBalance: 0,
+        decimals: 0,
+        holdersCount: 0,
+        image: '',
+        owner: '',
+        totalSupply: '',
+        marketCap: '',
+        pinSetting: false
+      };
+      listTokens.map((element) => {
+        if (element.contractAddress.toLowerCase() == debouncedQuery.toLowerCase())
+        {
+          if (element.network == constant.ETHEREUM_NETWORK){
+            foundEthToken = element;
+          } else if (element.network == constant.BINANCE_NETOWRK) {
+            foundBscToken = element;
+          }
+          foundFlag = true;
+        }
+      });
+      setSearchStatus(SearchStatus.searching);
+      if (foundEthToken.contractAddress == "0x00") {
+        const res_eth = await getTokenSymbol(debouncedQuery, constant.ETHEREUM_NETWORK);
+        if (res_eth != constant.NOT_FOUND_TOKEN) {
+          foundFlag = true;
+          const logo = await getTokenLogoURL(debouncedQuery, constant.ETHEREUM_NETWORK, res_eth[1]);
+          const token = {
+            name: res_eth[0],
+            contractAddress: debouncedQuery.toLowerCase(),
+            price: 0,
+            marketCap: "",
+            totalSupply: "0",
+            holdersCount: 0,
+            balance: 0,
+            symbol: res_eth[1],
+            image: logo,
+            network: constant.ETHEREUM_NETWORK,
+            pinSetting: false,
+          } as ERC20Token;
+          foundEthToken = token;
+        }
       }
-      const res_bsc = await getTokenSymbol(debouncedQuery, constant.BINANCE_NETOWRK);
-      if (res_bsc != constant.NOT_FOUND_TOKEN) {
-        foundFlag = true;
-        const logo = await getTokenLogoURL(debouncedQuery, constant.BINANCE_NETOWRK, res_bsc[1]);
-        token = {
-          name: res_bsc[0],
-          contractAddress: debouncedQuery,
-          price: 0,
-          marketCap: "",
-          totalSupply: "0",
-          holdersCount: 0,
-          symbol: res_bsc[1],
-          balance: 0,
-          image: logo,
-          network: constant.BINANCE_NETOWRK,
-          pinSetting: false,
-        } as ERC20Token;
-        setFoundToken(token);   
-      } 
+      if (foundBscToken.contractAddress == "0x00") {
+          const res_bsc = await getTokenSymbol(debouncedQuery, constant.BINANCE_NETOWRK);
+          if (res_bsc != constant.NOT_FOUND_TOKEN) {
+            foundFlag = true;
+            const logo = await getTokenLogoURL(debouncedQuery, constant.BINANCE_NETOWRK, res_bsc[1]);
+            const token = {
+              name: res_bsc[0],
+              contractAddress: debouncedQuery.toLowerCase(),
+              price: 0,
+              marketCap: "",
+              totalSupply: "0",
+              holdersCount: 0,
+              symbol: res_bsc[1],
+              balance: 0,
+              image: logo,
+              network: constant.BINANCE_NETOWRK,
+              pinSetting: false,
+            } as ERC20Token;
+            foundBscToken = token;
+          } 
+      }
       if(foundFlag == true){
+        setFoundToken(foundToken.filter(
+          item => (item.contractAddress != debouncedQuery.toLowerCase())
+        ));     
+        if (foundEthToken.contractAddress != "0x00"){
+          setFoundToken(tokens=>[...tokens, foundEthToken]);     
+        }   
+        if (foundBscToken.contractAddress != "0x00") {
+          setFoundToken(tokens=>[...tokens, foundBscToken]);  
+        }
         setSearchStatus(SearchStatus.founddata);     
       } else {
-        setFoundToken(undefined);
+        setFoundToken([]);
         setSearchStatus(SearchStatus.notsearch);
       }
     } else {
-      setFoundToken(undefined);
+      setFoundToken([]);
       setSearchStatus(SearchStatus.notsearch);
     }
   }
@@ -156,7 +199,10 @@ export default function TokenList() {
   }, []);
 
   const addPinTokenHandler = (token:ERC20Token) => {
-    const filterTokens = listTokens.filter(item => item.contractAddress !== token.contractAddress);
+    const filterTokens = listTokens.filter(
+      item => (item.contractAddress+item.network) !== 
+      (token.contractAddress+token.network)
+    );
     if (token.pinSetting) {
       filterTokens.push(token);
       setListTokens(filterTokens); 
@@ -175,18 +221,19 @@ export default function TokenList() {
   const setActiveTokenHandler = (token:ERC20Token) => {
     setActiveToken(token);
     setTokenData(token);
-    if (
-      foundToken != undefined && 
-      token.contractAddress == foundToken.contractAddress) {
+    if (searchStatus == SearchStatus.founddata) {
       setSearchQuery("");
       setListTokens(
-        listTokens.filter(item => item.contractAddress != token.contractAddress && 
+        listTokens.filter(item => (item.contractAddress + item.network) != (token.contractAddress + token.network) && 
         item.pinSetting == true)); 
       setListTokens(tokens => [...tokens, token]);
     } else if (token.pinSetting == true && listTokens.length >= 2){
       const last = listTokens.at(-1);
       if (last?.pinSetting == false)
-        setListTokens(listTokens.filter(item => item.contractAddress != last!.contractAddress));
+        setListTokens(listTokens.filter(
+          item => (item.contractAddress+item.network) != 
+          (last!.contractAddress + last!.network)
+      ));
     }
   }
 
@@ -213,7 +260,7 @@ export default function TokenList() {
             </Box>
           }
           {
-            foundToken != undefined && searchStatus == SearchStatus.founddata ? (
+            foundToken.length != 0 && searchStatus == SearchStatus.founddata ? (
             <Box 
               width = "100%" 
               style={{
@@ -221,13 +268,20 @@ export default function TokenList() {
                 justifyContent:"center", 
                 flexDirection:"column"
               }}>
-              <p style={{display:"flex", justifyContent:"center", width:"90%"}}> Search Result </p>
-              <TokenListItem
-                tokenData = {foundToken}
-                activeToken = {activeToken!}
-                activeTokenHandler = {setActiveTokenHandler}
-                pinTokenHandler = {addPinTokenHandler}
-              />
+                <p style={{display:"flex", justifyContent:"center", width:"90%"}}> Search Result </p>
+                {
+                  foundToken.map((token) => {
+                    return(
+                      <TokenListItem
+                        key={token.contractAddress + token.network}
+                        tokenData = {token}
+                        activeToken = {activeToken!}
+                        activeTokenHandler = {setActiveTokenHandler}
+                        pinTokenHandler = {addPinTokenHandler}
+                      />
+                    );
+                  })
+                }
             </Box>
             ):(
               debouncedQuery.length > 0 && searchStatus == SearchStatus.notsearch &&
@@ -256,7 +310,8 @@ export default function TokenList() {
           {
             showListToken &&
             listTokens.map((token) => {
-              if (token == foundToken)
+              const alreadyListed = foundToken.find(element => (element.contractAddress + element.network) == (token.contractAddress + token.network));
+              if (alreadyListed != undefined)
                 return;
               return (
               <TokenListItem
