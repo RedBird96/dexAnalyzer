@@ -5,8 +5,8 @@ import {
   useNetwork,
 } from '@thirdweb-dev/react'
 import {
-  getTokenNameWithAddress,
-  getTokenLogoURL
+  getTokenLogoURL,
+  getTokenSymbol
 } from '../../api'
 import {
   useTokenInfo,
@@ -36,7 +36,7 @@ export default function TokenList() {
   const walletAddress = useAddress();
   const {setTokenData} = useTokenInfo();
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const debouncedQuery = useDebounce(searchQuery, 200);
+  const debouncedQuery = useDebounce(searchQuery.replace(/\s/g, ''), 200);
   const network = useNetwork();
 
   const [showListToken, setShowListToken] = useState<Boolean>();
@@ -58,37 +58,37 @@ export default function TokenList() {
         return;
       }
       setSearchStatus(SearchStatus.searching);
-      const res_eth = await getTokenNameWithAddress(debouncedQuery, constant.ETHEREUM_NETWORK);
+      const res_eth = await getTokenSymbol(debouncedQuery, constant.ETHEREUM_NETWORK);
       let token;
       if (res_eth != constant.NOT_FOUND_TOKEN) {
         const logo = await getTokenLogoURL(debouncedQuery, constant.ETHEREUM_NETWORK);
         token = {
-          name: res_eth[0],
+          name: res_eth,
           contractAddress: debouncedQuery,
           price: 0,
           marketCap: "",
           totalSupply: "0",
           holdersCount: 0,
           balance: 0,
-          symbol: res_eth[1],
+          symbol: res_eth,
           image: logo,
           network: constant.ETHEREUM_NETWORK,
           pinSetting: false,
         } as ERC20Token;
         setFoundToken(token);
-        setSearchStatus(SearchStatus.founddata);     
+        setSearchStatus(SearchStatus.founddata);    
       } else {
-        const res_bsc = await getTokenNameWithAddress(debouncedQuery, constant.BINANCE_NETOWRK);
+        const res_bsc = await getTokenSymbol(debouncedQuery, constant.BINANCE_NETOWRK);
         if (res_bsc != constant.NOT_FOUND_TOKEN) {
           const logo = await getTokenLogoURL(debouncedQuery, constant.BINANCE_NETOWRK);
           token = {
-            name: res_bsc[0],
+            name: res_bsc,
             contractAddress: debouncedQuery,
             price: 0,
             marketCap: "",
             totalSupply: "0",
             holdersCount: 0,
-            symbol: res_bsc[1],
+            symbol: res_bsc,
             balance: 0,
             image: logo,
             network: constant.BINANCE_NETOWRK,

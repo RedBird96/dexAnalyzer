@@ -89,9 +89,9 @@ export function wrappedCurrency(chainId: ChainId | undefined): Token | undefined
   return chainId && WNATIVE[chainId]
 }
 
-export async function getTokenNameWithAddress(address: string, network: number) {
+export async function getTokenSymbol(address: string, network: number) {
 
-  let name, symbol, decimals, totalSupply;
+  let symbol;
   let TokenContract:ethers.Contract;
   if (network == constant.ETHEREUM_NETWORK) {
     const provider = new ethers.providers.JsonRpcProvider(constant.ETHRPC_URL, constant.ETHEREUM_NETWORK);
@@ -103,14 +103,11 @@ export async function getTokenNameWithAddress(address: string, network: number) 
     TokenContract = new ethers.Contract(address, BEP20TokenABI, signer)
   }
   try {
-    name = await TokenContract!.name()
     symbol = await TokenContract!.symbol()
-    decimals = await TokenContract!.decimals()
-    totalSupply = await TokenContract!.totalSupply()
   } catch (err:any) {
     return constant.NOT_FOUND_TOKEN;
   }
-  return [name, symbol, decimals, totalSupply];
+  return symbol;
 }
 
 const getTokenId = async (address: string): Promise<string | undefined> => {
