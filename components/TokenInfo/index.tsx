@@ -99,11 +99,16 @@ export default function TokenInfo() {
             <p className={style.tokenMarketCap} style={{color:"#00B112"}}>{convertBalanceCurrency(parseFloat(tokenData.marketCap))}</p>
           </Box>
           <div className={style.border} style={{borderColor:infoborderColorMode}}/>
-          <Box display={"flex"} flexDirection={"column"} width={"28%"} paddingLeft={"0.2rem"}>
-            <p className={style.marketCap} style={{color:textColor}}>UNI / BNB (LP)</p>
-            <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
-              <p className={style.tokenMarketCap} style={{marginRight:"1rem"}}  color={whiteBlackMode}>{numberWithCommasTwoDecimals(parseFloat(tokenData.marketCap))}</p>
-              <p className={style.tokenMarketCap} style={{color:"#00B112"}}>({convertBalanceCurrency(tokenData.balance! * tokenData.price)})</p>
+          <Box display={"flex"} flexDirection={"row"} width={"28%"} paddingLeft={"0.2rem"} paddingRight={"0.5rem"} justifyContent={"space-between"} alignItems={"center"}>
+            <Box display={"flex"} flexDirection={"column"} >
+              <p className={style.marketCap} style={{color:textColor}}>UNI / BNB (LP)</p>
+              <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
+                <p className={style.tokenMarketCap} style={{marginRight:"1rem"}}  color={whiteBlackMode}>{numberWithCommasTwoDecimals(parseFloat(tokenData.marketCap))}</p>
+                <p className={style.tokenMarketCap} style={{color:"#00B112"}}>({convertBalanceCurrency(tokenData.balance! * tokenData.price)})</p>
+              </Box>
+            </Box>
+            <Box cursor={"pointer"}>
+              
             </Box>
           </Box>
           <div className={style.border} style={{borderColor:infoborderColorMode}}/>

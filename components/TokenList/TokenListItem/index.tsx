@@ -29,6 +29,7 @@ const TokenListItem = ({
 }) => {
 
   const colorMode = useColorMode();
+  const textColor = useColorModeValue("#5E5E5E","#A7A7A7");
   const whiteColor = useColorModeValue("#000000","#FFFFFF");
   const hoverColor = useColorModeValue("#005CE5","#3A3A29");
   const [isActive, setIsActive] = useState<Boolean>(false);
@@ -53,7 +54,10 @@ const TokenListItem = ({
         <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
           <img src={tokenData?.image} width={"50rem"}/>
           <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
-            <p className={style.tokenName}>{tokenData?.symbol}</p>
+            <Box display={"flex"} flexDirection={"row"} >
+              <p className={style.tokenName}>{tokenData?.name}</p>
+              <p className={style.tokenName} style={{color:textColor}}>&nbsp;({tokenData?.symbol})</p>
+            </Box>
             <p className={style.tokenAddress}>{makeShortAddress(tokenData?.contractAddress!)}</p>
           </Box>
         </Box>

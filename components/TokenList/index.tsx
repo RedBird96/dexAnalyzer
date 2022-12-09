@@ -63,14 +63,14 @@ export default function TokenList() {
       if (res_eth != constant.NOT_FOUND_TOKEN) {
         const logo = await getTokenLogoURL(debouncedQuery, constant.ETHEREUM_NETWORK);
         token = {
-          name: res_eth,
+          name: res_eth[0],
           contractAddress: debouncedQuery,
           price: 0,
           marketCap: "",
           totalSupply: "0",
           holdersCount: 0,
           balance: 0,
-          symbol: res_eth,
+          symbol: res_eth[1],
           image: logo,
           network: constant.ETHEREUM_NETWORK,
           pinSetting: false,
@@ -82,13 +82,13 @@ export default function TokenList() {
         if (res_bsc != constant.NOT_FOUND_TOKEN) {
           const logo = await getTokenLogoURL(debouncedQuery, constant.BINANCE_NETOWRK);
           token = {
-            name: res_bsc,
+            name: res_bsc[0],
             contractAddress: debouncedQuery,
             price: 0,
             marketCap: "",
             totalSupply: "0",
             holdersCount: 0,
-            symbol: res_bsc,
+            symbol: res_bsc[1],
             balance: 0,
             image: logo,
             network: constant.BINANCE_NETOWRK,
