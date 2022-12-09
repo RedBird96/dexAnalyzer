@@ -18,6 +18,7 @@ export function TokenInfoProvider({children}:any) {
   const usdtAddress = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
     temp = {
       name:"USDT",
+      symbol:"USDT",
       contractAddress:usdtAddress,
       price: 1.0000656382416633,
       marketCap: "65448727018.6056",
