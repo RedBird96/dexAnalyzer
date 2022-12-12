@@ -1,13 +1,13 @@
 import { ethers } from "ethers";
+import { request, gql } from 'graphql-request';
+import fetch from 'cross-fetch';
 import web3 from 'web3';
-import { ChainId, Currency, CurrencyAmount, Native, Token, WNATIVE } from '@pancakeswap/sdk'
 import ERC20TokenABI from '../config/ERC20ABI.json'
 import BEP20TokenABI from '../config/ERC20ABI.json'
 import EtherscanClient, {Action} from './ethers/etherscan-client';
 import {ERC20Token} from '../utils/type'
-import { CoinGeckoClient } from './CoinGeckoClient';
 import * as constant from '../utils/constant'
-import fetch from 'cross-fetch';
+import { createClient, useQuery } from 'urql'
 
 const ETH_MAINNET_API_URL = 'https://api.etherscan.io/api';
 const BSC_MAINNET_API_URL = 'https://api.bscscan.com/api';
@@ -24,6 +24,7 @@ const BSC_MAINNET_CONNECTION = {
 }
 const CMC_ENDPOINT = 'https://3rdparty-apis.coinmarketcap.com/v1/cryptocurrency/contract?address='
 const CG_ENDPOINT = 'https://api.coingecko.com/api/v3/';
+const PC_PAIRS = "https://api.thegraph.com/subgraphs/name/pancakeswap/pairs";
 
 export async function getContractInfoFromWalletAddress(address:string, network: number) {
 
@@ -157,11 +158,6 @@ export async function getTokenInfoFromTokenName(_name: string) {
   return constant.NOT_FOUND_TOKEN;
 }
 
-
-export function wrappedCurrency(chainId: ChainId | undefined): Token | undefined {
-  return chainId && WNATIVE[chainId]
-}
-
 export async function getTokenSymbol(address: string, network: number) {
 
   let name, symbol, decimal, totalSupply;
@@ -231,4 +227,54 @@ export async function getTokenPricefromCoingeckoAPI(addresses: string, network: 
     return obj
   }
   return undefined    
+}
+
+export async function getLPTokenList(address: string, network: number) {
+      
+  let lpTokenSymbol: string[] = [];
+  let lpTokenAddresses: string[] = [];
+  let checkTokenList: string[] = [];
+  if(network == constant.ETHEREUM_NETWORK) {
+    checkTokenList.push(constant.WHITELIST_TOKENS.ETH.USDC);
+    checkTokenList.push(constant.WHITELIST_TOKENS.ETH.USDT);
+    checkTokenList.push(constant.WHITELIST_TOKENS.ETH.ETH);
+    checkTokenList.push(constant.WHITELIST_TOKENS.ETH.DAI);
+  } else {
+    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.USDC);
+    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.USDT);
+    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.BNB);
+    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.BUSD);
+    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.DAI);
+    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.WBNB);
+  }
+  const response = await request(PC_PAIRS,
+    gql`
+    query getLPTokenPairs($address:String){
+      pairs(where:{token1:$address}) {
+        id
+        token0 {
+          id
+          symbol
+        }
+        token1 {
+          id
+          symbol
+        }
+      }
+    }
+    `,
+    {
+      address
+    }
+  );
+  if (response != undefined && response.pairs.length > 0) {
+    response.pairs.forEach((token: any) => {
+      const token0 = token.token0.id;
+      if (checkTokenList.includes(token0)) {
+        lpTokenAddresses.push(token.id);
+        lpTokenSymbol.push(token.token0.symbol + "/" + token.token1.symbol);
+      }
+    });
+  }
+  return [lpTokenAddresses, lpTokenSymbol];
 }

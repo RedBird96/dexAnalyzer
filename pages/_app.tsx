@@ -5,6 +5,7 @@ import { ThirdwebProvider, ChainId } from '@thirdweb-dev/react';
 import {TokenInfoProvider} from '../hooks/useTokenInfo'
 import Layout from '../components/PageLayout'
 import { theme } from "../themes/theme";
+import { LpTokenPriceProvider } from '../hooks/useLPTokenPrice';
 
 export default function App({ Component, pageProps }: AppProps) {
 
@@ -15,9 +16,11 @@ export default function App({ Component, pageProps }: AppProps) {
     <ChakraProvider theme={theme}>
       <ThirdwebProvider desiredChainId={desiredChainId} supportedChains={supportChain}>
         <TokenInfoProvider>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
+          <LpTokenPriceProvider>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </LpTokenPriceProvider>
         </TokenInfoProvider>
       </ThirdwebProvider>
     </ChakraProvider>

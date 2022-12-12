@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react'
 import { Box, Switch, useColorMode, useColorModeValue  } from "@chakra-ui/react"
-import {BigNumber} from 'bignumber.js'
 import {
   WebSite,
   FaceBook,
@@ -9,24 +8,28 @@ import {
   CopyAddressIconLight,
 } from "../../assests/icon"
 import {
-  useTokenInfo
-} from '../../hooks/useTokenInfo'
-import {ERC20Token} from '../../utils/type'
+  useTokenInfo,
+  useLPTokenPrice
+} from '../../hooks'
 import { 
   convertBalanceCurrency,
   numberWithCommasTwoDecimals
 } from '../../utils'
 import {
   getTokenInfofromCoingeckoAPI,
-  getTokenInfoFromWalletAddress
+  getTokenInfoFromWalletAddress,
+  getLPTokenList
 } from '../../api'
 import style from './TokenInfo.module.css'
 import * as constant from '../../utils/constant'
+import { ERC20Token } from '../../utils/type'
+
 
 export default function TokenInfo() {
 
   const colorMode = useColorMode();
   const {tokenData, setTokenData} = useTokenInfo();
+  const {lpTokenPrice, setLPTokenAddress} = useLPTokenPrice();
   const [balance, setBalance] = useState<number>(0);
   const [balanceUSD, setBalanceUSD] = useState<number>(0);
 
@@ -41,6 +44,23 @@ export default function TokenInfo() {
   const infoborderColorMode = useColorModeValue("#E2E8F0","#2B2A2A");
   const whiteBlackMode = useColorModeValue('#FFFFFF', '#000000');
   const  setTokenInfo = async() => {
+    const res = await getLPTokenList(tokenData.contractAddress, tokenData.network);
+    console.log('lpaddress', res);
+    if (res.length > 0) {
+      setLPTokenAddress({
+        name:res[1][0],
+        symbol:res[1][0],
+        contractAddress:res[0][0],
+        price: 0,
+        marketCap: "",
+        totalSupply: 0,
+        holdersCount: 0,
+        balance: 0,
+        decimals: 0,
+        image: "",
+        network: tokenData.network      
+      } as ERC20Token);
+    }
     if (tokenData.network == constant.ETHEREUM_NETWORK) {
       const res = await getTokenInfoFromWalletAddress(tokenData.contractAddress);
       if (res != constant.NOT_FOUND_TOKEN) {
@@ -66,6 +86,7 @@ export default function TokenInfo() {
     // console.log('totalSupply', tokenData.totalSupply);
 
   }
+
   useEffect(() => {
     setTokenInfo();
     let balance_temp = 0;
@@ -87,7 +108,7 @@ export default function TokenInfo() {
             <Box display={"flex"} flexDirection={"column"} paddingLeft={"1rem"}>
               <Box display={"flex"} flexDirection={"row"}>
                 <p className={style.tokenName}>{tokenData.symbol}</p>
-                <p className={style.tokenPrice}>{convertBalanceCurrency(tokenData.price)}</p>
+                <p className={style.tokenPrice}>{convertBalanceCurrency(lpTokenPrice)}</p>
               </Box>
               <Box display={"flex"} flexDirection={"row"} alignItems={"center"} justifyContent={"center"}>
                 <p className={style.tokenAddress} style={{color:textColor}}>{tokenData.contractAddress}</p>
@@ -141,7 +162,7 @@ export default function TokenInfo() {
         <Box display={"flex"} flexDirection={"row"} width={"83%"} height={"100%"} alignItems={"center"}>
           <Box display={"flex"} flexDirection={"column"} width={"28%"} paddingLeft={"4rem"}>
             <p className={style.marketCap} style={{color:textColor}} >Market Cap</p>
-            <p className={style.tokenMarketCap} style={{color:"#00B112"}}>{convertBalanceCurrency(parseFloat(tokenData.marketCap))}</p>
+            <p className={style.tokenMarketCap} style={{color:"#00B112"}}>{convertBalanceCurrency(tokenData.totalSupply * lpTokenPrice)}</p>
           </Box>
           <div className={style.border} style={{borderColor:infoborderColorMode}}/>
           <Box display={"flex"} flexDirection={"row"} width={"28%"} paddingLeft={"0.2rem"} paddingRight={"0.5rem"} justifyContent={"space-between"} alignItems={"center"}>

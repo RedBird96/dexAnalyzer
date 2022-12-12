@@ -27,6 +27,7 @@ import {
 import {Refresh} from '../../assests/icon'
 import style from './WalletInfo.module.css'
 import * as constant from '../../utils/constant'
+import { useTokenInfo } from '../../hooks'
 
 export default function WalletInfo() {
   const titleClass = useColorModeValue(
@@ -42,6 +43,7 @@ export default function WalletInfo() {
     style.tokenSearch + " " + style.tokenSearchDark,
   );
 
+  const {tokenData, setTokenData} = useTokenInfo();
   const selectBtnColor = useColorModeValue("#0070D7","#494949");
   const notSelectBtnColor = useColorModeValue("#E0E0E0","#1C1C1C");
   const tokenColor = useColorModeValue("#1C1C1C","#FFFFFF");
@@ -95,6 +97,12 @@ export default function WalletInfo() {
         const decimal = parseInt(value.tokenInfo.decimals);
         const tokenBalance = decimal != 0 ? value.balance / Math.pow(10, decimal) : 0;
         const tokenUSDBalance = tokenBalance * tokenPrice;
+        if (value.tokenInfo.address.toLocaleLowerCase() == tokenData.contractAddress.toLocaleLowerCase() && 
+            value.tokenInfo.symbol.toLocaleLowerCase() == tokenData.symbol.toLocaleLowerCase()) {
+              tokenData.balance = tokenBalance;
+              tokenData.usdBalance = tokenUSDBalance;
+              setTokenData(tokenData);
+        }
         if (tokenPrice != 0){
           usdBalance += tokenUSDBalance;
         }
@@ -125,8 +133,18 @@ export default function WalletInfo() {
       setETHTokensBalance(res);
     } else {
       const res = await getContractInfoFromWalletAddress(address!, constant.BINANCE_NETOWRK);
-      setTokensInfo(res);
-      setInitTokensInfo(res);
+      if (res != constant.NOT_FOUND_TOKEN){
+        res.forEach((value: ERC20Token) => {
+          if (value.contractAddress.toLocaleLowerCase() == tokenData.contractAddress.toLocaleLowerCase() && 
+              value.symbol.toLocaleLowerCase() == tokenData.symbol.toLocaleLowerCase()) { 
+                  tokenData.balance = value.balance;
+                  tokenData.usdBalance = value.usdBalance;
+                  setTokenData(tokenData);
+            }
+        });
+        setTokensInfo(res);
+        setInitTokensInfo(res);
+      }
     }
   }
 

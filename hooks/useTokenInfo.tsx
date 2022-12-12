@@ -25,6 +25,7 @@ export function TokenInfoProvider({children}:any) {
       totalSupply: 32297366521996886,
       holdersCount: 4408623,
       balance: 0,
+      usdBalance: 0,
       decimals: 6,
       image: "https://s2.coinmarketcap.com/static/img/coins/64x64/825.png"
     } as ERC20Token
