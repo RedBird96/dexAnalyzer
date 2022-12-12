@@ -91,9 +91,11 @@ export default function TokenInfo() {
               </Box>
               <Box display={"flex"} flexDirection={"row"} alignItems={"center"} justifyContent={"center"}>
                 <p className={style.tokenAddress} style={{color:textColor}}>{tokenData.contractAddress}</p>
-                {colorMode.colorMode == "dark" ?
-                <CopyAddressIconDark cursor={"pointer"}/> :
-                <CopyAddressIconLight cursor={"pointer"}/> }
+                <Box onClick={()=>{navigator.clipboard.writeText(tokenData.contractAddress)}}>
+                  {colorMode.colorMode == "dark" ?
+                  <CopyAddressIconDark cursor={"pointer"}/> :
+                  <CopyAddressIconLight cursor={"pointer"}/> }
+                </Box>
                 
               </Box>            
             </Box>
