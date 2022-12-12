@@ -8,6 +8,7 @@ export enum Action {
   account_txlist = 'account_txlist',
   account_txlistinternal = 'account_txlistinternal',
   account_tokentx = 'account_tokentx',
+  account_tokenbalance = 'account_tokenbalance',
   account_getminedblocks = 'account_getminedblocks',
   contract_getabi = 'contract_getabi',
   transaction_getstatus = 'transaction_getstatus',

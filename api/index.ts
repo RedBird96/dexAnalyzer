@@ -1,41 +1,115 @@
 import { ethers } from "ethers";
+import web3 from 'web3';
 import { ChainId, Currency, CurrencyAmount, Native, Token, WNATIVE } from '@pancakeswap/sdk'
 import ERC20TokenABI from '../config/ERC20ABI.json'
 import BEP20TokenABI from '../config/ERC20ABI.json'
 import EtherscanClient, {Action} from './ethers/etherscan-client';
+import {ERC20Token} from '../utils/type'
 import { CoinGeckoClient } from './CoinGeckoClient';
 import * as constant from '../utils/constant'
 import fetch from 'cross-fetch';
 
 const ETH_MAINNET_API_URL = 'https://api.etherscan.io/api';
-const BNB_MAINNET_API_URL = 'https://api.bscscan.com/api';
+const BSC_MAINNET_API_URL = 'https://api.bscscan.com/api';
 const ETH_MAINNET_PLORER_API_URL = 'https://api.ethplorer.io/';
 const ETHPLORER_API_KEY = 'EK-32KDR-3MoJfLq-QoUAU';
 const COINMARKETCAP_API_KEY = 'd27ab07a-3853-4402-8d56-651767ba4da5';
-const MAINNET_CONNECTION = {
+const ETH_MAINNET_CONNECTION = {
   apiKey: 'DF8U1AYKKAW8NHQQJ2H34W6B49H38JI9SU',
   apiUrl: ETH_MAINNET_API_URL
 };
+const BSC_MAINNET_CONNECTION = {
+  apiKey: '9JXFSN6Y82GSADZZRHHNDD29AMYFMB7XYS',
+  apiUrl: BSC_MAINNET_API_URL
+}
 const CMC_ENDPOINT = 'https://3rdparty-apis.coinmarketcap.com/v1/cryptocurrency/contract?address='
+const CG_ENDPOINT = 'https://api.coingecko.com/api/v3/';
 
-export async function getContractInfoFromWalletAddress(address:string) {
+export async function getContractInfoFromWalletAddress(address:string, network: number) {
 
-  const url = ETH_MAINNET_PLORER_API_URL + 
-    "getAddressInfo/" + 
-    address + 
-    "?apiKey=" + 
-    ETHPLORER_API_KEY;
-  let text: string;
-  const response = await fetch(url);
-  if (response.status != 200) {
-    return constant.NOT_FOUND_TOKEN;
+  if (network == constant.ETHEREUM_NETWORK) {
+    const url = ETH_MAINNET_PLORER_API_URL + 
+      "getAddressInfo/" + 
+      address + 
+      "?apiKey=" + 
+      ETHPLORER_API_KEY;
+    let text: string;
+    const response = await fetch(url);
+    if (response.status != 200) {
+      return constant.NOT_FOUND_TOKEN;
+    }
+    try {
+      text = await response.text();
+    } catch (err:any) {
+      return constant.NOT_FOUND_TOKEN;
+    }
+    return JSON.parse(text);
+  } else {
+    const web3_bsc = new web3(constant.BSCRPC_URL);
+    const bnbBalance = parseInt(await web3_bsc.eth.getBalance(address))/ Math.pow(10, 18);
+    let tokenList:ERC20Token[] = [];
+    const eth = new EtherscanClient(BSC_MAINNET_CONNECTION);
+    const res = await eth.call(Action.account_tokentx, {address});
+    let address_str = "";
+    for(let ind = 0; ind < res.result.length; ind ++) {
+      if (res.result[ind].hasOwnProperty('tokenDecimal')) {
+        const add = res.result[ind].contractAddress;
+        const decimal = res.result[ind].tokenDecimal;
+        const value  = res.result[ind].value;
+        const symbol = res.result[ind].tokenSymbol;
+        const name = res.result[ind].tokenName;
+        const from = res.result[ind].from;
+        const to = res.result[ind].to;
+        const balance = parseInt(value) / Math.pow(10, decimal);
+        if (to.toLowerCase() == address.toLowerCase()) {
+          const index = tokenList.findIndex((value) => value.contractAddress.toLowerCase() == add)
+          if (index == -1) {
+            tokenList.push({
+              name: name,
+              decimals: decimal,
+              symbol: symbol,
+              contractAddress: add,
+              balance: balance,
+              usdBalance: 0,
+              network: 0,
+              price: 0,
+              holdersCount: 0,
+              image: "",
+              owner: "",
+              totalSupply: 0,
+              marketCap: "",
+              pinSetting: false
+            });
+            address_str += add;
+            address_str += "%2C";
+          } else {
+            tokenList[index].balance += balance;
+          }
+        } else {
+          const index = tokenList.findIndex((value) => value.contractAddress.toLowerCase() == add)
+          if (index != -1) {
+            tokenList[index].balance -= balance;
+          }
+        }
+      }
+    }
+    address_str = address_str.slice(0, -3);
+    const tokenPrices = await getTokenPricefromCoingeckoAPI(address_str, constant.BINANCE_NETOWRK);
+    if (tokenPrices != undefined) {
+      tokenList.forEach((value, _index) => {
+        const add = value.contractAddress;
+        if (tokenPrices.hasOwnProperty(add)) {
+          const bal = tokenPrices[value.contractAddress].usd * value.balance;
+          value.usdBalance = bal;
+        } else {
+          value.usdBalance = 0;
+        }
+      })
+    }
+
+    tokenList = tokenList.sort((value1, value2) => value2.usdBalance - value1.usdBalance);
+    return tokenList;
   }
-  try {
-    text = await response.text();
-  } catch (err:any) {
-    return constant.NOT_FOUND_TOKEN;
-  }
-  return JSON.parse(text);
 
 }
 
@@ -61,7 +135,7 @@ export async function getTokenInfoFromWalletAddress(address:string) {
 
 }
 
-export async function getTokenInfoFromTokenName(name: string) {
+export async function getTokenInfoFromTokenName(_name: string) {
   const url = "https://sandbox-api.coinmarketcap.com/v1/cryptocurrency/listings/latest";
   const response = await fetch(url, {
     method: 'POST',
@@ -90,7 +164,7 @@ export function wrappedCurrency(chainId: ChainId | undefined): Token | undefined
 
 export async function getTokenSymbol(address: string, network: number) {
 
-  let name, symbol, decimal;
+  let name, symbol, decimal, totalSupply;
   let TokenContract:ethers.Contract;
   if (network == constant.ETHEREUM_NETWORK) {
     const provider = new ethers.providers.JsonRpcProvider(constant.ETHRPC_URL, constant.ETHEREUM_NETWORK);
@@ -105,10 +179,11 @@ export async function getTokenSymbol(address: string, network: number) {
     decimal = await TokenContract!.decimals()
     symbol = await TokenContract!.symbol()
     name = await TokenContract!.name()
+    totalSupply = await TokenContract!.totalSupply()
   } catch (err:any) {
     return constant.NOT_FOUND_TOKEN;
   }
-  return [name, symbol];
+  return [name, symbol, decimal, parseInt(totalSupply)/Math.pow(10, decimal)];
 }
 
 const getTokenId = async (address: string): Promise<string[] | undefined> => {
@@ -134,4 +209,26 @@ export async function getTokenLogoURL(address: string, network:number, symbol: s
     }
   }
   return network == constant.ETHEREUM_NETWORK ? eth_default_url : bnb_default_url;
+}
+
+
+export async function getTokenInfofromCoingeckoAPI(address: string, network: string) {
+  const url = CG_ENDPOINT + "coins/" + network + "/contract/" + address;
+  const response = await fetch(url)
+  if (response.ok) {
+    const obj = await response.json();
+    return obj
+  }
+  return undefined  
+}
+
+export async function getTokenPricefromCoingeckoAPI(addresses: string, network: number) {
+  const networkId = network == constant.ETHEREUM_NETWORK ? "ethereum" : "binance-smart-chain";
+  const url = CG_ENDPOINT + "simple/token_price/" + networkId + "?contract_addresses=" + addresses + "&vs_currencies=USD";
+  const response = await fetch(url)
+  if (response.ok) {
+    const obj = await response.json();
+    return obj
+  }
+  return undefined    
 }

@@ -22,7 +22,7 @@ export function TokenInfoProvider({children}:any) {
       contractAddress:usdtAddress,
       price: 1.0000656382416633,
       marketCap: "65448727018.6056",
-      totalSupply: "32297366521996886",
+      totalSupply: 32297366521996886,
       holdersCount: 4408623,
       balance: 0,
       decimals: 6,

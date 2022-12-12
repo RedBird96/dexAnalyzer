@@ -4,13 +4,13 @@ export interface ERC20Token {
   network: number;
   contractAddress: string;
   price: number;
-  balance?: number;
+  balance: number;
   usdBalance: number;
   decimals: number;
   holdersCount: number;
   image: string;
   owner: string;
-  totalSupply: string;
+  totalSupply: number;
   marketCap: string;
   website?: string;
   facebook?: string;

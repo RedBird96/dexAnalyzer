@@ -59,7 +59,7 @@ export default function TokenList() {
         holdersCount: 0,
         image: '',
         owner: '',
-        totalSupply: '',
+        totalSupply: 0,
         marketCap: '',
         pinSetting: false
       };
@@ -74,7 +74,7 @@ export default function TokenList() {
         holdersCount: 0,
         image: '',
         owner: '',
-        totalSupply: '',
+        totalSupply: 0,
         marketCap: '',
         pinSetting: false
       };
@@ -100,9 +100,10 @@ export default function TokenList() {
             contractAddress: debouncedQuery.toLowerCase(),
             price: 0,
             marketCap: "",
-            totalSupply: "0",
+            totalSupply: res_eth[3],
             holdersCount: 0,
             balance: 0,
+            decimals: res_eth[2],
             symbol: res_eth[1],
             image: logo,
             network: constant.ETHEREUM_NETWORK,
@@ -121,10 +122,11 @@ export default function TokenList() {
               contractAddress: debouncedQuery.toLowerCase(),
               price: 0,
               marketCap: "",
-              totalSupply: "0",
+              totalSupply: res_bsc[3],
               holdersCount: 0,
               symbol: res_bsc[1],
               balance: 0,
+              decimals: res_bsc[2],
               image: logo,
               network: constant.BINANCE_NETOWRK,
               pinSetting: false,

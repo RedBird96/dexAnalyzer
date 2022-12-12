@@ -9,7 +9,8 @@ import {
   Th,
   Tbody,
   useColorModeValue,
-  calc
+  calc,
+  TableContainer
 } from "@chakra-ui/react"
 import {
   useNetwork,
@@ -21,12 +22,11 @@ import {
 import {ERC20Token} from '../../utils/type'
 import { 
   convertBalanceCurrency,
-  deleteCookie,
   numberWithCommasTwoDecimals
 } from '../../utils'
 import {Refresh} from '../../assests/icon'
 import style from './WalletInfo.module.css'
-import { fontFamily } from '@thirdweb-dev/react/dist/declarations/src/evm/components/theme'
+import * as constant from '../../utils/constant'
 
 export default function WalletInfo() {
   const titleClass = useColorModeValue(
@@ -67,7 +67,7 @@ export default function WalletInfo() {
     setTokensInfo(temp);
   };
 
-  const setTokensBalance = (text:any) => {
+  const setETHTokensBalance = (text:any) => {
     let tempTokens: ERC20Token[] = [];
     const ethBalance = text.ETH.balance;
     const ethPrice = text.ETH.price.rate;
@@ -83,7 +83,7 @@ export default function WalletInfo() {
       holdersCount: 0,
       image: "",
       owner: address,
-      totalSupply: "",
+      totalSupply: 0,
       marketCap: ""
     } as ERC20Token)
 
@@ -118,10 +118,15 @@ export default function WalletInfo() {
     setInitTokensInfo(tempTokens);
     setWalletBalance(usdBalance);
   }
+
   const getTokensFromWallet = async() => {
     if (network[0].data.chain?.id == 1) {
-    const res = await getContractInfoFromWalletAddress(address!);
-    setTokensBalance(res);
+      const res = await getContractInfoFromWalletAddress(address!, constant.ETHEREUM_NETWORK);
+      setETHTokensBalance(res);
+    } else {
+      const res = await getContractInfoFromWalletAddress(address!, constant.BINANCE_NETOWRK);
+      setTokensInfo(res);
+      setInitTokensInfo(res);
     }
   }
 
@@ -212,42 +217,57 @@ export default function WalletInfo() {
           value={searchContext}
           height='2.5rem'
         />  
-        <Box style={{width:"78%"}}>
-          <Table>
-            <Thead className={tableHeadBorder}>
-              <Tr>
-                <Th style={{width:"40%", paddingBottom:"0rem", paddingLeft:"0rem"}} textTransform={"initial"} color={"#7C7C7C"}>Token</Th>
-                <Th style={{paddingBottom:"0rem", paddingLeft:"0rem"}} textTransform={"initial"} color={"#7C7C7C"}>Balance</Th>
-              </Tr>
-            </Thead>
-            <Tbody className={tableBodyBorder}>
-              {
-                tokensInfo?.map((token) => {
-                  if (Number.isNaN(token.decimals))
-                    return ;
-                  return (
-                    <Tr key={token.name}>
-                        <Th style={{paddingLeft:"0rem"}}>
-                          <p className={style.tokenName} style={{color:tokenColor}}>
-                            {token.symbol}
-                          </p>
-                        </Th>
-                        <Th style={{paddingLeft:"0rem"}}>
-                          <div className={style.tokenBalance}>
-                            <p style={{marginRight:"5px", color:tokenColor}}>
-                              {numberWithCommasTwoDecimals(token.balance)}
+        <Box style={{width:"78%", maxHeight:"30rem"}}>
+          <TableContainer overflowY={"auto"} overflowX={"auto"} height={"100%"} css={{
+              '&::-webkit-scrollbar': {
+                width: '10px',
+                height: '4px',
+              },
+              '&::-webkit-scrollbar-track': {
+                width: '6px',
+                height: '4px',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                backgroundColor: "grey",
+                borderRadius: '24px',
+              },
+            }}>
+            <Table style={{height:"5rem"}} >
+              <Thead className={tableHeadBorder}>
+                <Tr>
+                  <Th style={{width:"40%", paddingBottom:"0rem", paddingLeft:"0rem"}} textTransform={"initial"} color={"#7C7C7C"}>Token</Th>
+                  <Th style={{paddingBottom:"0rem", paddingLeft:"0rem"}} textTransform={"initial"} color={"#7C7C7C"}>Balance</Th>
+                </Tr>
+              </Thead>
+              <Tbody className={tableBodyBorder}>
+                {
+                  tokensInfo?.map((token) => {
+                    if (Number.isNaN(token.decimals))
+                      return ;
+                    return (
+                      <Tr key={token.name}>
+                          <Th style={{paddingLeft:"0rem"}}>
+                            <p className={style.tokenName} style={{color:tokenColor}}>
+                              {token.symbol}
                             </p>
-                            <p style={{color:"#00C514"}}>
-                              ({convertBalanceCurrency(token.usdBalance)})
-                            </p>
-                          </div>
-                        </Th>
-                    </Tr>
-                  )
-                })
-              }
-            </Tbody>
-          </Table>
+                          </Th>
+                          <Th style={{paddingLeft:"0rem"}}>
+                            <div className={style.tokenBalance}>
+                              <p style={{marginRight:"5px", color:tokenColor}}>
+                                {numberWithCommasTwoDecimals(token.balance)}
+                              </p>
+                              <p style={{color:"#00C514"}}>
+                                ({convertBalanceCurrency(token.usdBalance)})
+                              </p>
+                            </div>
+                          </Th>
+                      </Tr>
+                    )
+                  })
+                }
+              </Tbody>
+            </Table>
+          </TableContainer>
         </Box>
       </Box>
     </Box>
