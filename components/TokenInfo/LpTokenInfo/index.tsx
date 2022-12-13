@@ -48,34 +48,34 @@ export default function LpTokenInfo({
       if (showArrow) {
         if (lpTokenAddress.tokenside == TokenSide.token0) {
           setReserve(lptoken1Reserve)
-          const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token1_contractAddress, tokenData.network);
-          if (res != undefined) {
-            const price = res[lpTokenAddress.token1_contractAddress].usd;
-            setReserveUSD(lptoken1Reserve * price);
-          }
+          // const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token1_contractAddress, tokenData.network);
+          // if (res != undefined) {
+          //   const price = res[lpTokenAddress.token1_contractAddress].usd;
+          //   setReserveUSD(lptoken1Reserve * price);
+          // }
         } else {
           setReserve(lptoken0Reserve)
-          const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token1_contractAddress, tokenData.network);
-          if (res != undefined) {
-            const price = res[lpTokenAddress.token0_contractAddress].usd;
-            setReserveUSD(lptoken0Reserve * price);
-          }
+          // const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token1_contractAddress, tokenData.network);
+          // if (res != undefined) {
+          //   const price = res[lpTokenAddress.token0_contractAddress].usd;
+          //   setReserveUSD(lptoken0Reserve * price);
+          // }
         }
       } else {
         if (lpToken.tokenside == TokenSide.token0) {
           setReserve(lpToken.token1_reserve)
-          const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token1_contractAddress, tokenData.network);
-          if (res != undefined) {
-            const price = res[lpTokenAddress.token1_contractAddress].usd;
-            setReserveUSD(lpToken.token1_reserve * price);
-          }
+          // const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token1_contractAddress, tokenData.network);
+          // if (res != undefined) {
+          //   const price = res[lpTokenAddress.token1_contractAddress].usd;
+          //   setReserveUSD(lpToken.token1_reserve * price);
+          // }
         } else {
           setReserve(lpToken.token0_reserve)
-          const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token0_contractAddress, tokenData.network);
-          if (res != undefined) {
-            const price = res[lpTokenAddress.token0_contractAddress].usd;
-            setReserveUSD(lpToken.token0_reserve * price);
-          }
+          // const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token0_contractAddress, tokenData.network);
+          // if (res != undefined) {
+          //   const price = res[lpTokenAddress.token0_contractAddress].usd;
+          //   setReserveUSD(lpToken.token0_reserve * price);
+          // }
         }
       }
     }
