@@ -283,7 +283,7 @@ export async function getLPTokenList(address: string, network: number): Promise<
           totalSupply: 0,
           holdersCount: 0,
           balance: 0,
-          decimals: 0,
+          decimals: 18,
           image: "",
           network: network,
           token0_name: token.token0.symbol,

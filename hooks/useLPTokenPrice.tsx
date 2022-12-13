@@ -9,6 +9,10 @@ import * as constant from '../utils/constant'
 
 
 interface LpTokenPriceInterface {
+  lptoken0Reserve: number;
+  setLPToken0Reserve: (token0Reserve: number) => void;
+  lptoken1Reserve: number;
+  setLPToken1Reserve: (token1Reserve: number) => void;
   lpTokenPrice: number;
   setLPTokenPrice: (lpTokenPrice: number) => void;
   lpTokenAddress: LPTokenPair;
@@ -22,6 +26,8 @@ export function LpTokenPriceProvider({children}:any) {
 
   const [eventEmitter, setEventEmitter] = useState<any>();
   const [lptokenPrice, setlpTokenPrice] = useState<number>(0);
+  const [token0Reserve, setToken0Reserve] = useState<number>(0);
+  const [token1Reserve, setToken1Reserve] = useState<number>(0);
   const [lptokenAddress, setlpTokenAddress] = useState<LPTokenPair>({
     name:"USDT/BNB",
     symbol:"USDT/BNB",
@@ -31,7 +37,7 @@ export function LpTokenPriceProvider({children}:any) {
     totalSupply: 0,
     holdersCount: 0,
     balance: 0,
-    decimals: 0,
+    decimals: 18,
     image: "",
     network: constant.BINANCE_NETOWRK,
     token0_name: "USDT",
@@ -46,13 +52,14 @@ export function LpTokenPriceProvider({children}:any) {
     // state.token0 = BigNumber.from(data.returnValues.reserve0);
     // state.token1 = BigNumber.from(data.returnValues.reserve1);
 
-    if (data.address.toLowerCase() == lptokenAddress.contractAddress.toLowerCase()) {
       const token0Reserve = parseInt(data.returnValues.reserve0);
       const token1Reserve = parseInt(data.returnValues.reserve1);
 
       // console.log('token0Reserve, token1Reserve', token0Reserve, token1Reserve);
       setlpTokenPrice(token0Reserve / token1Reserve);
-    }
+      setToken0Reserve(token0Reserve);
+      setToken1Reserve(token1Reserve);
+
   };
 
   // function to get reserves
@@ -94,6 +101,8 @@ export function LpTokenPriceProvider({children}:any) {
       let token0Reserve, token1Reserve;
       [token0Reserve, token1Reserve] = await getReserves(PairContractHttp);
       const price = token0Reserve / token1Reserve;
+      setToken0Reserve(token0Reserve);
+      setToken1Reserve(token1Reserve);
       setlpTokenPrice(price);
 
       const event = PairContractWSS.events.Sync({})
@@ -121,6 +130,10 @@ export function LpTokenPriceProvider({children}:any) {
   return(
     <LpTokenPriceContext.Provider
       value={{
+        lptoken0Reserve:token0Reserve,
+        setLPToken0Reserve: setToken0Reserve,
+        lptoken1Reserve:token1Reserve,
+        setLPToken1Reserve: setToken1Reserve,        
         lpTokenPrice:lptokenPrice,
         setLPTokenPrice: setlpTokenPrice,
         lpTokenAddress:lptokenAddress,

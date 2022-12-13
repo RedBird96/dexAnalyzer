@@ -61,11 +61,13 @@ export default function TokenInfo() {
 
     setLPTokenList([]);
 
-    res.forEach((value) => {
+    for await (const value of res) {
      
-      // const res = await getLPTokenReserve(value.contractAddress, value.network);
+      const res = await getLPTokenReserve(value.contractAddress, value.network);
 
-      // value.price = value.token0_reserve / value.token1_reserve;
+      value.token0_reserve = res[0];
+      value.token1_reserve = res[1];
+      value.price = res[0] / res[1];
 
       if (index == 0) {
         setLPTokenAddress(value);
@@ -73,7 +75,8 @@ export default function TokenInfo() {
       else
         setLPTokenList(tokens=>[...tokens, value]);
       index ++;
-    })
+
+    }
     
   }
   const  setTokenInfo = async() => {

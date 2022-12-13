@@ -5,7 +5,8 @@ import {
   DownArrowLight,
 } from "../../../assests/icon"
 import {
-  useTokenInfo
+  useTokenInfo,
+  useLPTokenPrice
 } from '../../../hooks'
 import { 
   convertBalanceCurrency,
@@ -28,6 +29,7 @@ export default function LpTokenInfo({
 
   const colorMode = useColorMode();
   const {tokenData} = useTokenInfo();
+  const {lptoken0Reserve, lptoken1Reserve, lpTokenAddress} = useLPTokenPrice();
   const textColor = useColorModeValue("#5E5E5E","#A7A7A7");
   const backgroundColor = useColorModeValue("#ffffff","#1C1C1C");
   let hoverColor = useColorModeValue("#005CE5","#3A3A29");
@@ -68,13 +70,20 @@ export default function LpTokenInfo({
             style={{marginRight:"1rem"}}  
             color={whiteBlackMode}
           >
-            {numberWithCommasTwoDecimals(lpToken.token1_reserve / Math.pow(10, lpToken.decimals))}
+            { showArrow ?
+              numberWithCommasTwoDecimals(lptoken1Reserve / Math.pow(10, lpToken.decimals)) :
+              numberWithCommasTwoDecimals(lpToken.token1_reserve / Math.pow(10, lpToken.decimals))
+            } 
           </p>
           <p
             className={style.tokenMarketCap} 
             style={{color:"#00B112"}}
           >
-            ({convertBalanceCurrency(lpToken.token1_reserve / Math.pow(10, lpToken.decimals))})
+            ({
+              showArrow ?
+              convertBalanceCurrency(lptoken1Reserve / Math.pow(10, lpToken.decimals)) :
+              convertBalanceCurrency(lpToken.token1_reserve / Math.pow(10, lpToken.decimals))
+            })
           </p>
         </Box>
       </Box>
