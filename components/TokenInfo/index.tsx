@@ -113,7 +113,6 @@ export default function TokenInfo() {
         value.price = res[0] / res[1];  
       }
 
-      console.log('value', value);
       if (index == 0) {
         setLPTokenAddress(value);
       }
@@ -145,7 +144,6 @@ export default function TokenInfo() {
       item => (item.contractAddress.toLowerCase() != clickLp.contractAddress.toLowerCase())
     );
     filterTokens.push(lpTokenAddress);
-    console.log('filterTokens', filterTokens);
     setLPTokenList(filterTokens);
     setLPTokenAddress(clickLp);
     setDexDropShow(0);
@@ -238,11 +236,11 @@ export default function TokenInfo() {
         <Box display={"flex"} flexDirection={"row"} width={"83%"} alignItems={"center"}>
           <Box display={"flex"} flexDirection={"row"} width={"59%"} alignItems={"center"}>
             <img src={tokenData.image} width={"50rem"}/>
-            <Box display={"flex"} flexDirection={"column"} paddingLeft={"1rem"}>
+            <Box display={"flex"} flexDirection={"column"} paddingLeft={"1rem"} alignItems={"flex-start"}>
               <Box display={"flex"} flexDirection={"row"}>
                 <p className={style.tokenName}>{tokenData.symbol}</p>
                 <p className={style.tokenName} style={{color:"#767676"}}>&nbsp;({lpTokenAddress.symbol})</p>
-                <p className={style.tokenPrice}>{convertBalanceCurrency( lpTokenPrice)}</p>
+                <p className={style.tokenPrice}>{convertBalanceCurrency( lpTokenPrice, 6)}</p>
               </Box>
               <Box display={"flex"} flexDirection={"row"} alignItems={"center"} justifyContent={"center"}>
                 <p className={style.tokenAddress} style={{color:textColor}}>{tokenData.contractAddress}</p>
@@ -284,7 +282,7 @@ export default function TokenInfo() {
           >
             <p className={style.totalSupply}>Total Supply</p>
             <p className={style.tokenTotalSupply} style={{color:textColor}}>{tokenData.totalSupply != null ? 
-              numberWithCommasTwoDecimals(tokenData.totalSupply) :
+              numberWithCommasNoDecimals(tokenData.totalSupply) :
               0}</p>
           </Box>
         </Box>
@@ -296,7 +294,7 @@ export default function TokenInfo() {
         <Box display={"flex"} flexDirection={"row"} width={"83%"} height={"100%"} alignItems={"center"}>
           <Box display={"flex"} flexDirection={"column"} width={"28%"} paddingLeft={"4rem"}>
             <p className={style.marketCap} style={{color:textColor}} >Market Cap</p>
-            <p className={style.tokenMarketCap} style={{color:"#00B112"}}>{convertBalanceCurrency(tokenData.totalSupply * lpTokenPrice)}</p>
+            <p className={style.tokenMarketCap} style={{color:"#00B112"}}>{convertBalanceCurrency(tokenData.totalSupply * lpTokenPrice, 0)}</p>
           </Box>
           <div className={style.border} style={{borderColor:infoborderColorMode}}/>
           <Box 

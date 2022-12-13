@@ -3,11 +3,11 @@
  * @param x
  * @returns param value with 2 decimal places
  */
- export function numberWithCommasTwoDecimals(x :any) {
+ export function numberWithCommasTwoDecimals(x :any, decimals = 3) {
   return x
-    .toFixed(3)
+    .toFixed(decimals)
     .toString()
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    .replace(/(?<!\..*)(\d)(?=(?:\d{3})+(?:\.|$))/g, '$1,');
 }
 
 /**
@@ -20,8 +20,9 @@ export function numberWithCommasNoDecimals(x :any) {
     return "";
   }
   return x
+    .toFixed(0)
     .toString()
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    .replace(/(?<!\..*)(\d)(?=(?:\d{3})+(?:\.|$))/g, '$1,');
 }
 
 /**
@@ -38,14 +39,14 @@ export function numberWithCommasNoDecimals(x :any) {
   return numberWithCommasNoDecimals(x);
 }
 
-export function convertBalanceCurrency(x :any, decimal = true) {
-  if (decimal)
-    return '$'+numberWithCommasTwoDecimals(x);
+export function convertBalanceCurrency(x :any, decimals = 3) {
+  if (decimals != 0)
+    return '$'+numberWithCommasTwoDecimals(x, decimals);
   return '$'+numberWithCommasNoDecimals(x);
 }
 
-export function makeShortAddress(address: string): string {
-  if (address.length > 7)
+export function makeShortAddress(address: string, limitLen = 7): string {
+  if (address.length > limitLen)
     return address.substring(0, 9) + "......." + address.substring(31, address.length);
   return "";
 }
