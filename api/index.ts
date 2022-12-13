@@ -6,7 +6,7 @@ import { AbiItem } from 'web3-utils'
 import ERC20TokenABI from '../config/ERC20ABI.json'
 import BEP20TokenABI from '../config/ERC20ABI.json'
 import EtherscanClient, {Action} from './ethers/etherscan-client';
-import {ERC20Token, LPTokenPair} from '../utils/type'
+import {ERC20Token, LPTokenPair, TokenSide} from '../utils/type'
 import * as constant from '../utils/constant'
 import UniswapV2Pair from '../config/IUniswapV2Pair.json';
 import PancakeswapV2Pair from '../config/IPancakeswapV2Pair.json';
@@ -231,8 +231,9 @@ export async function getTokenPricefromCoingeckoAPI(addresses: string, network: 
   return undefined    
 }
 
-export async function getLPTokenList(address: string, network: number): Promise<LPTokenPair[]> {
+export async function getLPTokenList(address: string, network: number, tokenside: number): Promise<LPTokenPair[]> {
       
+  let response;
   let checkTokenList: string[] = [];
   let lpTokenList: LPTokenPair[] = [];
   if(network == constant.ETHEREUM_NETWORK) {
@@ -246,34 +247,58 @@ export async function getLPTokenList(address: string, network: number): Promise<
     checkTokenList.push(constant.WHITELIST_TOKENS.BSC.BNB);
     checkTokenList.push(constant.WHITELIST_TOKENS.BSC.BUSD);
     checkTokenList.push(constant.WHITELIST_TOKENS.BSC.DAI);
-    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.WBNB);
-    checkTokenList.push("0x13958e1eb63dfb8540eaf6ed7dcbbc1a60fd52af");
-    checkTokenList.push("0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82");
+    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.CAKE);
   }
-  const response = await request(PC_PAIRS,
-    gql`
-    query getLPTokenPairs($address:String){
-      pairs(where:{token1:$address}) {
-        id
-        token0 {
+  if (tokenside == TokenSide.token0) {
+    response = await request(PC_PAIRS,
+      gql`
+      query getLPTokenPairs($address:String){
+        pairs(where:{token0:$address}) {
           id
-          symbol
-        }
-        token1 {
-          id
-          symbol
+          token0 {
+            id
+            symbol
+          }
+          token1 {
+            id
+            symbol
+          }
         }
       }
-    }
-    `,
-    {
-      address
-    }
-  );
+      `,
+      {
+        address
+      }
+    );
+  } else {
+    response = await request(PC_PAIRS,
+      gql`
+      query getLPTokenPairs($address:String){
+        pairs(where:{token1:$address}) {
+          id
+          token0 {
+            id
+            symbol
+          }
+          token1 {
+            id
+            symbol
+          }
+        }
+      }
+      `,
+      {
+        address
+      }
+    );    
+  }
   if (response != undefined && response.pairs.length > 0) {
     response.pairs.forEach((token: any) => {
       const token0 = token.token0.id;
-      if (checkTokenList.includes(token0)) {
+      const token1 = token.token1.id;
+      if ( (tokenside == TokenSide.token0 && checkTokenList.includes(token1)) ||
+           (tokenside == TokenSide.token1 && checkTokenList.includes(token0) )
+      ) {
         lpTokenList.push({
           name:  token.token0.symbol + "/" + token.token1.symbol,
           symbol: token.token0.symbol + "/" + token.token1.symbol,
@@ -292,7 +317,8 @@ export async function getLPTokenList(address: string, network: number): Promise<
           token1_reserve: 0,
           usdBalance: 0,
           owner: "",
-          pinSetting: false
+          pinSetting: false,
+          tokenside: tokenside
         } as LPTokenPair);
       }
     });

@@ -42,6 +42,6 @@ export const WHITELIST_TOKENS ={
     USDC:"0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
     BUSD:"0xe9e7cea3dedca5984780bafc599bd69add087d56",
     DAI: "0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3",
-    WBNB: "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+    CAKE: "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82"
   }
 }

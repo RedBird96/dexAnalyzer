@@ -26,7 +26,7 @@ import {
 import style from './TokenInfo.module.css'
 import * as constant from '../../utils/constant'
 import LpTokenInfo from './LpTokenInfo'
-import { LPTokenPair } from '../../utils/type'
+import { LPTokenPair, TokenSide } from '../../utils/type'
 
 
 export default function TokenInfo() {
@@ -52,22 +52,46 @@ export default function TokenInfo() {
 
   const setLPTokenListInfo = async() => {
 
-    const res = await getLPTokenList(tokenData.contractAddress, tokenData.network);
+
+    const token0_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token0);
+    const token1_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token1);
+    const lptoken_Res = token0_Res.concat(token1_Res);
     let index = 0;
-    console.log('res', res.length, res);
-    if (res.length == 0) {
+    if (lptoken_Res.length == 0) {
+
+      setLPTokenList([]);
+      setLPTokenAddress({
+        name:"/",
+        symbol:"/",
+        contractAddress:"",
+        price: 0,
+        marketCap: "",
+        totalSupply: 0,
+        holdersCount: 0,
+        balance: 0,
+        decimals: 18,
+        image: "",
+        network: constant.BINANCE_NETOWRK,
+        token0_name: "0",
+        token1_name: "0",
+        token0_reserve: 0,
+        token1_reserve: 0,
+        tokenside: TokenSide.token1
+      } as LPTokenPair);      
       return;
     }
 
-    setLPTokenList([]);
-
-    for await (const value of res) {
+    for await (const value of lptoken_Res) {
      
       const res = await getLPTokenReserve(value.contractAddress, value.network);
 
       value.token0_reserve = res[0];
       value.token1_reserve = res[1];
-      value.price = res[0] / res[1];
+      if (value.tokenside == TokenSide.token0){
+        value.price = res[1] / res[0];  
+      } else {
+        value.price = res[0] / res[1];  
+      }
 
       if (index == 0) {
         setLPTokenAddress(value);

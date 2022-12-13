@@ -4,7 +4,7 @@ import PancakeswapV2Pair from '../config/IPancakeswapV2Pair.json';
 import { BigNumber } from "ethers";
 import Web3 from "web3";
 import { AbiItem } from 'web3-utils'
-import { LPTokenPair } from '../utils/type'
+import { LPTokenPair, TokenSide } from '../utils/type'
 import * as constant from '../utils/constant'
 
 
@@ -29,8 +29,8 @@ export function LpTokenPriceProvider({children}:any) {
   const [token0Reserve, setToken0Reserve] = useState<number>(0);
   const [token1Reserve, setToken1Reserve] = useState<number>(0);
   const [lptokenAddress, setlpTokenAddress] = useState<LPTokenPair>({
-    name:"USDT/BNB",
-    symbol:"USDT/BNB",
+    name:"BNB/USDT",
+    symbol:"BNB/USDT",
     contractAddress:"0x16b9a82891338f9bA80E2D6970FddA79D1eb0daE",
     price: 0,
     marketCap: "",
@@ -40,10 +40,11 @@ export function LpTokenPriceProvider({children}:any) {
     decimals: 18,
     image: "",
     network: constant.BINANCE_NETOWRK,
-    token0_name: "USDT",
-    token1_name: "BNB",
+    token0_name: "BNB",
+    token1_name: "USDT",
     token0_reserve: 0,
-    token1_reserve: 0
+    token1_reserve: 0,
+    tokenside: TokenSide.token1
   } as LPTokenPair);
   let web3Wss: Web3, web3Http: Web3, PairContractWSS:any, PairContractHttp:any;
 
@@ -56,7 +57,11 @@ export function LpTokenPriceProvider({children}:any) {
       const token1Reserve = parseInt(data.returnValues.reserve1);
 
       // console.log('token0Reserve, token1Reserve', token0Reserve, token1Reserve);
-      setlpTokenPrice(token0Reserve / token1Reserve);
+      if (lptokenAddress.tokenside == TokenSide.token0) {
+        setlpTokenPrice(token1Reserve / token0Reserve);
+      } else {
+        setlpTokenPrice(token0Reserve / token1Reserve);
+      }
       setToken0Reserve(token0Reserve);
       setToken1Reserve(token1Reserve);
 
@@ -100,10 +105,13 @@ export function LpTokenPriceProvider({children}:any) {
       }
       let token0Reserve, token1Reserve;
       [token0Reserve, token1Reserve] = await getReserves(PairContractHttp);
-      const price = token0Reserve / token1Reserve;
+      if (lptokenAddress.tokenside == TokenSide.token0) {
+        setlpTokenPrice(token1Reserve / token0Reserve);
+      } else {
+        setlpTokenPrice(token0Reserve / token1Reserve);
+      }
       setToken0Reserve(token0Reserve);
       setToken1Reserve(token1Reserve);
-      setlpTokenPrice(price);
 
       const event = PairContractWSS.events.Sync({})
         .on("data", (data:any) => updateState(data));
@@ -115,6 +123,10 @@ export function LpTokenPriceProvider({children}:any) {
     }
     if (lptokenAddress.contractAddress != undefined && lptokenAddress.contractAddress.length > 0){
       init();
+    } else {
+      setlpTokenPrice(0);
+      setToken0Reserve(0);
+      setToken1Reserve(0);
     }
     return ()=>{ 
 

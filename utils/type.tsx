@@ -25,9 +25,15 @@ export enum SearchStatus {
   founddata,
 }
 
+export enum TokenSide {
+  token0,
+  token1,
+}
+
 export interface LPTokenPair extends ERC20Token {
   token0_name: string;
   token1_name: string;
   token0_reserve: number;
   token1_reserve: number;
+  tokenside: number;
 }
