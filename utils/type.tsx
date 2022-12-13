@@ -32,8 +32,10 @@ export enum TokenSide {
 
 export interface LPTokenPair extends ERC20Token {
   token0_name: string;
+  token0_contractAddress: string;
   token1_name: string;
   token0_reserve: number;
   token1_reserve: number;
   tokenside: number;
+  token1_contractAddress: string;
 }

@@ -315,6 +315,8 @@ export async function getLPTokenList(address: string, network: number, tokenside
           token1_name: token.token1.symbol,
           token0_reserve: 0,
           token1_reserve: 0,
+          token0_contractAddress: token.token0.id,
+          token1_contractAddress: token.token1.id,
           usdBalance: 0,
           owner: "",
           pinSetting: false,

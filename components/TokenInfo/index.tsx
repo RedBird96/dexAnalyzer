@@ -77,6 +77,8 @@ export default function TokenInfo() {
         token1_name: "0",
         token0_reserve: 0,
         token1_reserve: 0,
+        token0_contractAddress: "",
+        token1_contractAddress: "",
         tokenside: TokenSide.token1
       } as LPTokenPair);      
       return;
@@ -97,8 +99,12 @@ export default function TokenInfo() {
       if (index == 0) {
         setLPTokenAddress(value);
       }
-      else
+      else{
+        setLPTokenList(lpTokenList.filter(
+          item => (item.contractAddress.toLowerCase() != value.contractAddress.toLowerCase())
+        ));        
         setLPTokenList(tokens=>[...tokens, value]);
+      }
       index ++;
 
     }

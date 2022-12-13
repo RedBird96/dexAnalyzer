@@ -14,6 +14,7 @@ import {
 } from '../../../utils'
 import { LPTokenPair, TokenSide } from '../../../utils/type'
 import style from './LpTokenInfo.module.css'
+import { getTokenPricefromCoingeckoAPI } from '../../../api'
 
 export default function LpTokenInfo({
   lpToken,
@@ -42,20 +43,43 @@ export default function LpTokenInfo({
     hoverColor = "transparent";
 
   useEffect(() => {
-    setClickDex(0);
-    if (showArrow) {
-      if (lpTokenAddress.tokenside == TokenSide.token0) {
-        setReserve(lptoken1Reserve)
+    const setFunc = async() => {
+      setClickDex(0);
+      if (showArrow) {
+        if (lpTokenAddress.tokenside == TokenSide.token0) {
+          setReserve(lptoken1Reserve)
+          const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token1_contractAddress, tokenData.network);
+          if (res != undefined) {
+            const price = res[lpTokenAddress.token1_contractAddress].usd;
+            setReserveUSD(lptoken1Reserve * price);
+          }
+        } else {
+          setReserve(lptoken0Reserve)
+          const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token1_contractAddress, tokenData.network);
+          if (res != undefined) {
+            const price = res[lpTokenAddress.token0_contractAddress].usd;
+            setReserveUSD(lptoken0Reserve * price);
+          }
+        }
       } else {
-        setReserve(lptoken0Reserve)
-      }
-    } else {
-      if (lpToken.tokenside == TokenSide.token0) {
-        setReserve(lpToken.token1_reserve)
-      } else {
-        setReserve(lpToken.token0_reserve)
+        if (lpToken.tokenside == TokenSide.token0) {
+          setReserve(lpToken.token1_reserve)
+          const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token1_contractAddress, tokenData.network);
+          if (res != undefined) {
+            const price = res[lpTokenAddress.token1_contractAddress].usd;
+            setReserveUSD(lpToken.token1_reserve * price);
+          }
+        } else {
+          setReserve(lpToken.token0_reserve)
+          const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token0_contractAddress, tokenData.network);
+          if (res != undefined) {
+            const price = res[lpTokenAddress.token0_contractAddress].usd;
+            setReserveUSD(lpToken.token0_reserve * price);
+          }
+        }
       }
     }
+    setFunc();
   }, [lpToken, lptoken0Reserve, lptoken1Reserve]);
 
   const setDexDropShow = () => {

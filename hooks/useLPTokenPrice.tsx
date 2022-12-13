@@ -44,6 +44,8 @@ export function LpTokenPriceProvider({children}:any) {
     token1_name: "USDT",
     token0_reserve: 0,
     token1_reserve: 0,
+    token0_contractAddress: "",
+    token1_contractAddress: "",
     tokenside: TokenSide.token0
   } as LPTokenPair);
   let web3Wss: Web3, web3Http: Web3, PairContractWSS:any, PairContractHttp:any;
