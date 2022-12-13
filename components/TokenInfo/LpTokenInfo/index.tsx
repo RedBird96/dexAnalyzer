@@ -12,7 +12,7 @@ import {
   convertBalanceCurrency,
   numberWithCommasTwoDecimals
 } from '../../../utils'
-import { LPTokenPair } from '../../../utils/type'
+import { LPTokenPair, TokenSide } from '../../../utils/type'
 import style from './LpTokenInfo.module.css'
 
 export default function LpTokenInfo({
@@ -30,6 +30,8 @@ export default function LpTokenInfo({
   const colorMode = useColorMode();
   const {tokenData} = useTokenInfo();
   const {lptoken0Reserve, lptoken1Reserve, lpTokenAddress} = useLPTokenPrice();
+  const [reserve, setReserve] = useState<number>(0);
+  const [reserveUSD, setReserveUSD] = useState<number>(0);
   const textColor = useColorModeValue("#5E5E5E","#A7A7A7");
   const backgroundColor = useColorModeValue("#ffffff","#1C1C1C");
   let hoverColor = useColorModeValue("#005CE5","#3A3A29");
@@ -41,7 +43,20 @@ export default function LpTokenInfo({
 
   useEffect(() => {
     setClickDex(0);
-  }, [lpToken]);
+    if (showArrow) {
+      if (lpTokenAddress.tokenside == TokenSide.token0) {
+        setReserve(lptoken1Reserve)
+      } else {
+        setReserve(lptoken0Reserve)
+      }
+    } else {
+      if (lpToken.tokenside == TokenSide.token0) {
+        setReserve(lpToken.token1_reserve)
+      } else {
+        setReserve(lpToken.token0_reserve)
+      }
+    }
+  }, [lpToken, lptoken0Reserve, lptoken1Reserve]);
 
   const setDexDropShow = () => {
     const count = clickDex+1;
@@ -74,20 +89,13 @@ export default function LpTokenInfo({
             style={{marginRight:"1rem"}}  
             color={whiteBlackMode}
           >
-            { showArrow ?
-              numberWithCommasTwoDecimals(lptoken1Reserve / Math.pow(10, lpToken.decimals)) :
-              numberWithCommasTwoDecimals(lpToken.token1_reserve / Math.pow(10, lpToken.decimals))
-            } 
+            {numberWithCommasTwoDecimals(reserve / Math.pow(10, lpToken.decimals))} 
           </p>
           <p
             className={style.tokenMarketCap} 
             style={{color:"#00B112"}}
           >
-            ({
-              showArrow ?
-              convertBalanceCurrency(lptoken1Reserve / Math.pow(10, lpToken.decimals)) :
-              convertBalanceCurrency(lpToken.token1_reserve / Math.pow(10, lpToken.decimals))
-            })
+            ({convertBalanceCurrency(reserve / Math.pow(10, lpToken.decimals))})
           </p>
         </Box>
       </Box>
