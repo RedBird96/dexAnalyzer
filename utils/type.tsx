@@ -24,3 +24,10 @@ export enum SearchStatus {
   nodata,
   founddata,
 }
+
+export interface LPTokenPair extends ERC20Token {
+  token0_name: string;
+  token1_name: string;
+  token0_reserve: number;
+  token1_reserve: number;
+}

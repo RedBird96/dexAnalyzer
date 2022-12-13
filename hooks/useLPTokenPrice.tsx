@@ -4,15 +4,15 @@ import PancakeswapV2Pair from '../config/IPancakeswapV2Pair.json';
 import { BigNumber } from "ethers";
 import Web3 from "web3";
 import { AbiItem } from 'web3-utils'
-import { ERC20Token } from '../utils/type'
+import { LPTokenPair } from '../utils/type'
 import * as constant from '../utils/constant'
 
 
 interface LpTokenPriceInterface {
   lpTokenPrice: number;
   setLPTokenPrice: (lpTokenPrice: number) => void;
-  lpTokenAddress: ERC20Token;
-  setLPTokenAddress: (tokenAddress: ERC20Token) => void;
+  lpTokenAddress: LPTokenPair;
+  setLPTokenAddress: (tokenAddress: LPTokenPair) => void;
 }
 
 const LpTokenPriceContext: React.Context<null | LpTokenPriceInterface> =
@@ -20,8 +20,9 @@ const LpTokenPriceContext: React.Context<null | LpTokenPriceInterface> =
 
 export function LpTokenPriceProvider({children}:any) {
 
+  const [eventEmitter, setEventEmitter] = useState<any>();
   const [lptokenPrice, setlpTokenPrice] = useState<number>(0);
-  const [lptokenAddress, setlpTokenAddress] = useState<ERC20Token>({
+  const [lptokenAddress, setlpTokenAddress] = useState<LPTokenPair>({
     name:"USDT/BNB",
     symbol:"USDT/BNB",
     contractAddress:"0x16b9a82891338f9bA80E2D6970FddA79D1eb0daE",
@@ -32,8 +33,12 @@ export function LpTokenPriceProvider({children}:any) {
     balance: 0,
     decimals: 0,
     image: "",
-    network: constant.BINANCE_NETOWRK
-  } as ERC20Token);
+    network: constant.BINANCE_NETOWRK,
+    token0_name: "USDT",
+    token1_name: "BNB",
+    token0_reserve: 0,
+    token1_reserve: 0
+  } as LPTokenPair);
   let web3Wss: Web3, web3Http: Web3, PairContractWSS:any, PairContractHttp:any;
 
   const updateState = (data:any) => {
@@ -41,11 +46,13 @@ export function LpTokenPriceProvider({children}:any) {
     // state.token0 = BigNumber.from(data.returnValues.reserve0);
     // state.token1 = BigNumber.from(data.returnValues.reserve1);
 
-    const token0Reserve = parseInt(data.returnValues.reserve0);
-    const token1Reserve = parseInt(data.returnValues.reserve1);
-    // console.log('data', data);
-    // console.log('token0Reserve, token1Reserve', token0Reserve, token1Reserve);
-    setlpTokenPrice(token0Reserve / token1Reserve);
+    if (data.address.toLowerCase() == lptokenAddress.contractAddress.toLowerCase()) {
+      const token0Reserve = parseInt(data.returnValues.reserve0);
+      const token1Reserve = parseInt(data.returnValues.reserve1);
+
+      // console.log('token0Reserve, token1Reserve', token0Reserve, token1Reserve);
+      setlpTokenPrice(token0Reserve / token1Reserve);
+    }
   };
 
   // function to get reserves
@@ -84,19 +91,32 @@ export function LpTokenPriceProvider({children}:any) {
           lptokenAddress.contractAddress
         );       
       }
-      
-      console.log('PairContractHttp', PairContractHttp)
-      console.log('PairContractWSS', PairContractWSS)
       let token0Reserve, token1Reserve;
       [token0Reserve, token1Reserve] = await getReserves(PairContractHttp);
       const price = token0Reserve / token1Reserve;
       setlpTokenPrice(price);
 
-      PairContractWSS.events.clear
-      PairContractWSS.events.Sync({}).on("data", (data:any) => updateState(data));
+      const event = PairContractWSS.events.Sync({})
+        .on("data", (data:any) => updateState(data));
+
+      setEventEmitter(event);
+
+      // console.log('subscribe', lptokenAddress.contractAddress);
+      // console.log('subscribe_event:', event);
     }
-    init();
-  }, [lptokenAddress])  
+    if (lptokenAddress.contractAddress != undefined && lptokenAddress.contractAddress.length > 0){
+      init();
+    }
+    return ()=>{ 
+
+      // console.log('unsubscribe');
+      // console.log('eventEmitter', eventEmitter);
+      if(eventEmitter != undefined) {
+        const id = eventEmitter.id;
+        eventEmitter.options.requestManager.removeSubscription(id);
+      }
+    }
+  }, [lptokenAddress.contractAddress])  
 
   return(
     <LpTokenPriceContext.Provider

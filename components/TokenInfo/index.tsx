@@ -1,11 +1,14 @@
 import React, {useState, useEffect} from 'react'
-import { Box, Switch, useColorMode, useColorModeValue  } from "@chakra-ui/react"
+import { Box, color, Switch, useColorMode, useColorModeValue  } from "@chakra-ui/react"
 import {
   WebSite,
   FaceBook,
   Twitter,
   CopyAddressIconDark,
   CopyAddressIconLight,
+  DownArrowDark,
+  DownArrowLight,
+  ColorMode,
 } from "../../assests/icon"
 import {
   useTokenInfo,
@@ -16,20 +19,23 @@ import {
   numberWithCommasTwoDecimals
 } from '../../utils'
 import {
-  getTokenInfofromCoingeckoAPI,
+  getLPTokenReserve,
   getTokenInfoFromWalletAddress,
   getLPTokenList
 } from '../../api'
 import style from './TokenInfo.module.css'
 import * as constant from '../../utils/constant'
-import { ERC20Token } from '../../utils/type'
+import LpTokenInfo from './LpTokenInfo'
+import { LPTokenPair } from '../../utils/type'
 
 
 export default function TokenInfo() {
 
   const colorMode = useColorMode();
   const {tokenData, setTokenData} = useTokenInfo();
-  const {lpTokenPrice, setLPTokenAddress} = useLPTokenPrice();
+  const {lpTokenPrice, lpTokenAddress ,setLPTokenAddress} = useLPTokenPrice();
+  
+  const [lpTokenList, setLPTokenList] = useState<LPTokenPair[]>([]);
   const [balance, setBalance] = useState<number>(0);
   const [balanceUSD, setBalanceUSD] = useState<number>(0);
 
@@ -43,24 +49,34 @@ export default function TokenInfo() {
   const textColor = useColorModeValue("#5E5E5E","#A7A7A7");
   const infoborderColorMode = useColorModeValue("#E2E8F0","#2B2A2A");
   const whiteBlackMode = useColorModeValue('#FFFFFF', '#000000');
-  const  setTokenInfo = async() => {
+
+  const setLPTokenListInfo = async() => {
+
     const res = await getLPTokenList(tokenData.contractAddress, tokenData.network);
-    console.log('lpaddress', res);
-    if (res.length > 0) {
-      setLPTokenAddress({
-        name:res[1][0],
-        symbol:res[1][0],
-        contractAddress:res[0][0],
-        price: 0,
-        marketCap: "",
-        totalSupply: 0,
-        holdersCount: 0,
-        balance: 0,
-        decimals: 0,
-        image: "",
-        network: tokenData.network      
-      } as ERC20Token);
+    let index = 0;
+    console.log('res', res.length, res);
+    if (res.length == 0) {
+      return;
     }
+
+    setLPTokenList([]);
+
+    res.forEach((value) => {
+     
+      // const res = await getLPTokenReserve(value.contractAddress, value.network);
+
+      // value.price = value.token0_reserve / value.token1_reserve;
+
+      if (index == 0) {
+        setLPTokenAddress(value);
+      }
+      else
+        setLPTokenList(tokens=>[...tokens, value]);
+      index ++;
+    })
+    
+  }
+  const  setTokenInfo = async() => {
     if (tokenData.network == constant.ETHEREUM_NETWORK) {
       const res = await getTokenInfoFromWalletAddress(tokenData.contractAddress);
       if (res != constant.NOT_FOUND_TOKEN) {
@@ -87,7 +103,27 @@ export default function TokenInfo() {
 
   }
 
+  const setLpTokenItem = (clickLp: LPTokenPair) => {
+    setLPTokenList(lpTokenList.filter(
+      item => (item.contractAddress.toLowerCase() != clickLp.contractAddress.toLowerCase())
+    ));
+    setLPTokenList(tokens=>[...tokens, lpTokenAddress]);
+    setLPTokenAddress(clickLp);
+    setDexDropShow(0);
+  }
+  const setDexDropShow = (clickDexCount: number) => {
+
+    const obj = document.getElementById("dexlist");
+    if (obj == null)
+      return;    
+
+    if (clickDexCount % 2 == 0)
+      obj.style.display = "none";
+    else 
+      obj.style.display = "flex";
+  }
   useEffect(() => {
+    setLPTokenListInfo();
     setTokenInfo();
     let balance_temp = 0;
     let balanceUSD_temp = 0;
@@ -97,6 +133,7 @@ export default function TokenInfo() {
     }
     setBalance(balance_temp);
     setBalanceUSD(balanceUSD_temp);
+    setDexDropShow(0);
   }, [tokenData])
  
   return (
@@ -108,7 +145,7 @@ export default function TokenInfo() {
             <Box display={"flex"} flexDirection={"column"} paddingLeft={"1rem"}>
               <Box display={"flex"} flexDirection={"row"}>
                 <p className={style.tokenName}>{tokenData.symbol}</p>
-                <p className={style.tokenPrice}>{convertBalanceCurrency(lpTokenPrice)}</p>
+                <p className={style.tokenPrice}>{convertBalanceCurrency( lpTokenPrice)}</p>
               </Box>
               <Box display={"flex"} flexDirection={"row"} alignItems={"center"} justifyContent={"center"}>
                 <p className={style.tokenAddress} style={{color:textColor}}>{tokenData.contractAddress}</p>
@@ -165,16 +202,51 @@ export default function TokenInfo() {
             <p className={style.tokenMarketCap} style={{color:"#00B112"}}>{convertBalanceCurrency(tokenData.totalSupply * lpTokenPrice)}</p>
           </Box>
           <div className={style.border} style={{borderColor:infoborderColorMode}}/>
-          <Box display={"flex"} flexDirection={"row"} width={"28%"} paddingLeft={"0.2rem"} paddingRight={"0.5rem"} justifyContent={"space-between"} alignItems={"center"}>
-            <Box display={"flex"} flexDirection={"column"} >
-              <p className={style.marketCap} style={{color:textColor}}>UNI / BNB (LP)</p>
-              <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
-                <p className={style.tokenMarketCap} style={{marginRight:"1rem"}}  color={whiteBlackMode}>{numberWithCommasTwoDecimals(parseFloat(tokenData.marketCap))}</p>
-                <p className={style.tokenMarketCap} style={{color:"#00B112"}}>({convertBalanceCurrency(tokenData.balance! * tokenData.price)})</p>
-              </Box>
-            </Box>
-            <Box cursor={"pointer"}>
-              
+          <Box 
+            display={"flex"} 
+            flexDirection={"column"} 
+            width={"28%"} 
+            paddingLeft={"0.2rem"} 
+            paddingRight={"0.5rem"} 
+            position={"relative"} 
+            height={"100%"}
+            top={"0.4rem"}
+          >
+            <LpTokenInfo 
+              lpToken={lpTokenAddress} 
+              dropListHandler ={setDexDropShow}
+              showArrow = {true}
+              setLPTokenHandler = {setLpTokenItem}
+            />
+            <Box 
+              id="dexlist" 
+              style={{
+                height:"15rem", 
+                display:"none", 
+                position:"absolute", 
+                top:"3rem", 
+                width:"100%", 
+                flexDirection:"column",
+                paddingRight:"0.5rem",
+                overflowY:"auto",
+                overflowX:"auto",
+              }}>
+              {
+                lpTokenList.length >0 &&
+                lpTokenList.map((value) => {
+                  if (value.contractAddress == lpTokenAddress.contractAddress)
+                    return;
+                  return (
+                    <LpTokenInfo
+                      key = {value.contractAddress}
+                      lpToken = {value}
+                      dropListHandler ={setDexDropShow}
+                      showArrow = {false}
+                      setLPTokenHandler = {setLpTokenItem}
+                    />
+                  );
+                })
+              }
             </Box>
           </Box>
           <div className={style.border} style={{borderColor:infoborderColorMode}}/>

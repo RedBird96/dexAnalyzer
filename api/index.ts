@@ -1,13 +1,15 @@
 import { ethers } from "ethers";
 import { request, gql } from 'graphql-request';
 import fetch from 'cross-fetch';
-import web3 from 'web3';
+import Web3 from 'web3';
+import { AbiItem } from 'web3-utils'
 import ERC20TokenABI from '../config/ERC20ABI.json'
 import BEP20TokenABI from '../config/ERC20ABI.json'
 import EtherscanClient, {Action} from './ethers/etherscan-client';
-import {ERC20Token} from '../utils/type'
+import {ERC20Token, LPTokenPair} from '../utils/type'
 import * as constant from '../utils/constant'
-import { createClient, useQuery } from 'urql'
+import UniswapV2Pair from '../config/IUniswapV2Pair.json';
+import PancakeswapV2Pair from '../config/IPancakeswapV2Pair.json';
 
 const ETH_MAINNET_API_URL = 'https://api.etherscan.io/api';
 const BSC_MAINNET_API_URL = 'https://api.bscscan.com/api';
@@ -46,7 +48,7 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
     }
     return JSON.parse(text);
   } else {
-    const web3_bsc = new web3(constant.BSCRPC_URL);
+    const web3_bsc = new Web3(constant.BSCRPC_URL);
     const bnbBalance = parseInt(await web3_bsc.eth.getBalance(address))/ Math.pow(10, 18);
     let tokenList:ERC20Token[] = [];
     const eth = new EtherscanClient(BSC_MAINNET_CONNECTION);
@@ -229,11 +231,10 @@ export async function getTokenPricefromCoingeckoAPI(addresses: string, network: 
   return undefined    
 }
 
-export async function getLPTokenList(address: string, network: number) {
+export async function getLPTokenList(address: string, network: number): Promise<LPTokenPair[]> {
       
-  let lpTokenSymbol: string[] = [];
-  let lpTokenAddresses: string[] = [];
   let checkTokenList: string[] = [];
+  let lpTokenList: LPTokenPair[] = [];
   if(network == constant.ETHEREUM_NETWORK) {
     checkTokenList.push(constant.WHITELIST_TOKENS.ETH.USDC);
     checkTokenList.push(constant.WHITELIST_TOKENS.ETH.USDT);
@@ -246,6 +247,8 @@ export async function getLPTokenList(address: string, network: number) {
     checkTokenList.push(constant.WHITELIST_TOKENS.BSC.BUSD);
     checkTokenList.push(constant.WHITELIST_TOKENS.BSC.DAI);
     checkTokenList.push(constant.WHITELIST_TOKENS.BSC.WBNB);
+    checkTokenList.push("0x13958e1eb63dfb8540eaf6ed7dcbbc1a60fd52af");
+    checkTokenList.push("0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82");
   }
   const response = await request(PC_PAIRS,
     gql`
@@ -271,10 +274,54 @@ export async function getLPTokenList(address: string, network: number) {
     response.pairs.forEach((token: any) => {
       const token0 = token.token0.id;
       if (checkTokenList.includes(token0)) {
-        lpTokenAddresses.push(token.id);
-        lpTokenSymbol.push(token.token0.symbol + "/" + token.token1.symbol);
+        lpTokenList.push({
+          name:  token.token0.symbol + "/" + token.token1.symbol,
+          symbol: token.token0.symbol + "/" + token.token1.symbol,
+          contractAddress: token.id,
+          price: 0,
+          marketCap: "",
+          totalSupply: 0,
+          holdersCount: 0,
+          balance: 0,
+          decimals: 0,
+          image: "",
+          network: network,
+          token0_name: token.token0.symbol,
+          token1_name: token.token1.symbol,
+          token0_reserve: 0,
+          token1_reserve: 0,
+          usdBalance: 0,
+          owner: "",
+          pinSetting: false
+        } as LPTokenPair);
       }
     });
   }
-  return [lpTokenAddresses, lpTokenSymbol];
+  return lpTokenList;
+}
+
+export async function getLPTokenReserve(address: string, network: number) {
+
+  let PairContractHttp;
+  if (network == constant.ETHEREUM_NETWORK) {
+    const web3Http = new Web3(constant.ETHRPC_URL);
+    PairContractHttp = new web3Http.eth.Contract(
+      UniswapV2Pair.abi as AbiItem[],
+      address
+    );   
+  } else {
+    const web3Http = new Web3(constant.BSCRPC_URL);
+    PairContractHttp = new web3Http.eth.Contract(
+      PancakeswapV2Pair as AbiItem[],
+      address
+    );       
+  }
+
+  const _reserves = await PairContractHttp.methods.getReserves().call();
+  const _decimal =  await PairContractHttp.methods.decimals().call();
+
+  // return data in Big Number
+  return [parseInt(_reserves._reserve0), 
+          parseInt(_reserves._reserve1),
+          _decimal];
 }
