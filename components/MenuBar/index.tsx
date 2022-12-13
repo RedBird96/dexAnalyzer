@@ -1,6 +1,5 @@
 import React from 'react'
 import { Box, useColorModeValue } from "@chakra-ui/react"
-import {images} from "../../config/images"
 import style from './MenuBar.module.css'
 import {TopMenuBar} from '../../assests/icon'
 import {ChartMenuBar} from '../../assests/icon'
