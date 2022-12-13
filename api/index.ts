@@ -320,7 +320,8 @@ export async function getLPTokenList(address: string, network: number, tokenside
           usdBalance: 0,
           owner: "",
           pinSetting: false,
-          tokenside: tokenside
+          tokenside: tokenside,
+          ownerToken: address
         } as LPTokenPair);
       }
     });

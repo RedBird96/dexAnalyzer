@@ -1,3 +1,4 @@
+import {WebSocket} from 'ws';
 import React, {useState, useEffect} from 'react'
 import { Box, color, Switch, useColorMode, useColorModeValue  } from "@chakra-ui/react"
 import {
@@ -5,10 +6,7 @@ import {
   FaceBook,
   Twitter,
   CopyAddressIconDark,
-  CopyAddressIconLight,
-  DownArrowDark,
-  DownArrowLight,
-  ColorMode,
+  CopyAddressIconLight
 } from "../../assests/icon"
 import {
   useTokenInfo,
@@ -16,13 +14,19 @@ import {
 } from '../../hooks'
 import { 
   convertBalanceCurrency,
-  numberWithCommasTwoDecimals
+  numberWithCommasTwoDecimals,
+  numberWithCommasNoDecimals
 } from '../../utils'
 import {
   getLPTokenReserve,
   getTokenInfoFromWalletAddress,
   getLPTokenList
 } from '../../api'
+import {
+  setCookie,
+  getCookie,
+  deleteCookie
+} from '../../utils'
 import style from './TokenInfo.module.css'
 import * as constant from '../../utils/constant'
 import LpTokenInfo from './LpTokenInfo'
@@ -36,6 +40,7 @@ export default function TokenInfo() {
   const {lpTokenPrice, lpTokenAddress ,setLPTokenAddress} = useLPTokenPrice();
   
   const [lpTokenList, setLPTokenList] = useState<LPTokenPair[]>([]);
+  const [lpTokenPinList, setLPTokenPinList] = useState<LPTokenPair[]>([]);
   const [balance, setBalance] = useState<number>(0);
   const [balanceUSD, setBalanceUSD] = useState<number>(0);
 
@@ -50,17 +55,31 @@ export default function TokenInfo() {
   const infoborderColorMode = useColorModeValue("#E2E8F0","#2B2A2A");
   const whiteBlackMode = useColorModeValue('#FFFFFF', '#000000');
 
+  const coin = 'btcusdt';
+
+  // const ws = new WebSocket(`wss://fstream.binance.com/ws/${coin}@trade`);
+
+// ws.on('message', (data?: string) => {
+//     if (data) {
+//         const trade = JSON.parse(data); // parsing a single-trade record
+//         console.log(trade);
+//     }
+// });
+
   const setLPTokenListInfo = async() => {
-
-
+    console.log("here");
+    const findInd = lpTokenPinList.findIndex((value) => value.ownerToken?.toLowerCase() == tokenData.contractAddress.toLowerCase());
+    console.log('findInd', findInd);
+    if (findInd != -1) {
+      setLPTokenAddress(lpTokenPinList[findInd]);
+    } 
     const token0_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token0);
     const token1_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token1);
+
     const lptoken_Res = token0_Res.concat(token1_Res);
     console.log('lptoken_Res', lptoken_Res);
     let index = 0;
     if (lptoken_Res.length == 0) {
-
-      setLPTokenList([]);
       setLPTokenAddress({
         name:"/",
         symbol:"/",
@@ -80,10 +99,10 @@ export default function TokenInfo() {
         token0_contractAddress: "",
         token1_contractAddress: "",
         tokenside: TokenSide.token1
-      } as LPTokenPair);      
+      } as LPTokenPair);       
       return;
     }
-
+    let lpToken_temp: LPTokenPair[] = [];
     for await (const value of lptoken_Res) {
      
       const res = await getLPTokenReserve(value.contractAddress, value.network);
@@ -96,21 +115,19 @@ export default function TokenInfo() {
         value.price = res[0] / res[1];  
       }
 
+      console.log('value', value);
       if (index == 0) {
         setLPTokenAddress(value);
       }
       else{
-        setLPTokenList(lpTokenList.filter(
-          item => (item.contractAddress.toLowerCase() != value.contractAddress.toLowerCase())
-        ));        
-        setLPTokenList(tokens=>[...tokens, value]);
+        lpToken_temp.push(value);
       }
       index ++;
 
     }
-    
+    setLPTokenList(lpToken_temp);    
   }
-  const  setTokenInfo = async() => {
+  const setTokenInfo = async() => {
     if (tokenData.network == constant.ETHEREUM_NETWORK) {
       const res = await getTokenInfoFromWalletAddress(tokenData.contractAddress);
       if (res != constant.NOT_FOUND_TOKEN) {
@@ -123,18 +140,6 @@ export default function TokenInfo() {
       setHoldersCount(0);
       setTransactionCount(0);
     }
-    // const obj = await getTokenInfofromCoingeckoAPI(
-    //   contractAddress, 
-    //   tokenData.network == constant.ETHEREUM_NETWORK ? "ethereum" : "binance"
-    // );
-    // if (obj == undefined)
-    //   return;
-    // tokenData.totalSupply = obj.market_data.total_supply;
-    // tokenData.website = obj.ico_data.links.web;
-    // tokenData.twitter = obj.ico_data.links.twitter;
-    // tokenData.facebook = obj.ico_data.links.facebook;
-    // console.log('totalSupply', tokenData.totalSupply);
-
   }
 
   const setLpTokenItem = (clickLp: LPTokenPair) => {
@@ -145,6 +150,7 @@ export default function TokenInfo() {
     setLPTokenAddress(clickLp);
     setDexDropShow(0);
   }
+
   const setDexDropShow = (clickDexCount: number) => {
 
     const obj = document.getElementById("dexlist");
@@ -156,7 +162,59 @@ export default function TokenInfo() {
     else 
       obj.style.display = "flex";
   }
+
+  const addPinLPToken = () => {
+    const filterTokens = lpTokenPinList.filter(
+      item => (item.ownerToken?.toLowerCase() !== 
+      lpTokenAddress.ownerToken?.toLowerCase())
+    );    
+    filterTokens.push(lpTokenAddress);
+    setLPTokenPinList(filterTokens);
+    let newCookieString = "";
+    filterTokens.forEach((token) => {
+      const obj = JSON.stringify(token);
+      newCookieString += obj;
+      newCookieString += "&";
+    });
+    setCookie("PinedLPToken", newCookieString);
+  }
+
+  const getLastLpTokenList = () => {
+    const cookieString = getCookie("PinedLPToken");
+    const tokenString = cookieString?.split("&");
+    let cookieLPToken:LPTokenPair[] = [];
+    tokenString?.forEach((jsonToken)=>{
+      if (jsonToken.length < 2)
+        return;
+      const obj = JSON.parse(jsonToken);
+      const token = {
+        name:obj["name"],
+        symbol:obj["symbol"],
+        balance:obj["balance"],
+        contractAddress:obj["contractAddress"],
+        holdersCount:obj["holdersCount"],
+        image:obj["image"],
+        marketCap:obj["marketCap"],
+        network:obj["network"],
+        price:obj["price"],
+        totalSupply:obj["totalSupply"],
+        pinSetting:obj["pinSetting"],
+        token0_contractAddress:obj["token0_contractAddress"],
+        token0_name:obj["token0_name"],
+        token0_reserve:obj["token0_reserve"],
+        token1_contractAddress:obj["token1_contractAddress"],
+        token1_name:obj["token1_name"],
+        token1_reserve:obj["token1_reserve"],
+        tokenside:obj["tokenside"],
+        ownerToken:obj["ownerToken"]
+      } as LPTokenPair;
+      cookieLPToken.push(token);    
+    });
+    setLPTokenPinList(cookieLPToken); 
+  }
+
   useEffect(() => {
+    addPinLPToken();
     setLPTokenListInfo();
     setTokenInfo();
     let balance_temp = 0;
@@ -169,6 +227,10 @@ export default function TokenInfo() {
     setBalanceUSD(balanceUSD_temp);
     setDexDropShow(0);
   }, [tokenData])
+
+  useEffect(() => {
+    getLastLpTokenList();
+  }, [])
  
   return (
     <Box className={infoClass}>
@@ -179,6 +241,7 @@ export default function TokenInfo() {
             <Box display={"flex"} flexDirection={"column"} paddingLeft={"1rem"}>
               <Box display={"flex"} flexDirection={"row"}>
                 <p className={style.tokenName}>{tokenData.symbol}</p>
+                <p className={style.tokenName} style={{color:"#767676"}}>&nbsp;({lpTokenAddress.symbol})</p>
                 <p className={style.tokenPrice}>{convertBalanceCurrency( lpTokenPrice)}</p>
               </Box>
               <Box display={"flex"} flexDirection={"row"} alignItems={"center"} justifyContent={"center"}>
@@ -270,7 +333,6 @@ export default function TokenInfo() {
                 lpTokenList.map((value) => {
                   if (value.contractAddress == lpTokenAddress.contractAddress)
                     return;
-                  console.log('address', value.contractAddress, value.symbol);
                   return (
                     <LpTokenInfo
                       key = {value.contractAddress + value.symbol}

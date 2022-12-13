@@ -6,6 +6,7 @@ import Web3 from "web3";
 import { AbiItem } from 'web3-utils'
 import { LPTokenPair, TokenSide } from '../utils/type'
 import * as constant from '../utils/constant'
+import { getTokenPricefromCoingeckoAPI } from "../api";
 
 
 interface LpTokenPriceInterface {
@@ -44,13 +45,14 @@ export function LpTokenPriceProvider({children}:any) {
     token1_name: "USDT",
     token0_reserve: 0,
     token1_reserve: 0,
-    token0_contractAddress: "",
-    token1_contractAddress: "",
-    tokenside: TokenSide.token0
+    token0_contractAddress: "0x55d398326f99059ff775485246999027b3197955",
+    token1_contractAddress: "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+    tokenside: TokenSide.token0,
+    ownerToken: "0x55d398326f99059ff775485246999027b3197955"
   } as LPTokenPair);
   let web3Wss: Web3, web3Http: Web3, PairContractWSS:any, PairContractHttp:any;
 
-  const updateState = (data:any) => {
+  const updateState = async(data:any) => {
     // update state
     // state.token0 = BigNumber.from(data.returnValues.reserve0);
     // state.token1 = BigNumber.from(data.returnValues.reserve1);
@@ -59,7 +61,7 @@ export function LpTokenPriceProvider({children}:any) {
       const token1Reserve = parseInt(data.returnValues.reserve1);
 
       // console.log('token0Reserve, token1Reserve', token0Reserve, token1Reserve);
-      if (lptokenAddress.tokenside == TokenSide.token0) {
+      if (lptokenAddress.tokenside == TokenSide.token0) { 
         setlpTokenPrice(token1Reserve / token0Reserve);
       } else {
         setlpTokenPrice(token0Reserve / token1Reserve);

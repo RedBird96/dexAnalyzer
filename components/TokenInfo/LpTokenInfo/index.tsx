@@ -33,6 +33,7 @@ export default function LpTokenInfo({
   const {lptoken0Reserve, lptoken1Reserve, lpTokenAddress} = useLPTokenPrice();
   const [reserve, setReserve] = useState<number>(0);
   const [reserveUSD, setReserveUSD] = useState<number>(0);
+  const [reserveCurrency, setReserveCurrency] = useState<string>("");
   const textColor = useColorModeValue("#5E5E5E","#A7A7A7");
   const backgroundColor = useColorModeValue("#ffffff","#1C1C1C");
   let hoverColor = useColorModeValue("#005CE5","#3A3A29");
@@ -48,34 +49,46 @@ export default function LpTokenInfo({
       if (showArrow) {
         if (lpTokenAddress.tokenside == TokenSide.token0) {
           setReserve(lptoken1Reserve)
-          // const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token1_contractAddress, tokenData.network);
-          // if (res != undefined) {
-          //   const price = res[lpTokenAddress.token1_contractAddress].usd;
-          //   setReserveUSD(lptoken1Reserve * price);
-          // }
+          setReserveCurrency(lpTokenAddress.token1_name);
+          if (lpTokenAddress.token1_contractAddress != undefined && lpTokenAddress.token1_contractAddress != "") {
+            const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token1_contractAddress, tokenData.network);
+            if (res != undefined) {
+              const price = res[lpTokenAddress.token1_contractAddress].usd;
+              setReserveUSD(lptoken1Reserve / Math.pow(10, lpTokenAddress.decimals) * price);
+            }
+          }
         } else {
           setReserve(lptoken0Reserve)
-          // const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token1_contractAddress, tokenData.network);
-          // if (res != undefined) {
-          //   const price = res[lpTokenAddress.token0_contractAddress].usd;
-          //   setReserveUSD(lptoken0Reserve * price);
-          // }
+          setReserveCurrency(lpTokenAddress.token0_name);
+          if (lpTokenAddress.token0_contractAddress != undefined && lpTokenAddress.token0_contractAddress != "") {
+            const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token0_contractAddress, tokenData.network);
+            if (res != undefined) {
+              const price = res[lpTokenAddress.token0_contractAddress].usd;
+              setReserveUSD(lptoken0Reserve / Math.pow(10, lpTokenAddress.decimals) * price);
+            }
+          }
         }
       } else {
         if (lpToken.tokenside == TokenSide.token0) {
           setReserve(lpToken.token1_reserve)
-          // const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token1_contractAddress, tokenData.network);
-          // if (res != undefined) {
-          //   const price = res[lpTokenAddress.token1_contractAddress].usd;
-          //   setReserveUSD(lpToken.token1_reserve * price);
-          // }
+          setReserveCurrency(lpToken.token1_name);
+          if (lpToken.token1_contractAddress != undefined && lpToken.token1_contractAddress != "") {
+            const res = await getTokenPricefromCoingeckoAPI(lpToken.token1_contractAddress, tokenData.network);
+            if (res != undefined) {
+              const price = res[lpToken.token1_contractAddress].usd;
+              setReserveUSD(lpToken.token1_reserve / Math.pow(10, lpToken.decimals) * price);
+            }
+          }
         } else {
           setReserve(lpToken.token0_reserve)
-          // const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token0_contractAddress, tokenData.network);
-          // if (res != undefined) {
-          //   const price = res[lpTokenAddress.token0_contractAddress].usd;
-          //   setReserveUSD(lpToken.token0_reserve * price);
-          // }
+          setReserveCurrency(lpToken.token0_name);
+          if (lpToken.token0_contractAddress != undefined && lpToken.token0_contractAddress != "") {
+            const res = await getTokenPricefromCoingeckoAPI(lpToken.token0_contractAddress, tokenData.network);
+            if (res != undefined) {
+              const price = res[lpToken.token0_contractAddress].usd;
+              setReserveUSD(lpToken.token0_reserve / Math.pow(10, lpToken.decimals) * price);
+            }
+          }
         }
       }
     }
@@ -110,16 +123,23 @@ export default function LpTokenInfo({
         <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
           <p 
             className={style.tokenMarketCap} 
-            style={{marginRight:"1rem"}}  
+            style={{marginRight:"0.2rem"}}  
             color={whiteBlackMode}
           >
             {numberWithCommasTwoDecimals(reserve / Math.pow(10, lpToken.decimals))} 
           </p>
           <p
             className={style.tokenMarketCap} 
+            style={{marginRight:"0.5rem"}}  
+            color={whiteBlackMode}
+          >
+            {reserveCurrency}
+          </p>
+          <p
+            className={style.tokenMarketCap} 
             style={{color:"#00B112"}}
           >
-            ({convertBalanceCurrency(reserve / Math.pow(10, lpToken.decimals))})
+            ({convertBalanceCurrency(reserveUSD)})
           </p>
         </Box>
       </Box>

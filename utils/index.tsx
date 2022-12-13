@@ -38,8 +38,10 @@ export function numberWithCommasNoDecimals(x :any) {
   return numberWithCommasNoDecimals(x);
 }
 
-export function convertBalanceCurrency(x :any) {
-  return '$'+numberWithCommasTwoDecimals(x);
+export function convertBalanceCurrency(x :any, decimal = true) {
+  if (decimal)
+    return '$'+numberWithCommasTwoDecimals(x);
+  return '$'+numberWithCommasNoDecimals(x);
 }
 
 export function makeShortAddress(address: string): string {
