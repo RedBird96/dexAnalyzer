@@ -5,7 +5,7 @@
  */
  export function numberWithCommasTwoDecimals(x :any) {
   return x
-    .toFixed(2)
+    .toFixed(3)
     .toString()
     .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }

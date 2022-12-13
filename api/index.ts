@@ -237,17 +237,17 @@ export async function getLPTokenList(address: string, network: number, tokenside
   let checkTokenList: string[] = [];
   let lpTokenList: LPTokenPair[] = [];
   if(network == constant.ETHEREUM_NETWORK) {
-    checkTokenList.push(constant.WHITELIST_TOKENS.ETH.USDC);
-    checkTokenList.push(constant.WHITELIST_TOKENS.ETH.USDT);
-    checkTokenList.push(constant.WHITELIST_TOKENS.ETH.ETH);
-    checkTokenList.push(constant.WHITELIST_TOKENS.ETH.DAI);
+    checkTokenList.push(constant.WHITELIST_TOKENS.ETH.USDC.toLowerCase());
+    checkTokenList.push(constant.WHITELIST_TOKENS.ETH.USDT.toLowerCase());
+    checkTokenList.push(constant.WHITELIST_TOKENS.ETH.ETH.toLowerCase());
+    checkTokenList.push(constant.WHITELIST_TOKENS.ETH.DAI.toLowerCase());
   } else {
-    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.USDC);
-    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.USDT);
-    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.BNB);
-    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.BUSD);
-    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.DAI);
-    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.CAKE);
+    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.USDC.toLowerCase());
+    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.USDT.toLowerCase());
+    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.BNB.toLowerCase());
+    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.BUSD.toLowerCase());
+    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.DAI.toLowerCase());
+    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.CAKE.toLowerCase());
   }
   if (tokenside == TokenSide.token0) {
     response = await request(PC_PAIRS,
@@ -296,8 +296,8 @@ export async function getLPTokenList(address: string, network: number, tokenside
     response.pairs.forEach((token: any) => {
       const token0 = token.token0.id;
       const token1 = token.token1.id;
-      if ( (tokenside == TokenSide.token0 && checkTokenList.includes(token1)) ||
-           (tokenside == TokenSide.token1 && checkTokenList.includes(token0) )
+      if ( (tokenside == TokenSide.token0 && checkTokenList.includes(token1.toLowerCase())) ||
+           (tokenside == TokenSide.token1 && checkTokenList.includes(token0.toLowerCase()) )
       ) {
         lpTokenList.push({
           name:  token.token0.symbol + "/" + token.token1.symbol,

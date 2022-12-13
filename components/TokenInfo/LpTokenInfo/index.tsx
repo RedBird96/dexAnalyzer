@@ -60,9 +60,13 @@ export default function LpTokenInfo({
       backgroundColor={showArrow?"transparent":backgroundColor}
       cursor={showArrow ? "":"pointer"}
       zIndex={"99"}
-      marginBottom={"0.2rem"}
     >
-      <Box display={"flex"} flexDirection={"column"} width={"100%"} _hover={{bg:hoverColor}} onClick={()=> {setLPTokenHandler(lpToken)}}>
+      <Box 
+        display={"flex"} 
+        flexDirection={"column"} 
+        width={"100%"} 
+        _hover={{bg:hoverColor}} 
+        onClick={()=> {setLPTokenHandler(lpToken)}}>
         <p className={style.marketCap} style={{color:textColor}}>{lpToken.symbol}</p>
         <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
           <p 

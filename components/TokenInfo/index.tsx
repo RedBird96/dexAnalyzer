@@ -56,6 +56,7 @@ export default function TokenInfo() {
     const token0_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token0);
     const token1_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token1);
     const lptoken_Res = token0_Res.concat(token1_Res);
+    console.log('lptoken_Res', lptoken_Res);
     let index = 0;
     if (lptoken_Res.length == 0) {
 
@@ -263,9 +264,10 @@ export default function TokenInfo() {
                 lpTokenList.map((value) => {
                   if (value.contractAddress == lpTokenAddress.contractAddress)
                     return;
+                  console.log('address', value.contractAddress, value.symbol);
                   return (
                     <LpTokenInfo
-                      key = {value.contractAddress}
+                      key = {value.contractAddress + value.symbol}
                       lpToken = {value}
                       dropListHandler ={setDexDropShow}
                       showArrow = {false}
