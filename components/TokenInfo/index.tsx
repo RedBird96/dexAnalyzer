@@ -67,17 +67,15 @@ export default function TokenInfo() {
 // });
 
   const setLPTokenListInfo = async() => {
-    console.log("here");
     const findInd = lpTokenPinList.findIndex((value) => value.ownerToken?.toLowerCase() == tokenData.contractAddress.toLowerCase());
-    console.log('findInd', findInd);
     if (findInd != -1) {
       setLPTokenAddress(lpTokenPinList[findInd]);
-    } 
+    }
     const token0_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token0);
     const token1_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token1);
 
+    setLPTokenList([]);
     const lptoken_Res = token0_Res.concat(token1_Res);
-    console.log('lptoken_Res', lptoken_Res);
     let index = 0;
     if (lptoken_Res.length == 0) {
       setLPTokenAddress({
@@ -143,10 +141,12 @@ export default function TokenInfo() {
   }
 
   const setLpTokenItem = (clickLp: LPTokenPair) => {
-    setLPTokenList(lpTokenList.filter(
+    const filterTokens = lpTokenList.filter(
       item => (item.contractAddress.toLowerCase() != clickLp.contractAddress.toLowerCase())
-    ));
-    setLPTokenList(tokens=>[...tokens, lpTokenAddress]);
+    );
+    filterTokens.push(lpTokenAddress);
+    console.log('filterTokens', filterTokens);
+    setLPTokenList(filterTokens);
     setLPTokenAddress(clickLp);
     setDexDropShow(0);
   }
