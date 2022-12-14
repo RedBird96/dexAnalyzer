@@ -235,7 +235,7 @@ export default function TokenInfo() {
       setBalance(0);
       setBalanceUSD(0);
     }
-  }, [walletTokens, tokenData])
+  }, [walletTokens, tokenData, lpTokenPrice])
   return (
     <Box className={infoClass}>
       <Box className={style.tokenSocialInfo}>
