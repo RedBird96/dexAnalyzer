@@ -22,6 +22,7 @@ import {
 import {ERC20Token} from '../../utils/type'
 import { 
   convertBalanceCurrency,
+  makeShortTokenName,
   numberWithCommasTwoDecimals
 } from '../../utils'
 import {Refresh} from '../../assests/icon'
@@ -49,6 +50,7 @@ export default function WalletInfo() {
   const tokenColor = useColorModeValue("#1C1C1C","#FFFFFF");
   const refreshBtnBgColor = useColorModeValue("#FFFFFF","#1C1C1C");
   const refreshBtnBorderColor = useColorModeValue("#CFCFCF","#5c5c5c");
+  const headerColor = useColorModeValue("#FFFFFF", "#262626");
   const tableBodyBorder = useColorModeValue(style.walletTokenBodyBorderLight,style.walletTokenBodyBorderDark);
   const tableHeadBorder = useColorModeValue(style.walletTokenHeadBorderLight,style.walletTokenHeadBorderDark);
   const address = useAddress();
@@ -132,9 +134,11 @@ export default function WalletInfo() {
       const res = await getContractInfoFromWalletAddress(address!, constant.ETHEREUM_NETWORK);
       setETHTokensBalance(res);
     } else {
+      let usdBalance = 0;
       const res = await getContractInfoFromWalletAddress(address!, constant.BINANCE_NETOWRK);
       if (res != constant.NOT_FOUND_TOKEN){
         res.forEach((value: ERC20Token) => {
+          usdBalance += value.usdBalance;
           if (value.contractAddress.toLocaleLowerCase() == tokenData.contractAddress.toLocaleLowerCase() && 
               value.symbol.toLocaleLowerCase() == tokenData.symbol.toLocaleLowerCase()) { 
                   tokenData.balance = value.balance;
@@ -144,6 +148,7 @@ export default function WalletInfo() {
         });
         setTokensInfo(res);
         setInitTokensInfo(res);
+        setWalletBalance(usdBalance);
       }
     }
   }
@@ -251,7 +256,13 @@ export default function WalletInfo() {
               },
             }}>
             <Table style={{height:"5rem"}} >
-              <Thead className={tableHeadBorder}>
+              <Thead
+               className={tableHeadBorder} 
+               position="sticky" 
+               top={0} 
+               zIndex="docked"
+               backgroundColor={headerColor}
+              >
                 <Tr>
                   <Th style={{width:"40%", paddingBottom:"0rem", paddingLeft:"0rem"}} textTransform={"initial"} color={"#7C7C7C"}>Token</Th>
                   <Th style={{paddingBottom:"0rem", paddingLeft:"0rem"}} textTransform={"initial"} color={"#7C7C7C"}>Balance</Th>
@@ -264,9 +275,9 @@ export default function WalletInfo() {
                       return ;
                     return (
                       <Tr key={token.name}>
-                          <Th style={{paddingLeft:"0rem"}}>
+                          <Th style={{paddingLeft:"0rem", paddingRight:"0.5rem"}}>
                             <p className={style.tokenName} style={{color:tokenColor}}>
-                              {token.symbol}
+                              {makeShortTokenName(token.symbol, 13)}
                             </p>
                           </Th>
                           <Th style={{paddingLeft:"0rem"}}>

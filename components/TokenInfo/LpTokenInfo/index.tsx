@@ -125,7 +125,7 @@ export default function LpTokenInfo({
         _hover={{bg:hoverColor}} 
         onClick={()=> {setLPTokenHandler(lpToken)}}
       >
-        <p className={style.marketCap} style={{color:textColor}}>{lpToken.symbol}</p>
+        <p className={style.marketCap} style={{color:textColor}}>{lpToken.symbol}&nbsp;(LP)</p>
         <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
           <p 
             className={style.tokenMarketCap} 
