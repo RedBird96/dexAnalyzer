@@ -28,7 +28,10 @@ import {
 import {Refresh} from '../../assests/icon'
 import style from './WalletInfo.module.css'
 import * as constant from '../../utils/constant'
-import { useTokenInfo } from '../../hooks'
+import { 
+  useTokenInfo,
+  useWalletTokenBalance 
+} from '../../hooks'
 
 export default function WalletInfo() {
   const titleClass = useColorModeValue(
@@ -44,6 +47,7 @@ export default function WalletInfo() {
     style.tokenSearch + " " + style.tokenSearchDark,
   );
 
+  const {setWalletTokens} = useWalletTokenBalance();
   const {tokenData, setTokenData} = useTokenInfo();
   const selectBtnColor = useColorModeValue("#0070D7","#494949");
   const notSelectBtnColor = useColorModeValue("#E0E0E0","#1C1C1C");
@@ -86,6 +90,7 @@ export default function WalletInfo() {
       usdBalance: usdETHBalance,
       holdersCount: 0,
       image: "",
+      network: constant.ETHEREUM_NETWORK,
       owner: address,
       totalSupply: 0,
       marketCap: ""
@@ -126,6 +131,7 @@ export default function WalletInfo() {
     }
     setTokensInfo(tempTokens);
     setInitTokensInfo(tempTokens);
+    setWalletTokens(tempTokens);
     setWalletBalance(usdBalance);
   }
 
@@ -149,6 +155,7 @@ export default function WalletInfo() {
         setTokensInfo(res);
         setInitTokensInfo(res);
         setWalletBalance(usdBalance);
+        setWalletTokens(res);
       }
     }
   }

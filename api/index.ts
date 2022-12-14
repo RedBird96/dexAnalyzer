@@ -50,6 +50,7 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
   } else {
     const web3_bsc = new Web3(constant.BSCRPC_URL);
     const bnbBalance = parseInt(await web3_bsc.eth.getBalance(address))/ Math.pow(10, 18);
+    console.log('bnbBalance', bnbBalance);
     let tokenList:ERC20Token[] = [];
     const eth = new EtherscanClient(BSC_MAINNET_CONNECTION);
     const res = await eth.call(Action.account_tokentx, {address});
@@ -74,7 +75,7 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
               contractAddress: add,
               balance: balance,
               usdBalance: 0,
-              network: 0,
+              network: network,
               price: 0,
               holdersCount: 0,
               image: "",

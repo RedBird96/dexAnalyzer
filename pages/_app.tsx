@@ -6,6 +6,7 @@ import {TokenInfoProvider} from '../hooks/useTokenInfo'
 import Layout from '../components/PageLayout'
 import { theme } from "../themes/theme";
 import { LpTokenPriceProvider } from '../hooks/useLPTokenPrice';
+import { WalletTokenBalanceProvider } from '../hooks/useWalletBalanceTokens';
 
 export default function App({ Component, pageProps }: AppProps) {
 
@@ -17,9 +18,11 @@ export default function App({ Component, pageProps }: AppProps) {
       <ThirdwebProvider desiredChainId={desiredChainId} supportedChains={supportChain}>
         <TokenInfoProvider>
           <LpTokenPriceProvider>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
+            <WalletTokenBalanceProvider>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </WalletTokenBalanceProvider>
           </LpTokenPriceProvider>
         </TokenInfoProvider>
       </ThirdwebProvider>

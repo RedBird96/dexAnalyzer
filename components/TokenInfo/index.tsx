@@ -9,7 +9,8 @@ import {
 } from "../../assests/icon"
 import {
   useTokenInfo,
-  useLPTokenPrice
+  useLPTokenPrice,
+  useWalletTokenBalance
 } from '../../hooks'
 import { 
   convertBalanceCurrency,
@@ -36,6 +37,7 @@ export default function TokenInfo() {
 
   const colorMode = useColorMode();
   const {tokenData, setTokenData} = useTokenInfo();
+  const {walletTokens} = useWalletTokenBalance();
   const {lpTokenPrice, lpTokenAddress ,setLPTokenAddress} = useLPTokenPrice();
   
   const [lpTokenList, setLPTokenList] = useState<LPTokenPair[]>([]);
@@ -216,14 +218,6 @@ export default function TokenInfo() {
     addPinLPToken();
     setLPTokenListInfo();
     setTokenInfo();
-    let balance_temp = 0;
-    let balanceUSD_temp = 0;
-    if (tokenData.decimals != 0 && tokenData.balance != 0) {
-      balance_temp = tokenData.balance! / Math.pow(10, tokenData.decimals);
-      balanceUSD_temp = balance_temp * tokenData.price;
-    }
-    setBalance(balance_temp);
-    setBalanceUSD(balanceUSD_temp);
     setDexDropShow(0);
   }, [tokenData])
 
@@ -231,6 +225,15 @@ export default function TokenInfo() {
     getLastLpTokenList();
   }, [])
  
+  useEffect(() => {
+    const res = walletTokens.find((value) => value.contractAddress.toLowerCase() + value.network ==
+                tokenData.contractAddress.toLowerCase() + tokenData.network);
+    console.log('walletTokens', walletTokens);
+    if (res != undefined) {
+      setBalance(res.balance);
+      setBalanceUSD(res.balance * lpTokenPrice);
+    }
+  }, [walletTokens])
   return (
     <Box className={infoClass}>
       <Box className={style.tokenSocialInfo}>
@@ -359,8 +362,8 @@ export default function TokenInfo() {
           <Box display={"flex"} flexDirection={"column"} width={"39%"}>
               <p className={style.marketCap} style={{color:textColor}}>Balance</p>
               <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
-                <p className={style.tokenMarketCap} style={{marginRight:"1rem"}} color={whiteBlackMode}>{numberWithCommasTwoDecimals(tokenData.balance)}</p>
-                <p className={style.tokenMarketCap} style={{color:"#00B112"}}>({convertBalanceCurrency(tokenData.balance! * tokenData.price)})</p>
+                <p className={style.tokenMarketCap} style={{marginRight:"1rem"}} color={whiteBlackMode}>{numberWithCommasTwoDecimals(balance)}</p>
+                <p className={style.tokenMarketCap} style={{color:"#00B112"}}>({convertBalanceCurrency(balanceUSD)})</p>
               </Box>
           </Box>          
         </Box>
