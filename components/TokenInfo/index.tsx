@@ -5,7 +5,8 @@ import {
   FaceBook,
   Twitter,
   CopyAddressIconDark,
-  CopyAddressIconLight
+  CopyAddressIconLight,
+  CoyAddressComfirm
 } from "../../assests/icon"
 import {
   useTokenInfo,
@@ -45,6 +46,7 @@ export default function TokenInfo() {
   const [balance, setBalance] = useState<number>(0);
   const [balanceUSD, setBalanceUSD] = useState<number>(0);
 
+  const [copyStatus, setCopyStatus] = useState<boolean>(false);
   const [holdersCount, setHoldersCount] = useState<number>(0);
   const [transactionCount, setTransactionCount] = useState<number>(0);
   const infoClass = useColorModeValue(
@@ -214,6 +216,14 @@ export default function TokenInfo() {
     setLPTokenPinList(cookieLPToken); 
   }
 
+  const copyBtnClick = () => {
+    navigator.clipboard.writeText(tokenData.contractAddress)
+    setCopyStatus(true);
+    setTimeout(() => {
+      setCopyStatus(false);
+    }, 2000)
+  }
+
   useEffect(() => {
     addPinLPToken();
     setLPTokenListInfo();
@@ -228,7 +238,6 @@ export default function TokenInfo() {
   useEffect(() => {
     const res = walletTokens.find((value) => value.contractAddress.toLowerCase() + value.network ==
                 tokenData.contractAddress.toLowerCase() + tokenData.network);
-    console.log('walletTokens', walletTokens);
     if (res != undefined) {
       setBalance(res.balance);
       setBalanceUSD(res.balance * lpTokenPrice);
@@ -248,8 +257,10 @@ export default function TokenInfo() {
               </Box>
               <Box display={"flex"} flexDirection={"row"} alignItems={"center"} justifyContent={"center"}>
                 <p className={style.tokenAddress} style={{color:textColor}}>{tokenData.contractAddress}</p>
-                <Box onClick={()=>{navigator.clipboard.writeText(tokenData.contractAddress)}}>
-                  {colorMode.colorMode == "dark" ?
+                <Box onClick={copyBtnClick}>
+                  
+                  {copyStatus ? <CoyAddressComfirm/> :
+                  colorMode.colorMode == "dark" ?
                   <CopyAddressIconDark cursor={"pointer"}/> :
                   <CopyAddressIconLight cursor={"pointer"}/> }
                 </Box>
