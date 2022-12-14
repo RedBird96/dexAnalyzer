@@ -28,6 +28,7 @@ const BSC_MAINNET_CONNECTION = {
 const CMC_ENDPOINT = 'https://3rdparty-apis.coinmarketcap.com/v1/cryptocurrency/contract?address='
 const CG_ENDPOINT = 'https://api.coingecko.com/api/v3/';
 const PC_PAIRS = "https://api.thegraph.com/subgraphs/name/pancakeswap/pairs";
+const SH_PAIRS = "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2";
 const LLAMA_ENDPOINT = "https://coins.llama.fi/";
 
 export async function getContractInfoFromWalletAddress(address:string, network: number) {
@@ -257,6 +258,7 @@ export async function getLPTokenList(address: string, network: number, tokenside
   let response;
   let checkTokenList: string[] = [];
   let lpTokenList: LPTokenPair[] = [];
+  const url = network == constant.ETHEREUM_NETWORK ? SH_PAIRS : PC_PAIRS;
   if(network == constant.ETHEREUM_NETWORK) {
     checkTokenList.push(constant.WHITELIST_TOKENS.ETH.USDC.toLowerCase());
     checkTokenList.push(constant.WHITELIST_TOKENS.ETH.USDT.toLowerCase());
@@ -271,7 +273,7 @@ export async function getLPTokenList(address: string, network: number, tokenside
     checkTokenList.push(constant.WHITELIST_TOKENS.BSC.CAKE.toLowerCase());
   }
   if (tokenside == TokenSide.token0) {
-    response = await request(PC_PAIRS,
+    response = await request(url,
       gql`
       query getLPTokenPairs($address:String){
         pairs(where:{token0:$address}) {
@@ -294,7 +296,7 @@ export async function getLPTokenList(address: string, network: number, tokenside
       }
     );
   } else {
-    response = await request(PC_PAIRS,
+    response = await request(url,
       gql`
       query getLPTokenPairs($address:String){
         pairs(where:{token1:$address}) {
@@ -362,7 +364,7 @@ export async function getLPTokenReserve(address: string, network: number) {
   if (network == constant.ETHEREUM_NETWORK) {
     const web3Http = new Web3(constant.ETHRPC_URL);
     PairContractHttp = new web3Http.eth.Contract(
-      UniswapV2Pair.abi as AbiItem[],
+      UniswapV2Pair as AbiItem[],
       address
     );   
   } else {
@@ -374,12 +376,10 @@ export async function getLPTokenReserve(address: string, network: number) {
   }
 
   const _reserves = await PairContractHttp.methods.getReserves().call();
-  const _decimal =  await PairContractHttp.methods.decimals().call();
 
   // return data in Big Number
   return [parseInt(_reserves._reserve0), 
-          parseInt(_reserves._reserve1),
-          _decimal];
+          parseInt(_reserves._reserve1)];
 }
 
 export async function getTokenPricefromllama(address: string, network: number) {
