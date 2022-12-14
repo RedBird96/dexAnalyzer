@@ -1,4 +1,3 @@
-import {WebSocket} from 'ws';
 import React, {useState, useEffect} from 'react'
 import { Box, color, Switch, useColorMode, useColorModeValue  } from "@chakra-ui/react"
 import {
@@ -140,9 +139,11 @@ export default function TokenInfo() {
   }
 
   const setLpTokenItem = (clickLp: LPTokenPair) => {
+    
     const filterTokens = lpTokenList.filter(
       item => (item.contractAddress.toLowerCase() != clickLp.contractAddress.toLowerCase())
     );
+    setLPTokenList([]);
     filterTokens.push(lpTokenAddress);
     setLPTokenList(filterTokens);
     setLPTokenAddress(clickLp);
@@ -296,13 +297,15 @@ export default function TokenInfo() {
             <p className={style.marketCap} style={{color:textColor}} >Market Cap</p>
             <p className={style.tokenMarketCap} style={{color:"#00B112"}}>{convertBalanceCurrency(tokenData.totalSupply * lpTokenPrice, 0)}</p>
           </Box>
-          <div className={style.border} style={{borderColor:infoborderColorMode}}/>
+          <div style={{
+            height:"90%",
+            borderWidth:"1px",
+            borderColor:infoborderColorMode,
+          }}/>
           <Box 
             display={"flex"} 
             flexDirection={"column"} 
-            width={"28%"} 
-            paddingLeft={"0.2rem"} 
-            paddingRight={"0.5rem"} 
+            width={"29%"} 
             position={"relative"} 
             height={"100%"}
             top={"0.4rem"}
@@ -312,23 +315,25 @@ export default function TokenInfo() {
               dropListHandler ={setDexDropShow}
               showArrow = {true}
               setLPTokenHandler = {setLpTokenItem}
+              isLast = {false}
             />
             <Box 
               id="dexlist" 
               style={{
-                height:"15rem", 
+                maxHeight:"15rem", 
                 display:"none", 
                 position:"absolute", 
-                top:"3rem", 
+                top:"3.9rem", 
                 width:"100%", 
                 flexDirection:"column",
-                paddingRight:"0.5rem",
                 overflowY:"auto",
                 overflowX:"auto",
+                borderWidth:"thin",
+                zIndex:"99"
               }}>
               {
                 lpTokenList.length >0 &&
-                lpTokenList.map((value) => {
+                lpTokenList.map((value, index) => {
                   if (value.contractAddress == lpTokenAddress.contractAddress)
                     return;
                   return (
@@ -338,13 +343,19 @@ export default function TokenInfo() {
                       dropListHandler ={setDexDropShow}
                       showArrow = {false}
                       setLPTokenHandler = {setLpTokenItem}
+                      isLast = {index == lpTokenList.length - 1 ? true : false}
                     />
                   );
                 })
               }
             </Box>
-          </Box>
-          <div className={style.border} style={{borderColor:infoborderColorMode}}/>
+          </Box>          
+          <div style={{
+            marginRight:"1rem",
+            height:"90%",
+            borderWidth:"1px",
+            borderColor:infoborderColorMode,
+          }}/>
           <Box display={"flex"} flexDirection={"column"} width={"39%"}>
               <p className={style.marketCap} style={{color:textColor}}>Balance</p>
               <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>

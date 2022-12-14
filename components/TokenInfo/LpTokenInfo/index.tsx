@@ -21,11 +21,13 @@ export default function LpTokenInfo({
   dropListHandler,
   showArrow,
   setLPTokenHandler,
+  isLast,
 }:{
   lpToken: LPTokenPair,
   dropListHandler: (x?: any) => void,
   showArrow: boolean,
   setLPTokenHandler: (x?: any) => void
+  isLast: boolean
 }) {
 
   const colorMode = useColorMode();
@@ -38,6 +40,7 @@ export default function LpTokenInfo({
   const backgroundColor = useColorModeValue("#ffffff","#1C1C1C");
   let hoverColor = useColorModeValue("#005CE5","#3A3A29");
   const whiteBlackMode = useColorModeValue('#FFFFFF', '#000000');
+  const infoborderColorMode = useColorModeValue("#E2E8F0","#2B2A2A");
   const [clickDex, setClickDex] = useState<number>(0);
 
   if (showArrow)
@@ -104,21 +107,24 @@ export default function LpTokenInfo({
   return (
     <Box 
       display={"flex"} 
-      flexDirection={"row"} 
+      flexDirection={showArrow ? "row" : "column"} 
       width={"100%"} 
       justifyContent={"space-between"} 
       alignItems={"center"} 
-      paddingRight={"0.5rem"}
+      paddingRight={showArrow?"0.5rem":"0rem"}
       backgroundColor={showArrow?"transparent":backgroundColor}
       cursor={showArrow ? "":"pointer"}
-      zIndex={"99"}
     >
       <Box 
         display={"flex"} 
         flexDirection={"column"} 
         width={"100%"} 
+        paddingLeft={"1rem"}
+        paddingTop={showArrow?"0rem":"0.5rem"}
+        paddingBottom={showArrow?"0rem":"0.5rem"}
         _hover={{bg:hoverColor}} 
-        onClick={()=> {setLPTokenHandler(lpToken)}}>
+        onClick={()=> {setLPTokenHandler(lpToken)}}
+      >
         <p className={style.marketCap} style={{color:textColor}}>{lpToken.symbol}</p>
         <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
           <p 
@@ -144,7 +150,7 @@ export default function LpTokenInfo({
         </Box>
       </Box>
       {
-        showArrow &&
+        showArrow ?
         <Box
           cursor={"pointer"} 
           style={{transform:`rotate(${clickDex * 180}deg)`, width:"1rem"}} 
@@ -155,6 +161,12 @@ export default function LpTokenInfo({
             <DownArrowLight/> 
           }
         </Box>
+        :   
+        <div style={{
+          width:"90%",
+          borderWidth:isLast?"0":"thin",
+          borderColor:infoborderColorMode,
+        }}/>
       }
     </Box>
     )
