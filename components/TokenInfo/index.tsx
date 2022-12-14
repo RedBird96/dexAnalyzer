@@ -231,8 +231,11 @@ export default function TokenInfo() {
     if (res != undefined) {
       setBalance(res.balance);
       setBalanceUSD(res.balance * lpTokenPrice);
+    } else {
+      setBalance(0);
+      setBalanceUSD(0);
     }
-  }, [walletTokens])
+  }, [walletTokens, tokenData])
   return (
     <Box className={infoClass}>
       <Box className={style.tokenSocialInfo}>
