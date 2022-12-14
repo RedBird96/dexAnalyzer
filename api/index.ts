@@ -27,6 +27,7 @@ const BSC_MAINNET_CONNECTION = {
 const CMC_ENDPOINT = 'https://3rdparty-apis.coinmarketcap.com/v1/cryptocurrency/contract?address='
 const CG_ENDPOINT = 'https://api.coingecko.com/api/v3/';
 const PC_PAIRS = "https://api.thegraph.com/subgraphs/name/pancakeswap/pairs";
+const LLAMA_ENDPOINT = "https://coins.llama.fi/";
 
 export async function getContractInfoFromWalletAddress(address:string, network: number) {
 
@@ -360,4 +361,18 @@ export async function getLPTokenReserve(address: string, network: number) {
   return [parseInt(_reserves._reserve0), 
           parseInt(_reserves._reserve1),
           _decimal];
+}
+
+export async function getTokenPricefromllama(address: string, network: number) {
+  const networkId = network == constant.ETHEREUM_NETWORK ? "ethereum" : "bsc";
+  const param = networkId + ":" + address;
+  const url = LLAMA_ENDPOINT + "prices/current/" + param;
+  const response = await fetch(url)
+  try {
+    const obj = await response.json();
+    const price = obj.coins[param]["price"];
+    return price
+  } catch (err:any) {
+    return constant.NOT_FOUND_TOKEN;
+  }
 }

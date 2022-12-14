@@ -21,7 +21,8 @@ import {
 import {
   getLPTokenReserve,
   getTokenInfoFromWalletAddress,
-  getLPTokenList
+  getLPTokenList,
+  getTokenPricefromllama
 } from '../../api'
 import {
   setCookie,

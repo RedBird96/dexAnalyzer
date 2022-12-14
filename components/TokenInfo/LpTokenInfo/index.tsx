@@ -14,7 +14,8 @@ import {
 } from '../../../utils'
 import { LPTokenPair, TokenSide } from '../../../utils/type'
 import style from './LpTokenInfo.module.css'
-import { getTokenPricefromCoingeckoAPI } from '../../../api'
+import { getTokenPricefromCoingeckoAPI, getTokenPricefromllama } from '../../../api'
+import { NOT_FOUND_TOKEN } from '../../../utils/constant'
 
 export default function LpTokenInfo({
   lpToken,
@@ -54,9 +55,8 @@ export default function LpTokenInfo({
           setReserve(lptoken1Reserve)
           setReserveCurrency(lpTokenAddress.token1_name);
           if (lpTokenAddress.token1_contractAddress != undefined && lpTokenAddress.token1_contractAddress != "") {
-            const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token1_contractAddress, tokenData.network);
-            if (res != undefined) {
-              const price = res[lpTokenAddress.token1_contractAddress].usd;
+            const price = await getTokenPricefromllama(lpTokenAddress.token1_contractAddress, tokenData.network);
+            if (price != NOT_FOUND_TOKEN) {
               setReserveUSD(lptoken1Reserve * price);
             }
           }
@@ -64,9 +64,8 @@ export default function LpTokenInfo({
           setReserve(lptoken0Reserve)
           setReserveCurrency(lpTokenAddress.token0_name);
           if (lpTokenAddress.token0_contractAddress != undefined && lpTokenAddress.token0_contractAddress != "") {
-            const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token0_contractAddress, tokenData.network);
-            if (res != undefined) {
-              const price = res[lpTokenAddress.token0_contractAddress].usd;
+            const price = await getTokenPricefromllama(lpTokenAddress.token0_contractAddress, tokenData.network);
+            if (price != undefined) {
               setReserveUSD(lptoken0Reserve * price);
             }
           }
@@ -76,9 +75,8 @@ export default function LpTokenInfo({
           setReserve(lpToken.token1_reserve)
           setReserveCurrency(lpToken.token1_name);
           if (lpToken.token1_contractAddress != undefined && lpToken.token1_contractAddress != "") {
-            const res = await getTokenPricefromCoingeckoAPI(lpToken.token1_contractAddress, tokenData.network);
-            if (res != undefined) {
-              const price = res[lpToken.token1_contractAddress].usd;
+            const price = await getTokenPricefromllama(lpToken.token1_contractAddress, tokenData.network);
+            if (price != undefined) {
               setReserveUSD(lpToken.token1_reserve * price);
             }
           }
@@ -86,9 +84,8 @@ export default function LpTokenInfo({
           setReserve(lpToken.token0_reserve)
           setReserveCurrency(lpToken.token0_name);
           if (lpToken.token0_contractAddress != undefined && lpToken.token0_contractAddress != "") {
-            const res = await getTokenPricefromCoingeckoAPI(lpToken.token0_contractAddress, tokenData.network);
-            if (res != undefined) {
-              const price = res[lpToken.token0_contractAddress].usd;
+            const price = await getTokenPricefromllama(lpToken.token0_contractAddress, tokenData.network);
+            if (price != undefined) {
               setReserveUSD(lpToken.token0_reserve * price);
             }
           }

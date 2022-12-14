@@ -6,7 +6,7 @@ import Web3 from "web3";
 import { AbiItem } from 'web3-utils'
 import { LPTokenPair, TokenSide } from '../utils/type'
 import * as constant from '../utils/constant'
-import { getTokenPricefromCoingeckoAPI } from "../api";
+import { getTokenPricefromCoingeckoAPI, getTokenPricefromllama } from "../api";
 
 
 interface LpTokenPriceInterface {
@@ -64,18 +64,16 @@ export function LpTokenPriceProvider({children}:any) {
 
       // console.log('token0Reserve, token1Reserve', token0Reserve, token1Reserve);
       if (lptokenAddress.tokenside == TokenSide.token0) { 
-        const res = await getTokenPricefromCoingeckoAPI(lptokenAddress.token1_contractAddress, lptokenAddress.network);
-        let price = 1;
-        if (res != undefined) {
-          price = res[lptokenAddress.token1_contractAddress].usd;
+        let price = await getTokenPricefromllama(lptokenAddress.token1_contractAddress, lptokenAddress.network);
+        if (price == constant.NOT_FOUND_TOKEN) {
+          price = 1;
         }         
         setlpTokenPrice(token1Reserve / token0Reserve * price);
       } else {
-        const res = await getTokenPricefromCoingeckoAPI(lptokenAddress.token0_contractAddress, lptokenAddress.network);
-        let price = 1;
-        if (res != undefined) {
-          price = res[lptokenAddress.token0_contractAddress].usd;
-        }         
+        let price = await getTokenPricefromllama(lptokenAddress.token0_contractAddress, lptokenAddress.network);
+        if (price == constant.NOT_FOUND_TOKEN) {
+          price = 1;
+        }                 
         setlpTokenPrice(token0Reserve / token1Reserve * price);
       }
       setToken0Reserve(token0Reserve);
@@ -122,18 +120,16 @@ export function LpTokenPriceProvider({children}:any) {
       let token0Reserve, token1Reserve;
       [token0Reserve, token1Reserve] = await getReserves(PairContractHttp);
       if (lptokenAddress.tokenside == TokenSide.token0) {  
-        const res = await getTokenPricefromCoingeckoAPI(lptokenAddress.token1_contractAddress, lptokenAddress.network);
-        let price = 1;
-        if (res != undefined) {
-          price = res[lptokenAddress.token1_contractAddress].usd;
-        }
+        let price = await getTokenPricefromllama(lptokenAddress.token1_contractAddress, lptokenAddress.network);
+        if (price == constant.NOT_FOUND_TOKEN) {
+          price = 1;
+        }         
         setlpTokenPrice(token1Reserve / token0Reserve * price);
       } else {
-        const res = await getTokenPricefromCoingeckoAPI(lptokenAddress.token0_contractAddress, lptokenAddress.network);
-        let price = 1;
-        if (res != undefined) {
-          price = res[lptokenAddress.token0_contractAddress].usd;
-        }        
+        let price = await getTokenPricefromllama(lptokenAddress.token0_contractAddress, lptokenAddress.network);
+        if (price == constant.NOT_FOUND_TOKEN) {
+          price = 1;
+        }              
         setlpTokenPrice(token0Reserve / token1Reserve * price);
       }
       setToken0Reserve(token0Reserve);
