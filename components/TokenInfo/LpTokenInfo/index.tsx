@@ -14,8 +14,9 @@ import {
 } from '../../../utils'
 import { LPTokenPair, TokenSide } from '../../../utils/type'
 import style from './LpTokenInfo.module.css'
-import { getTokenPricefromCoingeckoAPI, getTokenPricefromllama } from '../../../api'
+import { getTokenPricefromllama } from '../../../api'
 import { NOT_FOUND_TOKEN } from '../../../utils/constant'
+import { useStableCoinPrice } from '../../../hooks/useStableCoinPrice'
 
 export default function LpTokenInfo({
   lpToken,
@@ -31,6 +32,7 @@ export default function LpTokenInfo({
   isLast: boolean
 }) {
 
+  const {coinPrice} = useStableCoinPrice();
   const colorMode = useColorMode();
   const {tokenData} = useTokenInfo();
   const {lptoken0Reserve, lptoken1Reserve, lpTokenAddress} = useLPTokenPrice();
@@ -54,40 +56,36 @@ export default function LpTokenInfo({
         if (lpTokenAddress.tokenside == TokenSide.token0) {
           setReserve(lptoken1Reserve)
           setReserveCurrency(lpTokenAddress.token1_name);
-          if (lpTokenAddress.token1_contractAddress != undefined && lpTokenAddress.token1_contractAddress != "") {
-            const price = await getTokenPricefromllama(lpTokenAddress.token1_contractAddress, tokenData.network);
-            if (price != NOT_FOUND_TOKEN) {
-              setReserveUSD(lptoken1Reserve * price);
-            }
+          const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
+                       lpTokenAddress.token1_contractAddress + lpTokenAddress.network);
+          if (coin != undefined) {
+            setReserveUSD(lptoken1Reserve * coin.price);
           }
         } else {
           setReserve(lptoken0Reserve)
           setReserveCurrency(lpTokenAddress.token0_name);
-          if (lpTokenAddress.token0_contractAddress != undefined && lpTokenAddress.token0_contractAddress != "") {
-            const price = await getTokenPricefromllama(lpTokenAddress.token0_contractAddress, tokenData.network);
-            if (price != undefined) {
-              setReserveUSD(lptoken0Reserve * price);
-            }
+          const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
+                       lpTokenAddress.token0_contractAddress + lpTokenAddress.network);
+          if (coin != undefined) {
+            setReserveUSD(lptoken0Reserve * coin.price);
           }
         }
       } else {
         if (lpToken.tokenside == TokenSide.token0) {
           setReserve(lpToken.token1_reserve)
           setReserveCurrency(lpToken.token1_name);
-          if (lpToken.token1_contractAddress != undefined && lpToken.token1_contractAddress != "") {
-            const price = await getTokenPricefromllama(lpToken.token1_contractAddress, tokenData.network);
-            if (price != undefined) {
-              setReserveUSD(lpToken.token1_reserve * price);
-            }
+          const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
+                      lpToken.token1_contractAddress + lpToken.network);
+          if (coin != undefined) {
+            setReserveUSD(lpToken.token1_reserve * coin.price);
           }
         } else {
           setReserve(lpToken.token0_reserve)
           setReserveCurrency(lpToken.token0_name);
-          if (lpToken.token0_contractAddress != undefined && lpToken.token0_contractAddress != "") {
-            const price = await getTokenPricefromllama(lpToken.token0_contractAddress, tokenData.network);
-            if (price != undefined) {
-              setReserveUSD(lpToken.token0_reserve * price);
-            }
+          const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
+                      lpToken.token0_contractAddress + lpToken.network);
+          if (coin != undefined) {
+            setReserveUSD(lpToken.token0_reserve * coin.price);
           }
         }
       }

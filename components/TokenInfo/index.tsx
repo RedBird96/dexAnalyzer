@@ -59,17 +59,6 @@ export default function TokenInfo() {
   const infoborderColorMode = useColorModeValue("#E2E8F0","#2B2A2A");
   const whiteBlackMode = useColorModeValue('#FFFFFF', '#000000');
 
-  const coin = 'btcusdt';
-
-  // const ws = new WebSocket(`wss://fstream.binance.com/ws/${coin}@trade`);
-
-// ws.on('message', (data?: string) => {
-//     if (data) {
-//         const trade = JSON.parse(data); // parsing a single-trade record
-//         console.log(trade);
-//     }
-// });
-
   const setLPTokenListInfo = async() => {
     const findInd = lpTokenPinList.findIndex((value) => value.ownerToken?.toLowerCase() == tokenData.contractAddress.toLowerCase());
     if (findInd != -1) {

@@ -7,6 +7,7 @@ import { AbiItem } from 'web3-utils'
 import { LPTokenPair, TokenSide } from '../utils/type'
 import * as constant from '../utils/constant'
 import { getTokenPricefromCoingeckoAPI, getTokenPricefromllama } from "../api";
+import { useStableCoinPrice } from "./useStableCoinPrice";
 
 
 interface LpTokenPriceInterface {
@@ -25,6 +26,7 @@ const LpTokenPriceContext: React.Context<null | LpTokenPriceInterface> =
 
 export function LpTokenPriceProvider({children}:any) {
 
+  const {coinPrice} = useStableCoinPrice();
   const [eventEmitter, setEventEmitter] = useState<any>();
   const [lptokenPrice, setlpTokenPrice] = useState<number>(0);
   const [token0Reserve, setToken0Reserve] = useState<number>(0);
@@ -64,16 +66,20 @@ export function LpTokenPriceProvider({children}:any) {
 
       // console.log('token0Reserve, token1Reserve', token0Reserve, token1Reserve);
       if (lptokenAddress.tokenside == TokenSide.token0) { 
-        let price = await getTokenPricefromllama(lptokenAddress.token1_contractAddress, lptokenAddress.network);
-        if (price == constant.NOT_FOUND_TOKEN) {
-          price = 1;
+        const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
+                    lptokenAddress.token1_contractAddress + lptokenAddress.network);
+        let price = 1;
+        if (coin != undefined) {
+          price = coin.price;
         }         
         setlpTokenPrice(token1Reserve / token0Reserve * price);
       } else {
-        let price = await getTokenPricefromllama(lptokenAddress.token0_contractAddress, lptokenAddress.network);
-        if (price == constant.NOT_FOUND_TOKEN) {
-          price = 1;
-        }                 
+        const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
+                    lptokenAddress.token0_contractAddress + lptokenAddress.network);
+        let price = 1;
+        if (coin != undefined) {
+          price = coin.price;
+        }                         
         setlpTokenPrice(token0Reserve / token1Reserve * price);
       }
       setToken0Reserve(token0Reserve);
@@ -120,16 +126,20 @@ export function LpTokenPriceProvider({children}:any) {
       let token0Reserve, token1Reserve;
       [token0Reserve, token1Reserve] = await getReserves(PairContractHttp);
       if (lptokenAddress.tokenside == TokenSide.token0) {  
-        let price = await getTokenPricefromllama(lptokenAddress.token1_contractAddress, lptokenAddress.network);
-        if (price == constant.NOT_FOUND_TOKEN) {
-          price = 1;
-        }         
+        const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
+                    lptokenAddress.token1_contractAddress + lptokenAddress.network);
+        let price = 1;
+        if (coin != undefined) {
+          price = coin.price;
+        }      
         setlpTokenPrice(token1Reserve / token0Reserve * price);
       } else {
-        let price = await getTokenPricefromllama(lptokenAddress.token0_contractAddress, lptokenAddress.network);
-        if (price == constant.NOT_FOUND_TOKEN) {
-          price = 1;
-        }              
+        const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
+                    lptokenAddress.token0_contractAddress + lptokenAddress.network);
+        let price = 1;
+        if (coin != undefined) {
+          price = coin.price;
+        }            
         setlpTokenPrice(token0Reserve / token1Reserve * price);
       }
       setToken0Reserve(token0Reserve);

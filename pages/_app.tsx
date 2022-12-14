@@ -7,6 +7,7 @@ import Layout from '../components/PageLayout'
 import { theme } from "../themes/theme";
 import { LpTokenPriceProvider } from '../hooks/useLPTokenPrice';
 import { WalletTokenBalanceProvider } from '../hooks/useWalletBalanceTokens';
+import { StableCoinPriceProvider } from '../hooks/useStableCoinPrice';
 
 export default function App({ Component, pageProps }: AppProps) {
 
@@ -16,15 +17,17 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider theme={theme}>
       <ThirdwebProvider desiredChainId={desiredChainId} supportedChains={supportChain}>
-        <TokenInfoProvider>
-          <LpTokenPriceProvider>
-            <WalletTokenBalanceProvider>
-              <Layout>
-                <Component {...pageProps} />
-              </Layout>
-            </WalletTokenBalanceProvider>
-          </LpTokenPriceProvider>
-        </TokenInfoProvider>
+        <StableCoinPriceProvider>
+          <TokenInfoProvider>
+            <LpTokenPriceProvider>
+              <WalletTokenBalanceProvider>
+                  <Layout>
+                    <Component {...pageProps} />
+                  </Layout>
+              </WalletTokenBalanceProvider>
+            </LpTokenPriceProvider>
+          </TokenInfoProvider>
+        </StableCoinPriceProvider>
       </ThirdwebProvider>
     </ChakraProvider>
     

@@ -10,6 +10,7 @@ import {ERC20Token, LPTokenPair, TokenSide} from '../utils/type'
 import * as constant from '../utils/constant'
 import UniswapV2Pair from '../config/IUniswapV2Pair.json';
 import PancakeswapV2Pair from '../config/IPancakeswapV2Pair.json';
+import { useStableCoinPrice } from "../hooks/useStableCoinPrice";
 
 const ETH_MAINNET_API_URL = 'https://api.etherscan.io/api';
 const BSC_MAINNET_API_URL = 'https://api.bscscan.com/api';
@@ -51,7 +52,24 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
   } else {
     const web3_bsc = new Web3(constant.BSCRPC_URL);
     const bnbBalance = parseInt(await web3_bsc.eth.getBalance(address))/ Math.pow(10, 18);
-    console.log('bnbBalance', bnbBalance);
+    const bnbPrice = await getTokenPricefromllama(constant.WHITELIST_TOKENS.BSC.BNB, constant.BINANCE_NETOWRK);
+    const usdBalance = bnbPrice * bnbBalance;
+    let bnbToken:ERC20Token = {
+      name: "WBNB",
+      decimals: 18,
+      symbol: "WBNB",
+      contractAddress: constant.WHITELIST_TOKENS.BSC.BNB,
+      balance: bnbBalance,
+      usdBalance: usdBalance,
+      network: constant.BINANCE_NETOWRK,
+      price: bnbPrice,
+      holdersCount: 0,
+      image: "",
+      owner: "",
+      totalSupply: 0,
+      marketCap: "",
+      pinSetting: false      
+    }               
     let tokenList:ERC20Token[] = [];
     const eth = new EtherscanClient(BSC_MAINNET_CONNECTION);
     const res = await eth.call(Action.account_tokentx, {address});
@@ -112,6 +130,7 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
       })
     }
 
+    tokenList.push(bnbToken);
     tokenList = tokenList.sort((value1, value2) => value2.usdBalance - value1.usdBalance);
     return tokenList;
   }
@@ -375,4 +394,32 @@ export async function getTokenPricefromllama(address: string, network: number) {
   } catch (err:any) {
     return constant.NOT_FOUND_TOKEN;
   }
+}
+
+export async function getMultiTokenPricefromllama(tokenList:ERC20Token[]){
+
+  let param = "";
+  tokenList.forEach((value) => {
+    const networkId = value.network == constant.ETHEREUM_NETWORK ? "ethereum" : "bsc";
+    param += networkId;
+    param += ":";
+    param += value.contractAddress;
+    param += ",";
+  })
+
+  const url = LLAMA_ENDPOINT + "prices/current/" + param;
+  const response = await fetch(url)
+  try {
+    const obj = await response.json();
+    tokenList.forEach((value, index) => {
+      const networkId = value.network == constant.ETHEREUM_NETWORK ? "ethereum" : "bsc";
+      param = networkId + ":" + value.contractAddress;
+      const price = obj.coins[param]["price"];
+      value.price = price;
+      return value;
+    });
+    return tokenList;
+  } catch (err:any) {
+    return constant.NOT_FOUND_TOKEN;
+  }  
 }
