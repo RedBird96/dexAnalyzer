@@ -258,10 +258,12 @@ export async function getLPTokenList(address: string, network: number, tokenside
           token0 {
             id
             symbol
+            decimals
           }
           token1 {
             id
             symbol
+            decimals
           }
         }
       }
@@ -279,10 +281,12 @@ export async function getLPTokenList(address: string, network: number, tokenside
           token0 {
             id
             symbol
+            decimals
           }
           token1 {
             id
             symbol
+            decimals
           }
         }
       }
@@ -321,7 +325,9 @@ export async function getLPTokenList(address: string, network: number, tokenside
           owner: "",
           pinSetting: false,
           tokenside: tokenside,
-          ownerToken: address
+          ownerToken: address,
+          token0_decimal: token.token0.decimals,
+          token1_decimal: token.token1.decimals,
         } as LPTokenPair);
       }
     });

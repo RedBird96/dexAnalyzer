@@ -54,7 +54,7 @@ export default function LpTokenInfo({
             const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token1_contractAddress, tokenData.network);
             if (res != undefined) {
               const price = res[lpTokenAddress.token1_contractAddress].usd;
-              setReserveUSD(lptoken1Reserve / Math.pow(10, lpTokenAddress.decimals) * price);
+              setReserveUSD(lptoken1Reserve * price);
             }
           }
         } else {
@@ -64,7 +64,7 @@ export default function LpTokenInfo({
             const res = await getTokenPricefromCoingeckoAPI(lpTokenAddress.token0_contractAddress, tokenData.network);
             if (res != undefined) {
               const price = res[lpTokenAddress.token0_contractAddress].usd;
-              setReserveUSD(lptoken0Reserve / Math.pow(10, lpTokenAddress.decimals) * price);
+              setReserveUSD(lptoken0Reserve * price);
             }
           }
         }
@@ -76,7 +76,7 @@ export default function LpTokenInfo({
             const res = await getTokenPricefromCoingeckoAPI(lpToken.token1_contractAddress, tokenData.network);
             if (res != undefined) {
               const price = res[lpToken.token1_contractAddress].usd;
-              setReserveUSD(lpToken.token1_reserve / Math.pow(10, lpToken.decimals) * price);
+              setReserveUSD(lpToken.token1_reserve * price);
             }
           }
         } else {
@@ -86,7 +86,7 @@ export default function LpTokenInfo({
             const res = await getTokenPricefromCoingeckoAPI(lpToken.token0_contractAddress, tokenData.network);
             if (res != undefined) {
               const price = res[lpToken.token0_contractAddress].usd;
-              setReserveUSD(lpToken.token0_reserve / Math.pow(10, lpToken.decimals) * price);
+              setReserveUSD(lpToken.token0_reserve * price);
             }
           }
         }
@@ -126,7 +126,7 @@ export default function LpTokenInfo({
             style={{marginRight:"0.2rem"}}  
             color={whiteBlackMode}
           >
-            {numberWithCommasTwoDecimals(reserve / Math.pow(10, lpToken.decimals))} 
+            {numberWithCommasTwoDecimals(reserve)} 
           </p>
           <p
             className={style.tokenMarketCap} 

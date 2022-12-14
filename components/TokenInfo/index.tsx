@@ -105,8 +105,8 @@ export default function TokenInfo() {
      
       const res = await getLPTokenReserve(value.contractAddress, value.network);
 
-      value.token0_reserve = res[0];
-      value.token1_reserve = res[1];
+      value.token0_reserve = res[0] / Math.pow(10, value.token0_decimal!);
+      value.token1_reserve = res[1] / Math.pow(10, value.token1_decimal!);
       if (value.tokenside == TokenSide.token0){
         value.price = res[1] / res[0];  
       } else {

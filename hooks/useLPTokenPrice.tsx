@@ -48,23 +48,35 @@ export function LpTokenPriceProvider({children}:any) {
     token0_contractAddress: "0x55d398326f99059ff775485246999027b3197955",
     token1_contractAddress: "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
     tokenside: TokenSide.token0,
-    ownerToken: "0x55d398326f99059ff775485246999027b3197955"
+    ownerToken: "0x55d398326f99059ff775485246999027b3197955",
+    token0_decimal: 18,
+    token1_decimal: 18,
   } as LPTokenPair);
   let web3Wss: Web3, web3Http: Web3, PairContractWSS:any, PairContractHttp:any;
 
-  const updateState = async(data:any) => {
+  const updateState = async (data:any) => {
     // update state
     // state.token0 = BigNumber.from(data.returnValues.reserve0);
     // state.token1 = BigNumber.from(data.returnValues.reserve1);
 
-      const token0Reserve = parseInt(data.returnValues.reserve0);
-      const token1Reserve = parseInt(data.returnValues.reserve1);
+      const token0Reserve = parseInt(data.returnValues.reserve0) / Math.pow(10, lptokenAddress.token0_decimal!);
+      const token1Reserve = parseInt(data.returnValues.reserve1) / Math.pow(10, lptokenAddress.token1_decimal!);
 
       // console.log('token0Reserve, token1Reserve', token0Reserve, token1Reserve);
       if (lptokenAddress.tokenside == TokenSide.token0) { 
-        setlpTokenPrice(token1Reserve / token0Reserve);
+        const res = await getTokenPricefromCoingeckoAPI(lptokenAddress.token1_contractAddress, lptokenAddress.network);
+        let price = 1;
+        if (res != undefined) {
+          price = res[lptokenAddress.token1_contractAddress].usd;
+        }         
+        setlpTokenPrice(token1Reserve / token0Reserve * price);
       } else {
-        setlpTokenPrice(token0Reserve / token1Reserve);
+        const res = await getTokenPricefromCoingeckoAPI(lptokenAddress.token0_contractAddress, lptokenAddress.network);
+        let price = 1;
+        if (res != undefined) {
+          price = res[lptokenAddress.token0_contractAddress].usd;
+        }         
+        setlpTokenPrice(token0Reserve / token1Reserve * price);
       }
       setToken0Reserve(token0Reserve);
       setToken1Reserve(token1Reserve);
@@ -76,8 +88,8 @@ export function LpTokenPriceProvider({children}:any) {
     // call getReserves function of Pair contract
     const _reserves = await ContractObj.methods.getReserves().call();
     // return data in Big Number
-    return [parseInt(_reserves._reserve0), 
-            parseInt(_reserves._reserve1)];
+    return [parseInt(_reserves._reserve0) / Math.pow(10, lptokenAddress.token0_decimal!), 
+            parseInt(_reserves._reserve1) / Math.pow(10, lptokenAddress.token1_decimal!)];
   };
     
   useEffect(() => {
@@ -109,10 +121,20 @@ export function LpTokenPriceProvider({children}:any) {
       }
       let token0Reserve, token1Reserve;
       [token0Reserve, token1Reserve] = await getReserves(PairContractHttp);
-      if (lptokenAddress.tokenside == TokenSide.token0) {
-        setlpTokenPrice(token1Reserve / token0Reserve);
+      if (lptokenAddress.tokenside == TokenSide.token0) {  
+        const res = await getTokenPricefromCoingeckoAPI(lptokenAddress.token1_contractAddress, lptokenAddress.network);
+        let price = 1;
+        if (res != undefined) {
+          price = res[lptokenAddress.token1_contractAddress].usd;
+        }
+        setlpTokenPrice(token1Reserve / token0Reserve * price);
       } else {
-        setlpTokenPrice(token0Reserve / token1Reserve);
+        const res = await getTokenPricefromCoingeckoAPI(lptokenAddress.token0_contractAddress, lptokenAddress.network);
+        let price = 1;
+        if (res != undefined) {
+          price = res[lptokenAddress.token0_contractAddress].usd;
+        }        
+        setlpTokenPrice(token0Reserve / token1Reserve * price);
       }
       setToken0Reserve(token0Reserve);
       setToken1Reserve(token1Reserve);

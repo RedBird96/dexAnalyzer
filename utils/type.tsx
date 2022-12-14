@@ -39,4 +39,6 @@ export interface LPTokenPair extends ERC20Token {
   tokenside: number;
   token1_contractAddress: string;
   ownerToken?: string;
+  token0_decimal?: number;
+  token1_decimal?: number;
 }
