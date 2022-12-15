@@ -22,6 +22,7 @@
     "@types/node": "18.11.9",
     "@types/react": "18.0.25",
     "@types/react-dom": "18.0.9",
+    "@types/websocket": "^1.0.5",
     "@zeit/next-css": "^1.0.1",
     "@zeit/next-less": "^1.0.1",
     "bignumber.js": "^9.1.1",

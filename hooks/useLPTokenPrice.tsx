@@ -99,7 +99,6 @@ export function LpTokenPriceProvider({children}:any) {
   useEffect(() => {
     const init = async() => {
       
-      console.log('lptokenAddress.contractAddress', lptokenAddress.contractAddress);
       if (lptokenAddress.network == constant.ETHEREUM_NETWORK) {
         web3Wss = new Web3(constant.WSSETHRPC_URL);
         PairContractWSS = new web3Wss.eth.Contract(
@@ -144,15 +143,14 @@ export function LpTokenPriceProvider({children}:any) {
       }
       setToken0Reserve(token0Reserve);
       setToken1Reserve(token1Reserve);
-      console.log('token0Reserve', token0Reserve, token1Reserve);
 
       const event = PairContractWSS.events.Sync({})
         .on("data", (data:any) => updateState(data));
 
       setEventEmitter(event);
 
-      console.log('subscribe', lptokenAddress);
-      console.log('subscribe_event:', event);
+      // console.log('subscribe', lptokenAddress);
+      // console.log('subscribe_event:', event);
     }
     if (lptokenAddress.contractAddress != undefined && lptokenAddress.contractAddress.length > 0){
       init();
