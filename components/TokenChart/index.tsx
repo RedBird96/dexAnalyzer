@@ -3,9 +3,8 @@ import { Box, position, useColorMode, useColorModeValue } from "@chakra-ui/react
 import dynamic from 'next/dynamic'
 import style from './TokenChart.module.css'
 import {ResizerDark, ResizerLight} from '../../assests/icon'
-const AdvancedRealTimeChart = 
-  dynamic(import('react-ts-tradingview-widgets').
-  then(mod => mod.AdvancedRealTimeChart), {ssr: false})
+
+const ChartContainer = dynamic(() => import("./ChartContainer"), { ssr: false })
 
 export default function TokenChart() {
 
@@ -14,11 +13,7 @@ export default function TokenChart() {
 
   return (
     <Box className={style.tokenChart}>
-      <AdvancedRealTimeChart
-        theme={colorMode}
-        width={"100%"}
-        height={"100%"}
-      />
+      <ChartContainer />
       <Box 
         style={{
         display:"flex",

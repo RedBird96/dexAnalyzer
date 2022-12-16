@@ -42,3 +42,16 @@ export interface LPTokenPair extends ERC20Token {
   token0_decimal?: number;
   token1_decimal?: number;
 }
+
+export interface Block {
+  number: number
+  timestamp: string
+}
+
+export interface PriceChartEntry {
+  time: number
+  open: number
+  close: number
+  high: number
+  low: number
+}

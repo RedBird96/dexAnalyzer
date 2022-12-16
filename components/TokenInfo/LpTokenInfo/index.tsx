@@ -17,6 +17,7 @@ import style from './LpTokenInfo.module.css'
 import { getTokenPricefromllama } from '../../../api'
 import { NOT_FOUND_TOKEN } from '../../../utils/constant'
 import { useStableCoinPrice } from '../../../hooks/useStableCoinPrice'
+import { getlimitHistoryData } from '../../../api/bitquery_graphql'
 
 export default function LpTokenInfo({
   lpToken,
@@ -51,6 +52,7 @@ export default function LpTokenInfo({
 
   useEffect(() => {
     const setFunc = async() => {
+          
       setClickDex(0);
       if (showArrow) {
         if (lpTokenAddress.tokenside == TokenSide.token0) {

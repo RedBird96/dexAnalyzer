@@ -32,7 +32,10 @@ import {
 import style from './TokenInfo.module.css'
 import * as constant from '../../utils/constant'
 import LpTokenInfo from './LpTokenInfo'
+import {io} from 'socket.io-client'
 import { LPTokenPair, TokenSide } from '../../utils/type'
+import { getlimitHistoryData } from '../../api/bitquery_graphql'
+import { ethers } from 'ethers'
 
 
 export default function TokenInfo() {
@@ -104,7 +107,6 @@ export default function TokenInfo() {
       } else {
         value.price = value.token0_reserve / value.token1_reserve;  
       }
-      console.log('value', value);
 
       if (index == 0) {
         setLPTokenAddress(value);
