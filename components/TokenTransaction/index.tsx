@@ -56,7 +56,7 @@ export default function TokenTransaction() {
                 const buy_sell = data.buyCurrency.address == data.quoteCurrency.address ? "Buy" : "Sell"; 
                 const color = buy_sell == "Buy" ? "#00C414": "#FF002E";
                 return (
-                <Tr color={color}>
+                <Tr key={data.any} color={color}>
                   <Td width={"8%"} paddingLeft={"1.5rem"}>{buy_sell}</Td>
                   <Td width={"24%"} paddingLeft={"0.7rem"}>{data.baseAmount}</Td>
                   <Td width={"32%"} paddingLeft={"2rem"}>{data.quoteAmount}</Td>
