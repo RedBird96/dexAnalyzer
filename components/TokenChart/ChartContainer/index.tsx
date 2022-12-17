@@ -11,7 +11,7 @@ import {
 import axios from 'axios'
 import { getUnixTime, startOfHour, Duration, sub } from 'date-fns'
 import fetchTokenPriceData from '../../../api/priceDataforChart'
-import { useLPTokenPrice } from '../../../hooks'
+import { useLPTokenPrice, useLPTransaction } from '../../../hooks'
 import { getlimitHistoryData } from '../../../api/bitquery_graphql'
 import * as constant from '../../../utils/constant'
 import { LPTokenPair, TokenSide } from '../../../utils/type'
@@ -62,6 +62,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
 
   const { colorMode } = useColorMode();
   const {lpTokenPrice, lpTokenAddress ,setLPTokenAddress} = useLPTokenPrice();
+  const {setTransactionData} = useLPTransaction();
   const checksumAddress = lpTokenAddress.contractAddress;
 
   let myInterval: any
@@ -169,6 +170,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
             1
           );
           priceData = priceData.concat(bar_data);
+          setTransactionData(priceData);
         }
 
         console.log('priceData', priceData);

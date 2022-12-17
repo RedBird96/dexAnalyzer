@@ -57,6 +57,9 @@ export function makeShortTokenName(name: string, len: number): string {
   return name;
 }
 
+export function makeShortTxHash(txHash:string): string {
+  return txHash.substring(0, 4) + "..." + txHash.substring(64,66);
+}
 
 /*
  * General utils for managing cookies in Typescript.

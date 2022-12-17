@@ -11,7 +11,9 @@ import {
   TableCaption,
   TableContainer,
 } from '@chakra-ui/react'
+import { useLPTokenPrice, useLPTransaction } from '../../hooks'
 import style from './TokenTransaction.module.css'
+import { makeShortTxHash } from '../../utils'
 
 export default function TokenTransaction() {
   const transactionClass = useColorModeValue(
@@ -19,6 +21,7 @@ export default function TokenTransaction() {
     style.tokenTransaction + " " + style.tokenTransactionDark
   );
   const headerColor = useColorModeValue("#FFFFFF", "#1C1C1C");
+  const {transactionData} = useLPTransaction();
 
   return (
     <Box className={transactionClass}>
@@ -47,7 +50,22 @@ export default function TokenTransaction() {
           </Tr>
         </Thead>
         <Tbody className={style.tbody}>
-          <Tr color={"#00C414"}>
+          {
+            transactionData.map(data => {
+              const buy_sell = data.buyCurrency.address == data.quoteCurrency.address ? "Buy" : "Sell"; 
+              const color = buy_sell == "Buy" ? "#00C414": "#FF002E";
+              return (
+              <Tr color={color}>
+                <Td width={"8%"} paddingLeft={"1.5rem"}>{buy_sell}</Td>
+                <Td width={"24%"} paddingLeft={"0.7rem"}>{data.baseAmount}</Td>
+                <Td width={"32%"} paddingLeft={"2rem"}>{data.quoteAmount}</Td>
+                <Td width={"24%"} paddingLeft={"3rem"}>{data.timeInterval.second}</Td>
+                <Td width={"16%"} paddingLeft={"0rem"}>{makeShortTxHash(data.any)}</Td>
+              </Tr>
+              );
+            })
+          }
+          {/* <Tr color={"#00C414"}>
             <Td width={"8%"} paddingLeft={"1.5rem"}>Buy</Td>
             <Td width={"24%"} paddingLeft={"0.7rem"}>59,034,543,124,564,247</Td>
             <Td width={"32%"} paddingLeft={"2rem"}>$ 50.30 (0.2 BNB)</Td>
@@ -137,7 +155,7 @@ export default function TokenTransaction() {
             <Td width={"32%"} paddingLeft={"2rem"}>$ 50.30 (0.2 BNB)</Td>
             <Td width={"24%"} paddingLeft={"3rem"}>Dec-01-2022 (04:35:49 PM + UTC)</Td>
             <Td width={"16%"} paddingLeft={"0rem"}>0xe2.....6f8</Td>
-          </Tr>           
+          </Tr>            */}
         </Tbody>
         </Table>
       </TableContainer>

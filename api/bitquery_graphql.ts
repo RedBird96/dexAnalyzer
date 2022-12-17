@@ -41,7 +41,10 @@ export const getlimitHistoryData = async (
         open: minimum(of: block, get: quote_price)
         close: maximum(of: block, get: quote_price)
         volume: quoteAmount
-        count: count
+        any(of: tx_hash)
+        buyCurrency {
+          address
+        }
       }
     }
   }

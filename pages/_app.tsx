@@ -8,6 +8,7 @@ import { theme } from "../themes/theme";
 import { LpTokenPriceProvider } from '../hooks/useLPTokenPrice';
 import { WalletTokenBalanceProvider } from '../hooks/useWalletBalanceTokens';
 import { StableCoinPriceProvider } from '../hooks/useStableCoinPrice';
+import { LPTransactionProvider } from '../hooks/useLPTransaction';
 
 export default function App({ Component, pageProps }: AppProps) {
 
@@ -17,17 +18,19 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider theme={theme}>
       <ThirdwebProvider desiredChainId={desiredChainId} supportedChains={supportChain}>
-        <StableCoinPriceProvider>
-          <TokenInfoProvider>
-            <LpTokenPriceProvider>
-              <WalletTokenBalanceProvider>
-                  <Layout>
-                    <Component {...pageProps} />
-                  </Layout>
-              </WalletTokenBalanceProvider>
-            </LpTokenPriceProvider>
-          </TokenInfoProvider>
-        </StableCoinPriceProvider>
+        <LPTransactionProvider>
+          <StableCoinPriceProvider>
+            <TokenInfoProvider>
+              <LpTokenPriceProvider>
+                <WalletTokenBalanceProvider>
+                    <Layout>
+                      <Component {...pageProps} />
+                    </Layout>
+                </WalletTokenBalanceProvider>
+              </LpTokenPriceProvider>
+            </TokenInfoProvider>
+          </StableCoinPriceProvider>
+        </LPTransactionProvider>
       </ThirdwebProvider>
     </ChakraProvider>
     
