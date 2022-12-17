@@ -161,11 +161,11 @@ export default function WalletInfo() {
   }
 
   useEffect(() => {
-    if (address) {
+    setInitTokensInfo([]);
+    setTokensInfo([]);
+    setWalletBalance(0);
+    if (address != undefined) {
       getTokensFromWallet();
-      setInitTokensInfo([]);
-      setTokensInfo([]);
-      setWalletBalance(0);
     }
   }, [address, network[0].data.chain?.id]);
 

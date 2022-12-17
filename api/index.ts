@@ -412,8 +412,8 @@ export async function getMultiTokenPricefromllama(tokenList:ERC20Token[]){
   })
 
   const url = LLAMA_ENDPOINT + "prices/current/" + param;
-  const response = await fetch(url)
   try {
+    const response = await fetch(url)
     const obj = await response.json();
     tokenList.forEach((value, index) => {
       const networkId = value.network == constant.ETHEREUM_NETWORK ? "ethereum" : "bsc";

@@ -100,7 +100,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
         timezone: 'Est/UTC',
         locale: 'zh',
         exchange: lpTokenAddress.tokenside == TokenSide.token0 ? lpTokenAddress.token0_name : lpTokenAddress.token1_name,
-        minmov: 1,
+        minmov: 10,
         pricescale: 1000000,
         has_intraday: true,
         has_no_volume: false,
@@ -125,23 +125,23 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
         let bars: any = []
         const { from, to, firstDataRequest } = periodParams
         // console.log('getBars firstDataRequest', new Date(from * 1000).toISOString(), new Date(to * 1000).toISOString(),  firstDataRequest);
-        if (checksumAddress) {
-          // setLoader(true);
-          if (!firstDataRequest) {
-            // "noData" should be set if there is no data in the requested period.
-            onHistoryCallback([], {
-              noData: true,
-            })
-            return
-          }
-        }
+        // if (checksumAddress) {
+        //   // setLoader(true);
+        //   if (!firstDataRequest) {
+        //     // "noData" should be set if there is no data in the requested period.
+        //     onHistoryCallback([], {
+        //       noData: true,
+        //     })
+        //     return
+        //   }
+        // }
 
         // console.log('from to', new Date(from * 1000).toISOString(), new Date(to * 1000).toISOString(), resolution);
         let bar_data;
         const after = new Date(from * 1000).toISOString();
         const before = new Date(to * 1000).toISOString();
         
-        console.log('after before', after, before);
+        console.log('after before ', after, before);
 
         let beforeIndex = -1;
         let afterIndex = -1;
@@ -150,10 +150,10 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
           const searchafter = (after.replace('T', ' ')).slice(0, 19);
           console.log('search', searchafter, searchbefore);
           beforeIndex = priceData.findIndex(function(number) {
-            return number.timeInterval.second > searchbefore
+            return number.timeInterval.second < searchbefore
           });
           afterIndex = priceData.findIndex(function(number) {
-            return number.timeInterval.second > searchafter
+            return number.timeInterval.second < searchafter
           });
           console.log('after before index', beforeIndex, afterIndex);
         }

@@ -16,7 +16,7 @@ export const getlimitHistoryData = async (
   {
     ethereum(network: ${network == constant.ETHEREUM_NETWORK ? "ethereum" : "bsc"}) {
       dexTrades(
-        options: {desc: "timeInterval.second" limit:100}
+        options: {desc: "timeInterval.second"}
         exchangeName: {in: ["Pancake v2"]}
         baseCurrency: {is: "${baseAddress}"}
         quoteCurrency: {is: "${quoteAddress}"}
