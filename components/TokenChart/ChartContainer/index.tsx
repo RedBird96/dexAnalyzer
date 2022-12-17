@@ -324,7 +324,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
   }, [lpTokenAddress.contractAddress])
 
   return (
-    <div style={{width: "100%", height:"100%"}}>
+    <div style={{width: "100%", height:props.height}}>
       <div id={ChartContainerProps.containerId} style={{ height: '100%', paddingBottom: '10px' }} />
     </div>
   )

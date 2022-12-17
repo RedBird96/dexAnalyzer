@@ -52,17 +52,19 @@ export default function TokenTransaction() {
         <Tbody className={style.tbody}>
           {
             transactionData.map(data => {
-              const buy_sell = data.buyCurrency.address == data.quoteCurrency.address ? "Buy" : "Sell"; 
-              const color = buy_sell == "Buy" ? "#00C414": "#FF002E";
-              return (
-              <Tr color={color}>
-                <Td width={"8%"} paddingLeft={"1.5rem"}>{buy_sell}</Td>
-                <Td width={"24%"} paddingLeft={"0.7rem"}>{data.baseAmount}</Td>
-                <Td width={"32%"} paddingLeft={"2rem"}>{data.quoteAmount}</Td>
-                <Td width={"24%"} paddingLeft={"3rem"}>{data.timeInterval.second}</Td>
-                <Td width={"16%"} paddingLeft={"0rem"}>{makeShortTxHash(data.any)}</Td>
-              </Tr>
-              );
+              if (data != null) {
+                const buy_sell = data.buyCurrency.address == data.quoteCurrency.address ? "Buy" : "Sell"; 
+                const color = buy_sell == "Buy" ? "#00C414": "#FF002E";
+                return (
+                <Tr color={color}>
+                  <Td width={"8%"} paddingLeft={"1.5rem"}>{buy_sell}</Td>
+                  <Td width={"24%"} paddingLeft={"0.7rem"}>{data.baseAmount}</Td>
+                  <Td width={"32%"} paddingLeft={"2rem"}>{data.quoteAmount}</Td>
+                  <Td width={"24%"} paddingLeft={"3rem"}>{data.timeInterval.second}</Td>
+                  <Td width={"16%"} paddingLeft={"0rem"}>{makeShortTxHash(data.any)}</Td>
+                </Tr>
+                );
+              }
             })
           }
           {/* <Tr color={"#00C414"}>
