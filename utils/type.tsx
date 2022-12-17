@@ -41,6 +41,13 @@ export interface LPTokenPair extends ERC20Token {
   ownerToken?: string;
   token0_decimal?: number;
   token1_decimal?: number;
+  protocolType?: string;
+  baseCurrency_contractAddress?: string;
+  baseCurrency_name?: string;
+  baseCurrency_decimals?: number;
+  quoteCurrency_contractAddress?: string;
+  quoteCurrency_name?: string;
+  quoteCurrency_decimals?: number;
 }
 
 export interface Block {

@@ -52,11 +52,10 @@ export default function LpTokenInfo({
 
   useEffect(() => {
     const setFunc = async() => {
-          
       setClickDex(0);
       if (showArrow) {
-        if (lpTokenAddress.tokenside == TokenSide.token0) {
-          setReserve(lptoken1Reserve)
+        if (tokenData.contractAddress.toLowerCase() == lpTokenAddress.token0_contractAddress.toLowerCase()) {
+          setReserve(lptoken1Reserve);
           setReserveCurrency(lpTokenAddress.token1_name);
           const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
                        lpTokenAddress.token1_contractAddress + lpTokenAddress.network);
@@ -73,7 +72,7 @@ export default function LpTokenInfo({
           }
         }
       } else {
-        if (lpToken.tokenside == TokenSide.token0) {
+        if (tokenData.contractAddress.toLowerCase() == lpToken.token0_contractAddress.toLowerCase()) {
           setReserve(lpToken.token1_reserve)
           setReserveCurrency(lpToken.token1_name);
           const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==

@@ -67,11 +67,11 @@ export default function TokenInfo() {
     if (findInd != -1) {
       setLPTokenAddress(lpTokenPinList[findInd]);
     }
-    const token0_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token0);
-    const token1_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token1);
+    const token0_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token1);
+    const token1_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token0);
 
     setLPTokenList([]);
-    const lptoken_Res = token0_Res.concat(token1_Res);
+    const lptoken_Res = token0_Res;//token0_Res.concat(token1_Res);
     let index = 0;
     if (lptoken_Res.length == 0) {
       setLPTokenAddress({
@@ -92,17 +92,49 @@ export default function TokenInfo() {
         token1_reserve: 0,
         token0_contractAddress: "",
         token1_contractAddress: "",
-        tokenside: TokenSide.token1
+        tokenside: TokenSide.token1,
+        protocolType: "",
       } as LPTokenPair);       
       return;
     }
     let lpToken_temp: LPTokenPair[] = [];
     for await (const value of lptoken_Res) {
-     
+      if (value.protocolType == "Uniswap v3")
+        continue;
       const res = await getLPTokenReserve(value.contractAddress, value.network);
+      if (res[2] != constant.PANCAKESWAP_FACTORY.v2 && res[2] != constant.UNISWAP_FACTORY.v2)
+        continue;
+
+      if (res[3].toLowerCase() == tokenData.contractAddress.toLowerCase()) {
+        value.tokenside = TokenSide.token0;
+      } else if (res[4].toLowerCase() == tokenData.contractAddress.toLowerCase()) {
+        value.tokenside = TokenSide.token1;
+      }
+      if (value.baseCurrency_contractAddress?.toLowerCase() == res[3].toLowerCase()) {
+
+        value.token0_contractAddress = value.baseCurrency_contractAddress!;
+        value.token0_decimal = value.baseCurrency_decimals!;
+        value.token0_name = value.baseCurrency_name!;
+
+        value.token1_contractAddress = value.quoteCurrency_contractAddress!;
+        value.token1_decimal = value.quoteCurrency_decimals!;
+        value.token1_name = value.quoteCurrency_name!;
+
+      } else {
+
+        value.token1_contractAddress = value.baseCurrency_contractAddress!;
+        value.token1_decimal = value.baseCurrency_decimals!;
+        value.token1_name = value.baseCurrency_name!;
+
+        value.token0_contractAddress = value.quoteCurrency_contractAddress!;
+        value.token0_decimal = value.quoteCurrency_decimals!;
+        value.token0_name = value.quoteCurrency_name!;
+
+      }
       value.token0_reserve = res[0] / Math.pow(10, value.token0_decimal!);
       value.token1_reserve = res[1] / Math.pow(10, value.token1_decimal!);
-      if (value.tokenside == TokenSide.token0){
+
+      if (tokenData.contractAddress.toLowerCase() == value.token0_contractAddress.toLowerCase()){
         value.price = value.token1_reserve / value.token0_reserve;  
       } else {
         value.price = value.token0_reserve / value.token1_reserve;  

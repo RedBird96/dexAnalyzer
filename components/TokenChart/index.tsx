@@ -18,6 +18,7 @@ export default function TokenChart() {
   }
 
   const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
+    console.log('drag', chartHeight + e.pageY - dragPos);
     if (chartHeight + e.pageY - dragPos > 700) {
       setChartHeight(chartHeight + e.pageY - dragPos)
     } else {
@@ -26,7 +27,11 @@ export default function TokenChart() {
   }
   
   return (
-    <Box className={style.tokenChart}>
+    <Box className={style.tokenChart}
+    draggable={true}
+    onDragStart={e=> handleDragStart(e)}
+    onDragOver={e=>handleDrag(e)}
+    >
       <ChartContainer height={chartHeight}/>
       <Box 
         style={{
@@ -39,9 +44,6 @@ export default function TokenChart() {
         bottom={"0rem"}
         height={"1rem"}
         backgroundColor={headerColor}
-        draggable={true}
-        onDragStart={e=> handleDragStart(e)}
-        onDragOver={e=>handleDrag(e)}
       >
         <nav>
           <hr aria-orientation='horizontal' style={{width:"100%", height:"1px", color:"#313131"}}></hr>

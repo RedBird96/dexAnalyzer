@@ -262,12 +262,12 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
           }
         }
         onRealtimeCallback(lastBarsCache)
-      }, 1000 * 15) // 15s update interval      
+      }, 1000 * 1) // 15s update interval      
     },
     unsubscribeBars: (subscriberUID: any) => {
       console.log('[unsubscribeBars]: Method call with subscriberUID:', subscriberUID)
 
-      // clearInterval(myInterval)
+      clearInterval(myInterval)
       console.log('[unsubscribeBars]: cleared')
     },
   }
@@ -306,26 +306,25 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
 				const button = tvWidget!.createButton();
 				button.setAttribute('title', 'Click to show a position');
 				button.classList.add('apply-common-tooltip');
-				button.addEventListener('click', () => tvWidget!.showNoticeDialog({
-						title: 'Notification',
-						body: 'Show Trade positions',
-						callback: () => {
-							console.log('Noticed!');
-						},
-					}));
+				// button.addEventListener('click', () => tvWidget!.showNoticeDialog({
+				// 		title: 'Notification',
+				// 		body: 'Show Trade positions',
+				// 		callback: () => {
+				// 			console.log('Noticed!');
+				// 		},
+				// 	}));
 				button.innerHTML = 'Trade Show';
 			});
 		});
   }
   
   React.useEffect(() => {
-    console.log('here');
     getWidget()
   }, [lpTokenAddress.contractAddress])
 
   return (
-    <div style={{width: "100%", height:props.height}}>
-      <div id={ChartContainerProps.containerId} style={{ height: '100%', paddingBottom: '10px' }} />
+    <div style={{width: "100%", height: props.height}}>
+      <div id={ChartContainerProps.containerId} style={{ height: '100%'}} />
     </div>
   )
 }

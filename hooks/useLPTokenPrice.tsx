@@ -8,6 +8,7 @@ import { LPTokenPair, TokenSide } from '../utils/type'
 import * as constant from '../utils/constant'
 import { getTokenPricefromCoingeckoAPI, getTokenPricefromllama } from "../api";
 import { useStableCoinPrice } from "./useStableCoinPrice";
+import { useTokenInfo } from "./useTokenInfo";
 
 
 interface LpTokenPriceInterface {
@@ -31,6 +32,7 @@ export function LpTokenPriceProvider({children}:any) {
   const [lptokenPrice, setlpTokenPrice] = useState<number>(0);
   const [token0Reserve, setToken0Reserve] = useState<number>(0);
   const [token1Reserve, setToken1Reserve] = useState<number>(0);
+  const {tokenData, setTokenData} = useTokenInfo();
   const [lptokenAddress, setlpTokenAddress] = useState<LPTokenPair>({
     name:"BNB/USDT",
     symbol:"BNB/USDT",
@@ -64,8 +66,9 @@ export function LpTokenPriceProvider({children}:any) {
       const token0Reserve = parseInt(data.returnValues.reserve0) / Math.pow(10, lptokenAddress.token0_decimal!);
       const token1Reserve = parseInt(data.returnValues.reserve1) / Math.pow(10, lptokenAddress.token1_decimal!);
 
-      // console.log('token0Reserve, token1Reserve', token0Reserve, token1Reserve);
-      if (lptokenAddress.tokenside == TokenSide.token0) { 
+      
+      //if (lptokenAddress.tokenside == TokenSide.token0) { 
+      if (tokenData.contractAddress.toLowerCase() == lptokenAddress.token0_contractAddress.toLowerCase()) {
         const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
                     lptokenAddress.token1_contractAddress + lptokenAddress.network);
         let price = 1;
@@ -124,7 +127,7 @@ export function LpTokenPriceProvider({children}:any) {
       }
       let token0Reserve, token1Reserve;
       [token0Reserve, token1Reserve] = await getReserves(PairContractHttp);
-      if (lptokenAddress.tokenside == TokenSide.token0) {  
+      if (tokenData.contractAddress.toLowerCase() == lptokenAddress.token0_contractAddress.toLowerCase()) {
         const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
                     lptokenAddress.token1_contractAddress + lptokenAddress.network);
         let price = 1;

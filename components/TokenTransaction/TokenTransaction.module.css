@@ -1,7 +1,7 @@
 @import '../../styles/font.css';
 
 .tokenTransaction {
-  height: 20rem;
+  height: 30rem;
   display: flex;
   flex-direction: column;
 }

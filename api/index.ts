@@ -11,6 +11,7 @@ import * as constant from '../utils/constant'
 import UniswapV2Pair from '../config/IUniswapV2Pair.json';
 import PancakeswapV2Pair from '../config/IPancakeswapV2Pair.json';
 import { useStableCoinPrice } from "../hooks/useStableCoinPrice";
+import { getLPPairs } from "./bitquery_graphql";
 
 export const ETH_MAINNET_API_URL = 'https://api.etherscan.io/api';
 export const BSC_MAINNET_API_URL = 'https://api.bscscan.com/api';
@@ -262,78 +263,14 @@ export async function getLPTokenList(address: string, network: number, tokenside
   let response;
   let checkTokenList: string[] = [];
   let lpTokenList: LPTokenPair[] = [];
-  const url = network == constant.ETHEREUM_NETWORK ? SH_PAIRS : PC_PAIRS;
-  if(network == constant.ETHEREUM_NETWORK) {
-    checkTokenList.push(constant.WHITELIST_TOKENS.ETH.USDC.toLowerCase());
-    checkTokenList.push(constant.WHITELIST_TOKENS.ETH.USDT.toLowerCase());
-    checkTokenList.push(constant.WHITELIST_TOKENS.ETH.ETH.toLowerCase());
-    checkTokenList.push(constant.WHITELIST_TOKENS.ETH.DAI.toLowerCase());
-  } else {
-    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.USDC.toLowerCase());
-    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.USDT.toLowerCase());
-    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.BNB.toLowerCase());
-    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.BUSD.toLowerCase());
-    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.DAI.toLowerCase());
-    checkTokenList.push(constant.WHITELIST_TOKENS.BSC.CAKE.toLowerCase());
-  }
-  if (tokenside == TokenSide.token0) {
-    response = await request(url,
-      gql`
-      query getLPTokenPairs($address:String){
-        pairs(where:{token0:$address}) {
-          id
-          token0 {
-            id
-            symbol
-            decimals
-          }
-          token1 {
-            id
-            symbol
-            decimals
-          }
-        }
-      }
-      `,
-      {
-        address
-      }
-    );
-  } else {
-    response = await request(url,
-      gql`
-      query getLPTokenPairs($address:String){
-        pairs(where:{token1:$address}) {
-          id
-          token0 {
-            id
-            symbol
-            decimals
-          }
-          token1 {
-            id
-            symbol
-            decimals
-          }
-        }
-      }
-      `,
-      {
-        address
-      }
-    );    
-  }
-  if (response != undefined && response.pairs.length > 0) {
-    response.pairs.forEach((token: any) => {
-      const token0 = token.token0.id;
-      const token1 = token.token1.id;
-      if ( (tokenside == TokenSide.token0 && checkTokenList.includes(token1.toLowerCase())) ||
-           (tokenside == TokenSide.token1 && checkTokenList.includes(token0.toLowerCase()) )
-      ) {
+
+  response = await getLPPairs(address, network);
+  if (response != constant.NOT_FOUND_TOKEN && response != null) {
+    response.forEach((value:any) => {
         lpTokenList.push({
-          name:  token.token0.symbol + "/" + token.token1.symbol,
-          symbol: token.token0.symbol + "/" + token.token1.symbol,
-          contractAddress: token.id,
+          name:  value.baseCurrency.symbol + "/" + value.quoteCurrency.symbol,
+          symbol: value.baseCurrency.symbol + "/" + value.quoteCurrency.symbol,
+          contractAddress: value.smartContract.address.address,
           price: 0,
           marketCap: "",
           totalSupply: 0,
@@ -342,23 +279,120 @@ export async function getLPTokenList(address: string, network: number, tokenside
           decimals: 18,
           image: "",
           network: network,
-          token0_name: token.token0.symbol,
-          token1_name: token.token1.symbol,
           token0_reserve: 0,
           token1_reserve: 0,
-          token0_contractAddress: token.token0.id,
-          token1_contractAddress: token.token1.id,
           usdBalance: 0,
           owner: "",
           pinSetting: false,
           tokenside: tokenside,
           ownerToken: address,
-          token0_decimal: token.token0.decimals,
-          token1_decimal: token.token1.decimals,
+          baseCurrency_name: value.baseCurrency.symbol,
+          baseCurrency_decimals: value.baseCurrency.decimals,
+          baseCurrency_contractAddress: value.baseCurrency.address,
+          quoteCurrency_decimals: value.quoteCurrency.decimals,
+          quoteCurrency_name: value.quoteCurrency.symbol,
+          quoteCurrency_contractAddress: value.quoteCurrency.address,
+          protocolType: value.smartContract.protocolType,
         } as LPTokenPair);
-      }
     });
   }
+  // const url = network == constant.ETHEREUM_NETWORK ? SH_PAIRS : PC_PAIRS;
+  // if(network == constant.ETHEREUM_NETWORK) {
+  //   checkTokenList.push(constant.WHITELIST_TOKENS.ETH.USDC.toLowerCase());
+  //   checkTokenList.push(constant.WHITELIST_TOKENS.ETH.USDT.toLowerCase());
+  //   checkTokenList.push(constant.WHITELIST_TOKENS.ETH.ETH.toLowerCase());
+  //   checkTokenList.push(constant.WHITELIST_TOKENS.ETH.DAI.toLowerCase());
+  // } else {
+  //   checkTokenList.push(constant.WHITELIST_TOKENS.BSC.USDC.toLowerCase());
+  //   checkTokenList.push(constant.WHITELIST_TOKENS.BSC.USDT.toLowerCase());
+  //   checkTokenList.push(constant.WHITELIST_TOKENS.BSC.BNB.toLowerCase());
+  //   checkTokenList.push(constant.WHITELIST_TOKENS.BSC.BUSD.toLowerCase());
+  //   checkTokenList.push(constant.WHITELIST_TOKENS.BSC.DAI.toLowerCase());
+  //   checkTokenList.push(constant.WHITELIST_TOKENS.BSC.CAKE.toLowerCase());
+  // }
+  // if (tokenside == TokenSide.token0) {
+  //   response = await request(url,
+  //     gql`
+  //     query getLPTokenPairs($address:String){
+  //       pairs(where:{token0:$address}) {
+  //         id
+  //         token0 {
+  //           id
+  //           symbol
+  //           decimals
+  //         }
+  //         token1 {
+  //           id
+  //           symbol
+  //           decimals
+  //         }
+  //       }
+  //     }
+  //     `,
+  //     {
+  //       address
+  //     }
+  //   );
+  // } else {
+  //   response = await request(url,
+  //     gql`
+  //     query getLPTokenPairs($address:String){
+  //       pairs(where:{token1:$address}) {
+  //         id
+  //         token0 {
+  //           id
+  //           symbol
+  //           decimals
+  //         }
+  //         token1 {
+  //           id
+  //           symbol
+  //           decimals
+  //         }
+  //       }
+  //     }
+  //     `,
+  //     {
+  //       address
+  //     }
+  //   );    
+  // }
+  // if (response != undefined && response.pairs.length > 0) {
+  //   response.pairs.forEach((token: any) => {
+  //     const token0 = token.token0.id;
+  //     const token1 = token.token1.id;
+  //     if ( (tokenside == TokenSide.token0 && checkTokenList.includes(token1.toLowerCase())) ||
+  //          (tokenside == TokenSide.token1 && checkTokenList.includes(token0.toLowerCase()) )
+  //     ) {
+  //       lpTokenList.push({
+  //         name:  token.token0.symbol + "/" + token.token1.symbol,
+  //         symbol: token.token0.symbol + "/" + token.token1.symbol,
+  //         contractAddress: token.id,
+  //         price: 0,
+  //         marketCap: "",
+  //         totalSupply: 0,
+  //         holdersCount: 0,
+  //         balance: 0,
+  //         decimals: 18,
+  //         image: "",
+  //         network: network,
+  //         token0_name: token.token0.symbol,
+  //         token1_name: token.token1.symbol,
+  //         token0_reserve: 0,
+  //         token1_reserve: 0,
+  //         token0_contractAddress: token.token0.id,
+  //         token1_contractAddress: token.token1.id,
+  //         usdBalance: 0,
+  //         owner: "",
+  //         pinSetting: false,
+  //         tokenside: tokenside,
+  //         ownerToken: address,
+  //         token0_decimal: token.token0.decimals,
+  //         token1_decimal: token.token1.decimals,
+  //       } as LPTokenPair);
+  //     }
+  //   });
+  // }
   return lpTokenList;
 }
 
@@ -378,12 +412,15 @@ export async function getLPTokenReserve(address: string, network: number) {
       address
     );       
   }
-
   const _reserves = await PairContractHttp.methods.getReserves().call();
-
+  const _factory = await PairContractHttp.methods.factory().call();
+  const token0 = await PairContractHttp.methods.token0().call();
+  const token1 = await PairContractHttp.methods.token1().call();
   // return data in Big Number
   return [parseInt(_reserves._reserve0), 
-          parseInt(_reserves._reserve1)];
+          parseInt(_reserves._reserve1),
+          _factory,
+          token0, token1];
 }
 
 export async function getTokenPricefromllama(address: string, network: number) {
