@@ -64,12 +64,14 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
   const {lpTokenPrice, lpTokenAddress ,setLPTokenAddress} = useLPTokenPrice();
   const checksumAddress = lpTokenAddress.contractAddress;
 
+  let myInterval: any
+  let currentResolutions: any
   const [tokendetails, setTokenDetails] = React.useState({
     pair: ' ',
   })
   let priceData: any[] = [];
 
-  // const lastBarsCache = new Map()
+  let lastBarsCache: any;
 
   const configurationData = {
     supported_resolutions: ['1', '5', '10', '30', '1H', '6H', '12H', '1D']
@@ -82,11 +84,6 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
     searchSymbols: async (userInput: any, exchange: any, symbolType: any, onResultReadyCallback: any) => {
     },
     
-    unsubscribeBars() {
-    },
-
-    subscribeBars() {
-    },
     resolveSymbol: async (symbolName: any, onSymbolResolvedCallback: any, onResolveErrorCallback: any) => {
 
       let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -209,7 +206,9 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
             bars[lastIndex].low = Math.min(value.low, bars[lastIndex].low);
             bars[lastIndex].volume += value.quoteAmount;
           }
-        })
+        });
+        if(bars.length>0)
+          lastBarsCache = bars[bars.length - 1];
         
         onHistoryCallback(bars, {
           noData: false,
@@ -218,6 +217,56 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
         // console.log('[getBars]: Get error', error.message);
         onErrorCallback(error)
       }
+    },
+    subscribeBars: (
+      symbolInfo: any,
+      resolution: any,
+      onRealtimeCallback: any,
+      subscribeUID: any,
+      onResetCacheNeededCallback: any,
+    ) => {
+      console.log('subscribe');
+      currentResolutions = resolution
+      myInterval = setInterval(async function () {
+        const resolutionMapping: any = {
+          '1': 60000,
+          '5': 300000,
+          '10': 600000,
+          '15': 900000,
+          '30': 1800000,
+          '60': 3600000,
+          '1H': 3600000,
+          '1D': 24 * 3600000,
+          '1W': 7 * 24 * 3600000,
+          '1M': 30 * 24 * 3600000,
+        }
+
+        if (lastBarsCache === undefined) return
+        const isNew = new Date().getTime() - lastBarsCache.time >= resolutionMapping[currentResolutions]
+
+        lastBarsCache.close = lpTokenPrice;
+        if (isNew) {
+          lastBarsCache.time = new Date().getTime()
+          lastBarsCache.open = lastBarsCache.close
+          lastBarsCache.high = lastBarsCache.close
+          lastBarsCache.low = lastBarsCache.close
+          priceData = priceData.concat(lastBarsCache);
+        } else {
+          if (lastBarsCache.low > lastBarsCache.close) {
+            lastBarsCache.low = lastBarsCache.close
+          }
+          if (lastBarsCache.high < lastBarsCache.close) {
+            lastBarsCache.high = lastBarsCache.close
+          }
+        }
+        onRealtimeCallback(lastBarsCache)
+      }, 1000 * 15) // 15s update interval      
+    },
+    unsubscribeBars: (subscriberUID: any) => {
+      console.log('[unsubscribeBars]: Method call with subscriberUID:', subscriberUID)
+
+      // clearInterval(myInterval)
+      console.log('[unsubscribeBars]: cleared')
     },
   }
   // const tvWidget = null;
