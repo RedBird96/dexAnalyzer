@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import { Box, useColorModeValue } from "@chakra-ui/react"
 import {
   Table,
@@ -22,7 +22,16 @@ export default function TokenTransaction() {
   );
   const headerColor = useColorModeValue("#FFFFFF", "#1C1C1C");
   const {transactionData} = useLPTransaction();
+  const {lpTokenAddress} = useLPTokenPrice();
+  const [txTransaction, setTXTransaction] = useState<any[]>([]);
 
+  useEffect(() => {
+    setTXTransaction(transactionData);
+  }, [transactionData])
+  useEffect(() => {
+    setTXTransaction([]);
+  }, [lpTokenAddress])
+  console.log('transactionData ', transactionData);
   return (
     <Box className={transactionClass}>
       <TableContainer overflowY={"auto"} overflowX={"auto"} height={"100%"} css={{
@@ -51,12 +60,12 @@ export default function TokenTransaction() {
         </Thead>
         <Tbody className={style.tbody}>
           {
-            transactionData.map(data => {
+            txTransaction.map(data => {
               if (data != null) {
                 const buy_sell = data.buyCurrency.address == data.quoteCurrency.address ? "Buy" : "Sell"; 
                 const color = buy_sell == "Buy" ? "#00C414": "#FF002E";
                 return (
-                <Tr key={data.any} color={color}>
+                <Tr key={data.any + data.baseAmount} color={color}>
                   <Td width={"8%"} paddingLeft={"1.5rem"}>{buy_sell}</Td>
                   <Td width={"24%"} paddingLeft={"0.7rem"}>{data.baseAmount}</Td>
                   <Td width={"32%"} paddingLeft={"2rem"}>{data.quoteAmount}</Td>

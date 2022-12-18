@@ -10,14 +10,18 @@ import { getTokenPricefromCoingeckoAPI, getTokenPricefromllama } from "../api";
 import { useStableCoinPrice } from "./useStableCoinPrice";
 import { useTokenInfo } from "./useTokenInfo";
 
+interface ownerTokenPrice {
+  tokenPrice: number;
+  lpBaseTokenAddress: string;
+}
 
 interface LpTokenPriceInterface {
   lptoken0Reserve: number;
   setLPToken0Reserve: (token0Reserve: number) => void;
   lptoken1Reserve: number;
   setLPToken1Reserve: (token1Reserve: number) => void;
-  lpTokenPrice: number;
-  setLPTokenPrice: (lpTokenPrice: number) => void;
+  lpTokenPrice: ownerTokenPrice;
+  setLPTokenPrice: (lpTokenPrice: ownerTokenPrice) => void;
   lpTokenAddress: LPTokenPair;
   setLPTokenAddress: (tokenAddress: LPTokenPair) => void;
 }
@@ -29,7 +33,10 @@ export function LpTokenPriceProvider({children}:any) {
 
   const {coinPrice} = useStableCoinPrice();
   const [eventEmitter, setEventEmitter] = useState<any>();
-  const [lptokenPrice, setlpTokenPrice] = useState<number>(0);
+  const [lptokenPrice, setlpTokenPrice] = useState<ownerTokenPrice>({
+    tokenPrice:0,
+    lpBaseTokenAddress:"0x55d398326f99059ff775485246999027b3197955"
+  });
   const [token0Reserve, setToken0Reserve] = useState<number>(0);
   const [token1Reserve, setToken1Reserve] = useState<number>(0);
   const {tokenData, setTokenData} = useTokenInfo();
@@ -75,7 +82,10 @@ export function LpTokenPriceProvider({children}:any) {
         if (coin != undefined) {
           price = coin.price;
         }         
-        setlpTokenPrice(token1Reserve / token0Reserve * price);
+        setlpTokenPrice({ 
+          tokenPrice: token1Reserve / token0Reserve * price,
+          lpBaseTokenAddress: lptokenAddress.ownerToken!
+        });
       } else {
         const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
                     lptokenAddress.token0_contractAddress + lptokenAddress.network);
@@ -83,7 +93,10 @@ export function LpTokenPriceProvider({children}:any) {
         if (coin != undefined) {
           price = coin.price;
         }                         
-        setlpTokenPrice(token0Reserve / token1Reserve * price);
+        setlpTokenPrice( {
+          tokenPrice:token0Reserve / token1Reserve * price,
+          lpBaseTokenAddress: lptokenAddress.ownerToken!
+        });
       }
       setToken0Reserve(token0Reserve);
       setToken1Reserve(token1Reserve);
@@ -134,7 +147,10 @@ export function LpTokenPriceProvider({children}:any) {
         if (coin != undefined) {
           price = coin.price;
         }      
-        setlpTokenPrice(token1Reserve / token0Reserve * price);
+        setlpTokenPrice({
+          tokenPrice:token1Reserve / token0Reserve * price,
+          lpBaseTokenAddress: lptokenAddress.ownerToken!
+        });
       } else {
         const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
                     lptokenAddress.token0_contractAddress + lptokenAddress.network);
@@ -142,7 +158,10 @@ export function LpTokenPriceProvider({children}:any) {
         if (coin != undefined) {
           price = coin.price;
         }            
-        setlpTokenPrice(token0Reserve / token1Reserve * price);
+        setlpTokenPrice({
+          tokenPrice:token0Reserve / token1Reserve * price,
+          lpBaseTokenAddress: lptokenAddress.ownerToken!
+        });
       }
       setToken0Reserve(token0Reserve);
       setToken1Reserve(token1Reserve);
@@ -158,7 +177,7 @@ export function LpTokenPriceProvider({children}:any) {
     if (lptokenAddress.contractAddress != undefined && lptokenAddress.contractAddress.length > 0){
       init();
     } else {
-      setlpTokenPrice(0);
+      setlpTokenPrice({tokenPrice:0,lpBaseTokenAddress:""});
       setToken0Reserve(0);
       setToken1Reserve(0);
     }

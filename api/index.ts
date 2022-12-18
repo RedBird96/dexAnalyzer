@@ -285,7 +285,7 @@ export async function getLPTokenList(address: string, network: number, tokenside
           owner: "",
           pinSetting: false,
           tokenside: tokenside,
-          ownerToken: address,
+          ownerToken: address.toLowerCase(),
           baseCurrency_name: value.baseCurrency.symbol,
           baseCurrency_decimals: value.baseCurrency.decimals,
           baseCurrency_contractAddress: value.baseCurrency.address,

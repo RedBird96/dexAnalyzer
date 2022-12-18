@@ -98,7 +98,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
         timezone: 'Est/UTC',
         locale: 'zh',
         exchange: lpTokenAddress.tokenside == TokenSide.token0 ? lpTokenAddress.token0_name : lpTokenAddress.token1_name,
-        minmov: 10,
+        minmov: 1,
         pricescale: 1000000,
         has_intraday: true,
         has_no_volume: false,
@@ -122,17 +122,17 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       try {
         let bars: any = []
         const { from, to, firstDataRequest } = periodParams
-        // console.log('getBars firstDataRequest', new Date(from * 1000).toISOString(), new Date(to * 1000).toISOString(),  firstDataRequest);
-        // if (checksumAddress) {
-        //   // setLoader(true);
-        //   if (!firstDataRequest) {
-        //     // "noData" should be set if there is no data in the requested period.
-        //     onHistoryCallback([], {
-        //       noData: true,
-        //     })
-        //     return
-        //   }
-        // }
+        console.log('getBars firstDataRequest', new Date(from * 1000).toISOString(), new Date(to * 1000).toISOString(),  firstDataRequest);
+        if (checksumAddress) {
+          // setLoader(true);
+          if (!firstDataRequest) {
+            // "noData" should be set if there is no data in the requested period.
+            onHistoryCallback([], {
+              noData: true,
+            })
+            return
+          }
+        }
 
         // console.log('from to', new Date(from * 1000).toISOString(), new Date(to * 1000).toISOString(), resolution);
         let bar_data;
@@ -227,7 +227,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       subscribeUID: any,
       onResetCacheNeededCallback: any,
     ) => {
-      console.log('subscribe');
+      console.log('subscribe', lpTokenAddress, lpTokenPrice);
       currentResolutions = resolution
       myInterval = setInterval(async function () {
         const resolutionMapping: any = {
@@ -262,7 +262,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
           }
         }
         onRealtimeCallback(lastBarsCache)
-      }, 1000 * 1) // 15s update interval      
+      }, 1000 * 15) // 15s update interval      
     },
     unsubscribeBars: (subscriberUID: any) => {
       console.log('[unsubscribeBars]: Method call with subscriberUID:', subscriberUID)
@@ -319,11 +319,12 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
   }
   
   React.useEffect(() => {
+    lastBarsCache = undefined;
     getWidget()
   }, [lpTokenAddress.contractAddress])
 
   return (
-    <div style={{width: "100%", height: props.height}}>
+    <div style={{width: "100%", height: "100%"}}>
       <div id={ChartContainerProps.containerId} style={{ height: '100%'}} />
     </div>
   )

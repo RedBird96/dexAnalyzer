@@ -44,6 +44,7 @@ export default function TokenInfo() {
   const {tokenData, setTokenData} = useTokenInfo();
   const {walletTokens} = useWalletTokenBalance();
   const {lpTokenPrice, lpTokenAddress ,setLPTokenAddress} = useLPTokenPrice();
+  const [tokenPriceshow, setTokenPriceShow] = useState<number>(0.0);
   
   const [lpTokenList, setLPTokenList] = useState<LPTokenPair[]>([]);
   const [lpTokenPinList, setLPTokenPinList] = useState<LPTokenPair[]>([]);
@@ -260,15 +261,21 @@ export default function TokenInfo() {
   }, [])
  
   useEffect(() => {
+    
+    let tp = 0.0;
+    if (lpTokenPrice.lpBaseTokenAddress.toLowerCase() == tokenData.contractAddress.toLowerCase()) {
+      tp = lpTokenPrice.tokenPrice;
+    }
     const res = walletTokens.find((value) => value.contractAddress.toLowerCase() + value.network ==
                 tokenData.contractAddress.toLowerCase() + tokenData.network);
     if (res != undefined) {
       setBalance(res.balance);
-      setBalanceUSD(res.balance * lpTokenPrice);
+      setBalanceUSD(res.balance * tp);
     } else {
       setBalance(0);
       setBalanceUSD(0);
     }
+    setTokenPriceShow(tp);
   }, [walletTokens, tokenData, lpTokenPrice])
   return (
     <Box className={infoClass}>
@@ -280,7 +287,7 @@ export default function TokenInfo() {
               <Box display={"flex"} flexDirection={"row"}>
                 <p className={style.tokenName}>{tokenData.symbol}</p>
                 <p className={style.tokenName} style={{color:"#767676"}}>&nbsp;({lpTokenAddress.symbol})</p>
-                <p className={style.tokenPrice}>{convertBalanceCurrency( lpTokenPrice, 6)}</p>
+                <p className={style.tokenPrice}>{convertBalanceCurrency( tokenPriceshow, 6)}</p>
               </Box>
               <Box display={"flex"} flexDirection={"row"} alignItems={"center"} justifyContent={"center"}>
                 <p className={style.tokenAddress} style={{color:textColor}}>{tokenData.contractAddress}</p>
@@ -336,7 +343,7 @@ export default function TokenInfo() {
         <Box display={"flex"} flexDirection={"row"} width={"83%"} height={"100%"} alignItems={"center"}>
           <Box display={"flex"} flexDirection={"column"} width={"28%"} paddingLeft={"4rem"}>
             <p className={style.marketCap} style={{color:textColor}} >Market Cap</p>
-            <p className={style.tokenMarketCap} style={{color:"#00B112"}}>{convertBalanceCurrency(tokenData.totalSupply * lpTokenPrice, 0)}</p>
+            <p className={style.tokenMarketCap} style={{color:"#00B112"}}>{convertBalanceCurrency(tokenData.totalSupply * tokenPriceshow, 0)}</p>
           </Box>
           <div style={{
             height:"90%",
