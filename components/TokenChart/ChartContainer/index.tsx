@@ -61,6 +61,7 @@ function getLanguageFromURL(): LanguageCode | null {
 const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
 
   const { colorMode } = useColorMode();
+  let tvWidget: IChartingLibraryWidget | null = null
   const {lpTokenPrice, lpTokenAddress ,setLPTokenAddress} = useLPTokenPrice();
   const {setTransactionData} = useLPTransaction();
   const checksumAddress = lpTokenAddress.contractAddress;
@@ -279,7 +280,6 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
   //   React.useEffect(()=>{
   const getWidget = async () => {
     
-    let tvWidget: IChartingLibraryWidget | null = null
     const widgetOptions: ChartingLibraryWidgetOptions = {
       // symbol: this.props.symbol as string,
       symbol: tokendetails.pair,
@@ -292,7 +292,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       library_path: ChartContainerProps.libraryPath as string,
       container: 'dexAnalyzer_chart_container',
       locale: getLanguageFromURL() || 'en',
-      theme: 'Dark',
+      theme: colorMode == "dark" ? 'Dark' : 'Light',
       disabled_features: ['use_localstorage_for_settings'],
       charts_storage_url: ChartContainerProps.chartsStorageUrl,
       //   charts_storage_api_version: ChartContainerProps.chartsStorageApiVersion,
@@ -326,6 +326,11 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
     lastBarsCache = undefined;
     getWidget()
   }, [lpTokenAddress.contractAddress])
+
+  React.useEffect(() => {
+    lastBarsCache = undefined;
+    getWidget()
+  }, [colorMode])
 
   return (
     <div style={{width: "100%", height: "100%"}}>
