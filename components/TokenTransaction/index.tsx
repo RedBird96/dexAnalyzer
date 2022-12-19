@@ -27,14 +27,20 @@ export default function TokenTransaction() {
   const {lpTokenAddress} = useLPTokenPrice();
   const {tokenData} = useTokenInfo();
   const {coinPrice} = useStableCoinPrice();
+  const [quotePrice, setquotePrice] = useState(1);
   const [txTransaction, setTXTransaction] = useState<any[]>([]);
   const LINK_BSCNETWORK = "https://bscscan.com/tx/";
   const LINK_ETHNETWORK = "https://etherscan.io/tx/";
   useEffect(() => {
+    const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
+    lpTokenAddress.quoteCurrency_contractAddress! + lpTokenAddress.network);
+    if (coin != undefined)
+      setquotePrice(coin.price);
     setTXTransaction(transactionData);
   }, [transactionData])
   useEffect(() => {
     setTXTransaction([]);
+    setquotePrice(1);
   }, [lpTokenAddress.contractAddress])
   return (
     <Box className={transactionClass}>
@@ -68,21 +74,17 @@ export default function TokenTransaction() {
               if (data != null) {
                 let price = 1.0;
                 const buy_sell = data.buyCurrency.address == data.quoteCurrency.address ? "Buy" : "Sell"; 
-                const color = buy_sell == "Buy" ? "#00C414": "#FF002E";
-                const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
-                       lpTokenAddress.quoteCurrency_contractAddress! + lpTokenAddress.network);
-                if (coin != undefined)
-                  price = coin.price;
-                const usdVal = price * data.baseAmount;
+                const color = buy_sell == "Buy" ? "#00C414": "#FF002E";               
+                const usdVal = quotePrice * data.quoteAmount;
                 const txHash = data.any;
                 const linkAddr = tokenData.network == constant.BINANCE_NETOWRK ? LINK_BSCNETWORK + txHash: LINK_ETHNETWORK + txHash;
                 return (
-                <Tr key={data.any + data.baseAmount} color={color}>
+                <Tr key={data.any + data.baseAmount + usdVal} color={color}>
                   <Td width={"8%"} paddingLeft={"1.5rem"}>{buy_sell}</Td>
                   <Td width={"24%"} paddingLeft={"0.7rem"}>{numberWithCommasTwoDecimals(data.baseAmount)}</Td>
                   <Td width={"32%"} paddingLeft={"2rem"}>
                     {convertBalanceCurrency(usdVal) + " (" + 
-                    numberWithCommasTwoDecimals(data.quoteAmount) + 
+                    numberWithCommasTwoDecimals(data.quoteAmount) + " " +
                     lpTokenAddress.quoteCurrency_name! + ")"}
                   </Td>
                   <Td width={"24%"} paddingLeft={"3rem"}>{data.timeInterval.second}</Td>

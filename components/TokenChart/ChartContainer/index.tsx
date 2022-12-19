@@ -95,8 +95,8 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
         description: lpTokenAddress.symbol,
         type: 'crypto',
         session: '24x7',
-        timezone: 'Est/UTC',
-        locale: 'zh',
+        timezone: 'Etc/UTC',
+        locale: 'tr',
         exchange: lpTokenAddress.tokenside == TokenSide.token0 ? lpTokenAddress.token0_name : lpTokenAddress.token1_name,
         minmov: 1,
         pricescale: 1000000,
@@ -173,7 +173,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
           setTransactionData(priceData);
         }
 
-        // console.log('priceData', priceData);
+        console.log('priceData', priceData);
         // console.log('bar_data', bar_data);
         bar_data = bar_data.reverse()
 
@@ -262,7 +262,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
           }
         }
         onRealtimeCallback(lastBarsCache)
-      }, 1000 * 15) // 15s update interval      
+      }, 1000 * 1)
     },
     unsubscribeBars: (subscriberUID: any) => {
       // console.log('[unsubscribeBars]: Method call with subscriberUID:', subscriberUID)

@@ -45,6 +45,7 @@ export function LPTransactionProvider({children}:any) {
       const filterSync = PairContractWSS.filters.Swap()
       const event = PairContractWSS.on(filterSync, async(sender, amount0In, 
         amount1In, amount0Out, amount1Out, to, event) => {
+          transactionList.unshift()
           let time = new Date().toJSON();
           time = time.replace('T', ' ');
           time = time.slice(0, 19);
@@ -64,7 +65,9 @@ export function LPTransactionProvider({children}:any) {
             }
 
           }
-          setTransactionList(data=>[...data, item]);
+          const temp = transactionList;
+          temp.unshift(item);
+          setTransactionList(temp);
           // console.log('swap transaction', amount0In, amount1In, amount0Out, amount1Out, to, event);
       });
 
