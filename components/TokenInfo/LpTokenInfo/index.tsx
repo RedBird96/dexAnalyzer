@@ -36,7 +36,7 @@ export default function LpTokenInfo({
   const {coinPrice} = useStableCoinPrice();
   const colorMode = useColorMode();
   const {tokenData} = useTokenInfo();
-  const {lptoken0Reserve, lptoken1Reserve, lpTokenAddress} = useLPTokenPrice();
+  const {lpTokenAddress} = useLPTokenPrice();
   const [reserve, setReserve] = useState<number>(0);
   const [reserveUSD, setReserveUSD] = useState<number>(0);
   const [reserveCurrency, setReserveCurrency] = useState<string>("");

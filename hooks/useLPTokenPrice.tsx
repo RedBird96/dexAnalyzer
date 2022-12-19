@@ -16,10 +16,6 @@ interface ownerTokenPrice {
 }
 
 interface LpTokenPriceInterface {
-  lptoken0Reserve: number;
-  setLPToken0Reserve: (token0Reserve: number) => void;
-  lptoken1Reserve: number;
-  setLPToken1Reserve: (token1Reserve: number) => void;
   lpTokenPrice: ownerTokenPrice;
   setLPTokenPrice: (lpTokenPrice: ownerTokenPrice) => void;
   lpTokenAddress: LPTokenPair;
@@ -100,8 +96,6 @@ export function LpTokenPriceProvider({children}:any) {
       tempLP.token0_reserve = token0Reserve;
       tempLP.token1_reserve = token1Reserve;
       setlpTokenAddress(tempLP);
-      // setToken0Reserve(token0Reserve);
-      // setToken1Reserve(token1Reserve);
 
   };
 
@@ -159,8 +153,11 @@ export function LpTokenPriceProvider({children}:any) {
           lpBaseTokenAddress: lptokenAddress.ownerToken!
         });
       }
-      setToken0Reserve(token0Reserve);
-      setToken1Reserve(token1Reserve);
+      
+      const tempLP = lptokenAddress;
+      tempLP.token0_reserve = token0Reserve;
+      tempLP.token1_reserve = token1Reserve;
+      setlpTokenAddress(tempLP);
 
       const filterSync = PairContractWSS.filters.Sync()
       const event = PairContractWSS.on(filterSync, async(reserve0, reserve1, event) => {
@@ -178,30 +175,18 @@ export function LpTokenPriceProvider({children}:any) {
       init();
     } else {
       setlpTokenPrice({tokenPrice:0,lpBaseTokenAddress:""});
-      setToken0Reserve(0);
-      setToken1Reserve(0);
     }
     return ()=>{ 
 
       if (PairContractWSS) {
         PairContractWSS.removeAllListeners();
       }
-      // console.log('unsubscribe');
-      // console.log('eventEmitter', eventEmitter);
-      // if(eventEmitter != undefined) {
-      //   const id = eventEmitter.id;
-      //   eventEmitter.options.requestManager.removeSubscription(id);
-      // }
     }
   }, [lptokenAddress.contractAddress])  
 
   return(
     <LpTokenPriceContext.Provider
-      value={{
-        lptoken0Reserve:token0Reserve,
-        setLPToken0Reserve: setToken0Reserve,
-        lptoken1Reserve:token1Reserve,
-        setLPToken1Reserve: setToken1Reserve,        
+      value={{     
         lpTokenPrice:lptokenPrice,
         setLPTokenPrice: setlpTokenPrice,
         lpTokenAddress:lptokenAddress,

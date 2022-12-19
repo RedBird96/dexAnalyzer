@@ -116,7 +116,6 @@ export default function TokenList() {
       }
       if (foundBscToken.contractAddress == "0x00") {
           const res_bsc = await getTokenSymbol(debouncedQuery, constant.BINANCE_NETOWRK);
-          console.log('res_bsc', res_bsc);
           if (res_bsc != constant.NOT_FOUND_TOKEN) {
             foundFlag = true;
             const logo = await getTokenLogoURL(debouncedQuery, constant.BINANCE_NETOWRK, res_bsc[1]);

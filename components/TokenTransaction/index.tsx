@@ -11,9 +11,11 @@ import {
   TableCaption,
   TableContainer,
 } from '@chakra-ui/react'
-import { useLPTokenPrice, useLPTransaction } from '../../hooks'
+import { useLPTokenPrice, useLPTransaction, useTokenInfo } from '../../hooks'
 import style from './TokenTransaction.module.css'
-import { makeShortTxHash } from '../../utils'
+import { convertBalanceCurrency, makeShortTxHash, numberWithCommasTwoDecimals } from '../../utils'
+import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
+import * as constant from '../../utils/constant'
 
 export default function TokenTransaction() {
   const transactionClass = useColorModeValue(
@@ -23,8 +25,11 @@ export default function TokenTransaction() {
   const headerColor = useColorModeValue("#FFFFFF", "#1C1C1C");
   const {transactionData} = useLPTransaction();
   const {lpTokenAddress} = useLPTokenPrice();
+  const {tokenData} = useTokenInfo();
+  const {coinPrice} = useStableCoinPrice();
   const [txTransaction, setTXTransaction] = useState<any[]>([]);
-
+  const LINK_BSCNETWORK = "https://bscscan.com/tx/";
+  const LINK_ETHNETWORK = "https://etherscan.io/tx/";
   useEffect(() => {
     setTXTransaction(transactionData);
   }, [transactionData])
@@ -61,15 +66,36 @@ export default function TokenTransaction() {
           {
             txTransaction.map(data => {
               if (data != null) {
+                let price = 1.0;
                 const buy_sell = data.buyCurrency.address == data.quoteCurrency.address ? "Buy" : "Sell"; 
                 const color = buy_sell == "Buy" ? "#00C414": "#FF002E";
+                const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
+                       lpTokenAddress.quoteCurrency_contractAddress! + lpTokenAddress.network);
+                if (coin != undefined)
+                  price = coin.price;
+                const usdVal = price * data.baseAmount;
+                const txHash = data.any;
+                const linkAddr = tokenData.network == constant.BINANCE_NETOWRK ? LINK_BSCNETWORK + txHash: LINK_ETHNETWORK + txHash;
                 return (
                 <Tr key={data.any + data.baseAmount} color={color}>
                   <Td width={"8%"} paddingLeft={"1.5rem"}>{buy_sell}</Td>
-                  <Td width={"24%"} paddingLeft={"0.7rem"}>{data.baseAmount}</Td>
-                  <Td width={"32%"} paddingLeft={"2rem"}>{data.quoteAmount}</Td>
+                  <Td width={"24%"} paddingLeft={"0.7rem"}>{numberWithCommasTwoDecimals(data.baseAmount)}</Td>
+                  <Td width={"32%"} paddingLeft={"2rem"}>
+                    {convertBalanceCurrency(usdVal) + " (" + 
+                    numberWithCommasTwoDecimals(data.quoteAmount) + 
+                    lpTokenAddress.quoteCurrency_name! + ")"}
+                  </Td>
                   <Td width={"24%"} paddingLeft={"3rem"}>{data.timeInterval.second}</Td>
-                  <Td width={"16%"} paddingLeft={"0rem"}>{makeShortTxHash(data.any)}</Td>
+                  <Td width={"16%"} paddingLeft={"0rem"}>
+                    <Box
+                     _hover={{"textDecoration":"underline"}}
+                     cursor="pointer"
+                    >
+                      <a href={linkAddr}>
+                        {makeShortTxHash(txHash)}
+                      </a>
+                    </Box>
+                  </Td>
                 </Tr>
                 );
               }

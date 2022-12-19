@@ -18,19 +18,19 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider theme={theme}>
       <ThirdwebProvider desiredChainId={desiredChainId} supportedChains={supportChain}>
-        <LPTransactionProvider>
           <StableCoinPriceProvider>
             <TokenInfoProvider>
               <LpTokenPriceProvider>
-                <WalletTokenBalanceProvider>
+                <LPTransactionProvider>
+                    <WalletTokenBalanceProvider>
                     <Layout>
                       <Component {...pageProps} />
                     </Layout>
-                </WalletTokenBalanceProvider>
+                    </WalletTokenBalanceProvider>
+                  </LPTransactionProvider>
               </LpTokenPriceProvider>
             </TokenInfoProvider>
           </StableCoinPriceProvider>
-        </LPTransactionProvider>
       </ThirdwebProvider>
     </ChakraProvider>
     
