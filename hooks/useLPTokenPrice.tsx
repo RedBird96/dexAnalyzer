@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import UniswapV2Pair from '../config/IUniswapV2Pair.json';
 import PancakeswapV2Pair from '../config/IPancakeswapV2Pair.json';
-import { BigNumber } from "ethers";
+import { BigNumber, Contract, ethers } from "ethers";
 import Web3 from "web3";
 import { AbiItem } from 'web3-utils'
 import { LPTokenPair, TokenSide } from '../utils/type'
@@ -32,6 +32,7 @@ const LpTokenPriceContext: React.Context<null | LpTokenPriceInterface> =
 export function LpTokenPriceProvider({children}:any) {
 
   const {coinPrice} = useStableCoinPrice();
+  const {tokenData} = useTokenInfo();
   const [eventEmitter, setEventEmitter] = useState<any>();
   const [lptokenPrice, setlpTokenPrice] = useState<ownerTokenPrice>({
     tokenPrice:0,
@@ -39,7 +40,6 @@ export function LpTokenPriceProvider({children}:any) {
   });
   const [token0Reserve, setToken0Reserve] = useState<number>(0);
   const [token1Reserve, setToken1Reserve] = useState<number>(0);
-  const {tokenData, setTokenData} = useTokenInfo();
   const [lptokenAddress, setlpTokenAddress] = useState<LPTokenPair>({
     name:"BNB/USDT",
     symbol:"BNB/USDT",
@@ -63,17 +63,15 @@ export function LpTokenPriceProvider({children}:any) {
     token0_decimal: 18,
     token1_decimal: 18,
   } as LPTokenPair);
-  let web3Wss: Web3, web3Http: Web3, PairContractWSS:any, PairContractHttp:any;
+  let web3Wss: any, web3Http: any, PairContractWSS:Contract, PairContractHttp:Contract;
 
-  const updateState = async (data:any) => {
+  const updateState = async (reserve0:any, reserve1:any) => {
     // update state
     // state.token0 = BigNumber.from(data.returnValues.reserve0);
     // state.token1 = BigNumber.from(data.returnValues.reserve1);
 
-      const token0Reserve = parseInt(data.returnValues.reserve0) / Math.pow(10, lptokenAddress.token0_decimal!);
-      const token1Reserve = parseInt(data.returnValues.reserve1) / Math.pow(10, lptokenAddress.token1_decimal!);
-
-      
+      const token0Reserve = parseInt(reserve0) / Math.pow(10, lptokenAddress.token0_decimal!);
+      const token1Reserve = parseInt(reserve1) / Math.pow(10, lptokenAddress.token1_decimal!);
       //if (lptokenAddress.tokenside == TokenSide.token0) { 
       if (tokenData.contractAddress.toLowerCase() == lptokenAddress.token0_contractAddress.toLowerCase()) {
         const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
@@ -98,8 +96,12 @@ export function LpTokenPriceProvider({children}:any) {
           lpBaseTokenAddress: lptokenAddress.ownerToken!
         });
       }
-      setToken0Reserve(token0Reserve);
-      setToken1Reserve(token1Reserve);
+      const tempLP = lptokenAddress;
+      tempLP.token0_reserve = token0Reserve;
+      tempLP.token1_reserve = token1Reserve;
+      setlpTokenAddress(tempLP);
+      // setToken0Reserve(token0Reserve);
+      // setToken1Reserve(token1Reserve);
 
   };
 
@@ -116,27 +118,21 @@ export function LpTokenPriceProvider({children}:any) {
     const init = async() => {
       
       if (lptokenAddress.network == constant.ETHEREUM_NETWORK) {
-        web3Wss = new Web3(constant.WSSETHRPC_URL);
-        PairContractWSS = new web3Wss.eth.Contract(
-          UniswapV2Pair as AbiItem[],
-          lptokenAddress.contractAddress
-        );  
+        web3Wss = new ethers.providers.WebSocketProvider(constant.WSSETHRPC_URL);
+        PairContractWSS = new ethers.Contract(lptokenAddress.contractAddress, UniswapV2Pair, web3Wss); 
         web3Http = new Web3(constant.ETHRPC_URL);
         PairContractHttp = new web3Http.eth.Contract(
           UniswapV2Pair as AbiItem[],
           lptokenAddress.contractAddress
         );   
       } else {
-        web3Wss = new Web3(constant.WSSBSCRPC_URL);
-        PairContractWSS = new web3Wss.eth.Contract(
-          PancakeswapV2Pair as AbiItem[],
-          lptokenAddress.contractAddress
-        );  
+        web3Wss = new ethers.providers.WebSocketProvider(constant.WSSBSCRPC_URL);
+        PairContractWSS = new ethers.Contract(lptokenAddress.contractAddress, PancakeswapV2Pair, web3Wss);
         web3Http = new Web3(constant.BSCRPC_URL);
         PairContractHttp = new web3Http.eth.Contract(
           PancakeswapV2Pair as AbiItem[],
           lptokenAddress.contractAddress
-        );       
+        );
       }
       let token0Reserve, token1Reserve;
       [token0Reserve, token1Reserve] = await getReserves(PairContractHttp);
@@ -166,8 +162,12 @@ export function LpTokenPriceProvider({children}:any) {
       setToken0Reserve(token0Reserve);
       setToken1Reserve(token1Reserve);
 
-      const event = PairContractWSS.events.Sync({})
-        .on("data", (data:any) => updateState(data));
+      const filterSync = PairContractWSS.filters.Sync()
+      const event = PairContractWSS.on(filterSync, async(reserve0, reserve1, event) => {
+        updateState(reserve0, reserve1);
+      });
+      // const event = PairContractWSS.events.Sync({})
+      //   .on("data", (data:any) => updateState(data, lptokenAddress.ownerToken!));
 
       setEventEmitter(event);
 
@@ -183,12 +183,15 @@ export function LpTokenPriceProvider({children}:any) {
     }
     return ()=>{ 
 
+      if (PairContractWSS) {
+        PairContractWSS.removeAllListeners();
+      }
       // console.log('unsubscribe');
       // console.log('eventEmitter', eventEmitter);
-      if(eventEmitter != undefined) {
-        const id = eventEmitter.id;
-        eventEmitter.options.requestManager.removeSubscription(id);
-      }
+      // if(eventEmitter != undefined) {
+      //   const id = eventEmitter.id;
+      //   eventEmitter.options.requestManager.removeSubscription(id);
+      // }
     }
   }, [lptokenAddress.contractAddress])  
 

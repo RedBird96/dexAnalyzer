@@ -139,21 +139,21 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
         const after = new Date(from * 1000).toISOString();
         const before = new Date(to * 1000).toISOString();
         
-        console.log('after before ', after, before);
+        // console.log('after before ', after, before);
 
         let beforeIndex = -1;
         let afterIndex = -1;
         if (priceData!=undefined) {
           const searchbefore = (before.replace('T', ' ')).slice(0, 19);
           const searchafter = (after.replace('T', ' ')).slice(0, 19);
-          console.log('search', searchafter, searchbefore);
+          // console.log('search', searchafter, searchbefore);
           beforeIndex = priceData.findIndex(function(number) {
             return number.timeInterval.second < searchbefore
           });
           afterIndex = priceData.findIndex(function(number) {
             return number.timeInterval.second < searchafter
           });
-          console.log('after before index', beforeIndex, afterIndex);
+          // console.log('after before index', beforeIndex, afterIndex);
         }
         if (beforeIndex != -1) {
           bar_data = priceData.slice(afterIndex == -1 ? 0 : afterIndex, beforeIndex);
@@ -173,8 +173,8 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
           setTransactionData(priceData);
         }
 
-        console.log('priceData', priceData);
-        console.log('bar_data', bar_data);
+        // console.log('priceData', priceData);
+        // console.log('bar_data', bar_data);
         bar_data = bar_data.reverse()
 
         bar_data?.forEach((value:any)  => {
@@ -227,7 +227,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       subscribeUID: any,
       onResetCacheNeededCallback: any,
     ) => {
-      console.log('subscribe', lpTokenAddress, lpTokenPrice);
+      // console.log('subscribe', lpTokenAddress, lpTokenPrice);
       currentResolutions = resolution
       myInterval = setInterval(async function () {
         const resolutionMapping: any = {
@@ -265,10 +265,10 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       }, 1000 * 15) // 15s update interval      
     },
     unsubscribeBars: (subscriberUID: any) => {
-      console.log('[unsubscribeBars]: Method call with subscriberUID:', subscriberUID)
+      // console.log('[unsubscribeBars]: Method call with subscriberUID:', subscriberUID)
 
       clearInterval(myInterval)
-      console.log('[unsubscribeBars]: cleared')
+      // console.log('[unsubscribeBars]: cleared')
     },
   }
   // const tvWidget = null;

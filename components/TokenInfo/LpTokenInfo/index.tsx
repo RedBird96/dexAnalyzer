@@ -55,20 +55,20 @@ export default function LpTokenInfo({
       setClickDex(0);
       if (showArrow) {
         if (tokenData.contractAddress.toLowerCase() == lpTokenAddress.token0_contractAddress.toLowerCase()) {
-          setReserve(lptoken1Reserve);
+          setReserve(lpTokenAddress.token1_reserve);
           setReserveCurrency(lpTokenAddress.token1_name);
           const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
                        lpTokenAddress.token1_contractAddress + lpTokenAddress.network);
           if (coin != undefined) {
-            setReserveUSD(lptoken1Reserve * coin.price);
+            setReserveUSD(lpTokenAddress.token1_reserve * coin.price);
           }
         } else {
-          setReserve(lptoken0Reserve)
+          setReserve(lpTokenAddress.token0_reserve)
           setReserveCurrency(lpTokenAddress.token0_name);
           const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
                        lpTokenAddress.token0_contractAddress + lpTokenAddress.network);
           if (coin != undefined) {
-            setReserveUSD(lptoken0Reserve * coin.price);
+            setReserveUSD(lpTokenAddress.token0_reserve * coin.price);
           }
         }
       } else {
@@ -91,8 +91,10 @@ export default function LpTokenInfo({
         }
       }
     }
-    setFunc();
-  }, [lpToken, lptoken0Reserve, lptoken1Reserve]);
+    if (lpTokenAddress.ownerToken == tokenData.contractAddress){
+      setFunc();
+    }
+  }, [lpToken, lpTokenAddress.token0_reserve]);
 
   const setDexDropShow = () => {
     const count = clickDex+1;

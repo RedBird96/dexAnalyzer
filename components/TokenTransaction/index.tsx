@@ -30,8 +30,7 @@ export default function TokenTransaction() {
   }, [transactionData])
   useEffect(() => {
     setTXTransaction([]);
-  }, [lpTokenAddress])
-  console.log('transactionData ', transactionData);
+  }, [lpTokenAddress.contractAddress])
   return (
     <Box className={transactionClass}>
       <TableContainer overflowY={"auto"} overflowX={"auto"} height={"100%"} css={{
