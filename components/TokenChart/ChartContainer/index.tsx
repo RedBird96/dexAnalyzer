@@ -93,10 +93,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
         ticker: lpTokenAddress.name,
         name: lpTokenAddress.name,
         description: lpTokenAddress.symbol,
-        type: 'crypto',
-        session: '24x7',
-        timezone: 'Etc/UTC',
-        locale: 'tr',
+        locale: getLanguageFromURL() || 'en',
         exchange: lpTokenAddress.tokenside == TokenSide.token0 ? lpTokenAddress.token0_name : lpTokenAddress.token1_name,
         minmov: 1,
         pricescale: 1000000,
@@ -105,7 +102,6 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
         has_weekly_and_monthly: false,
         supported_resolutions: configurationData.supported_resolutions,
         volume_precision: 3,
-        data_status: 'streaming',
       }
       // eslint-disable-next-line no-console
       // console.log('[resolveSymbol]: Symbol resolved', symbolName);
@@ -227,6 +223,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       subscribeUID: any,
       onResetCacheNeededCallback: any,
     ) => {
+      return;
       // console.log('subscribe', lpTokenAddress, lpTokenPrice);
       currentResolutions = resolution
       myInterval = setInterval(async function () {

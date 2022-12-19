@@ -27,7 +27,7 @@ export default function MenuBar() {
       <div style={{
         display: "flex", 
         justifyContent:"center", 
-        height:"4.8rem", 
+        height:"5rem", 
         alignContent:"center",
         cursor: "pointer",
         backgroundColor:chartSelectColor,

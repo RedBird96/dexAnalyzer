@@ -49,7 +49,7 @@ export default function WalletInfo() {
 
   const {setWalletTokens} = useWalletTokenBalance();
   const {tokenData, setTokenData} = useTokenInfo();
-  const selectBtnColor = useColorModeValue("#0070D7","#494949");
+  const selectBtnColor ="#0067C6";// useColorModeValue("#0070D7","#494949");
   const notSelectBtnColor = useColorModeValue("#E0E0E0","#1C1C1C");
   const tokenColor = useColorModeValue("#1C1C1C","#FFFFFF");
   const refreshBtnBgColor = useColorModeValue("#FFFFFF","#1C1C1C");
@@ -210,7 +210,7 @@ export default function WalletInfo() {
             fontWeight:"500"
           }}
           _hover={{
-            backgroundColor:"transparent"
+            backgroundColor:notSelectBtnColor
           }}
           width={"39%"}
           borderRadius={"0.7rem 0rem 0rem 0.7rem"}
@@ -227,7 +227,7 @@ export default function WalletInfo() {
             fontWeight:"500"
           }}
           _hover={{
-            backgroundColor:"transparent"
+            backgroundColor:selectBtnColor
           }}
           width={"39%"}
           height={"2.8rem"}
@@ -277,17 +277,17 @@ export default function WalletInfo() {
               </Thead>
               <Tbody className={tableBodyBorder}>
                 {
-                  tokensInfo?.map((token) => {
+                  tokensInfo?.map((token, index) => {
                     if (Number.isNaN(token.decimals))
                       return ;
                     return (
-                      <Tr key={token.name}>
-                          <Th style={{paddingLeft:"0rem", paddingRight:"0.5rem"}}>
+                      <Tr key={token.name + index}>
+                          <Th style={{padding:"0.3rem 0.5rem 0.3rem 0rem"}}>
                             <p className={style.tokenName} style={{color:tokenColor}}>
                               {makeShortTokenName(token.symbol, 13)}
                             </p>
                           </Th>
-                          <Th style={{paddingLeft:"0rem"}}>
+                          <Th style={{padding:"0.3rem 0rem 0.3rem 0rem"}}>
                             <div className={style.tokenBalance}>
                               <p style={{marginRight:"5px", color:tokenColor}}>
                                 {numberWithCommasTwoDecimals(token.balance)}

@@ -237,12 +237,26 @@ export async function getTokenLogoURL(address: string, network:number, symbol: s
 }
 
 
-export async function getTokenInfofromCoingeckoAPI(address: string, network: string) {
-  const url = CG_ENDPOINT + "coins/" + network + "/contract/" + address;
+export async function getTokenSocialInfofromCoingeckoAPI(address: string, network: number) {
+  const networkId = network == constant.ETHEREUM_NETWORK ? "ethereum" : "binance-smart-chain";
+  const url = CG_ENDPOINT + "coins/" + networkId + "/contract/" + address;
   const response = await fetch(url)
   if (response.ok) {
     const obj = await response.json();
-    return obj
+    let website = "", facebook = "", twitter = "";
+    if (obj["links"].hasOwnProperty('homepage')) {
+      website = obj["links"].homepage[0];
+      twitter= obj["links"].twitter_screen_name;
+      facebook = obj["links"].facebook_username;
+    }
+    if (twitter != "") {
+      twitter = "https://twitter.com/" + twitter;
+    }
+    if (facebook != "") {
+      facebook = "https://www.facebook.com/" + facebook;
+    }
+    console.log("website, twitter, facebook", website, twitter, facebook);
+    return [website, twitter, facebook]
   }
   return undefined  
 }

@@ -29,9 +29,13 @@ const TokenListItem = ({
 }) => {
 
   const colorMode = useColorMode();
-  const textColor = useColorModeValue("#5E5E5E","#A7A7A7");
+  const textColor = useColorModeValue("#3b2c2c","#A7A7A7");
+  const textColorActive = useColorModeValue("#bfbfbf","#A7A7A7");
   const whiteColor = useColorModeValue("#000000","#FFFFFF");
   const hoverColor = useColorModeValue("#005CE5","#3A3A29");
+  const addressColor = useColorModeValue("#6a6a6a","#6a6a6a");
+  const addressColorActive  = useColorModeValue("#a7a7a7","#6a6a6a");
+  const [isHover, setIsHover] = useState<Boolean>(false);
   const [isActive, setIsActive] = useState<Boolean>(false);
   useEffect(() => {
       setIsActive(activeToken == tokenData);
@@ -46,19 +50,21 @@ const TokenListItem = ({
   return(
     <Box className= {style.tokenListInfo} 
       _hover={{bg:hoverColor}}
+      onMouseOver={() => {setIsHover(true)}}
+      onMouseOut={() => {setIsHover(false)}}
       onClick={setActiveToken}
       backgroundColor={isActive ? hoverColor:"#transparent"}
       color={isActive?"#FFFFFF":whiteColor}
     >
       <Box display={"flex"} flexDirection={"row"} alignItems={"center"} width={"90%"} justifyContent={"space-between"}>
         <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
-          <img src={tokenData?.image} width={"50rem"}/>
+          <img src={tokenData?.image} width={"40rem"}/>
           <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
             <Box display={"flex"} flexDirection={"row"} >
               <p className={style.tokenName}>{makeShortTokenName(tokenData?.name, 13)}</p>
-              <p className={style.tokenName} style={{color:textColor}}>&nbsp;({makeShortTokenName(tokenData?.symbol, 5)})</p>
+              <p className={style.tokenName} style={{color:isActive || isHover ? textColorActive : textColor}}>&nbsp;({makeShortTokenName(tokenData?.symbol, 5)})</p>
             </Box>
-            <p className={style.tokenAddress}>{makeShortAddress(tokenData?.contractAddress!)}</p>
+            <p className={style.tokenAddress} style ={{color:isActive || isHover ? addressColorActive : addressColor}}>{makeShortAddress(tokenData?.contractAddress!)}</p>
           </Box>
         </Box>
         <Box style={{display:"flex", flexDirection:"row", alignItems:"center", width:"3rem", justifyContent:"space-between"}}>

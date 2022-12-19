@@ -1,6 +1,6 @@
 .tokenListInfo {
   display: flex;
-  height: 4.8rem;
+  height: 5rem;
   flex-direction: row;
   align-items: center;
   width: 100%;
@@ -12,7 +12,7 @@
 .tokenName {
   font-family: 'Inter';
   font-style: normal;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 1rem;
 }
 .tokenAddress {

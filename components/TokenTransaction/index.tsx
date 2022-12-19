@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import { Box, useColorModeValue } from "@chakra-ui/react"
 import {
   Table,
@@ -16,6 +16,8 @@ import style from './TokenTransaction.module.css'
 import { convertBalanceCurrency, makeShortTxHash, numberWithCommasTwoDecimals } from '../../utils'
 import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
 import * as constant from '../../utils/constant'
+import { getlimitHistoryData } from '../../api/bitquery_graphql'
+import { TokenSide } from '../../utils/type'
 
 export default function TokenTransaction() {
   const transactionClass = useColorModeValue(
@@ -31,6 +33,29 @@ export default function TokenTransaction() {
   const [txTransaction, setTXTransaction] = useState<any[]>([]);
   const LINK_BSCNETWORK = "https://bscscan.com/tx/";
   const LINK_ETHNETWORK = "https://etherscan.io/tx/";
+  const listInnerRef = useRef();
+
+  // useEffect(() => {
+  //   const init = async () => {
+  //   const bar_data = await getlimitHistoryData(
+  //     lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token1_contractAddress : lpTokenAddress.token0_contractAddress, 
+  //     lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token0_contractAddress : lpTokenAddress.token1_contractAddress, 
+  //     lpTokenAddress.network,
+  //     after,
+  //     before,
+  //     1
+  //   );
+  //   }
+  //   init();
+  // }, [lpTokenAddress.contractAddress])
+
+  const handleScroll = (e:any) => {
+    const bottom = e.target.scrollHeight - e.target.scrollTop <= (e.target.clientHeight + 20);
+    if (bottom) { 
+        console.log("bottom")
+    }
+  }
+
   useEffect(() => {
     const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
     lpTokenAddress.quoteCurrency_contractAddress! + lpTokenAddress.network);
@@ -57,7 +82,9 @@ export default function TokenTransaction() {
           backgroundColor: "grey",
           borderRadius: '24px',
         },
-      }}>
+        }}
+        onScroll={handleScroll}
+      >
         <Table variant='striped' colorScheme='transactionTable' size={"sm"}>
         <Thead position="sticky" top={0} zIndex="docked" backgroundColor={headerColor}>
           <Tr>
@@ -70,16 +97,18 @@ export default function TokenTransaction() {
         </Thead>
         <Tbody className={style.tbody}>
           {
-            txTransaction.map(data => {
+            txTransaction.map((data, index) => {
               if (data != null) {
-                let price = 1.0;
-                const buy_sell = data.buyCurrency.address == data.quoteCurrency.address ? "Buy" : "Sell"; 
+                const buy_sell = data.buyCurrency.address == data.quoteCurrency.address ? 
+                  lpTokenAddress.network == constant.BINANCE_NETOWRK ? "Buy" : "Sell": 
+                  lpTokenAddress.network == constant.BINANCE_NETOWRK ? "Sell" : "Buy"; 
                 const color = buy_sell == "Buy" ? "#00C414": "#FF002E";               
                 const usdVal = quotePrice * data.quoteAmount;
                 const txHash = data.any;
+                const currentTime = new Date(data.timeInterval.second).toLocaleTimeString();
                 const linkAddr = tokenData.network == constant.BINANCE_NETOWRK ? LINK_BSCNETWORK + txHash: LINK_ETHNETWORK + txHash;
                 return (
-                <Tr key={data.any + data.baseAmount + usdVal} color={color}>
+                <Tr key={data.any + data.baseAmount + usdVal + index} color={color}>
                   <Td width={"8%"} paddingLeft={"1.5rem"}>{buy_sell}</Td>
                   <Td width={"24%"} paddingLeft={"0.7rem"}>{numberWithCommasTwoDecimals(data.baseAmount)}</Td>
                   <Td width={"32%"} paddingLeft={"2rem"}>

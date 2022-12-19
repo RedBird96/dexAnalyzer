@@ -6,7 +6,8 @@ import {
 } from '@thirdweb-dev/react'
 import {
   getTokenLogoURL,
-  getTokenSymbol
+  getTokenSymbol,
+  getTokenSocialInfofromCoingeckoAPI
 } from '../../api'
 import {
   useTokenInfo,
@@ -46,6 +47,9 @@ export default function TokenList() {
   const [searchStatus, setSearchStatus] = useState<SearchStatus>(SearchStatus.notsearch);
  
   const searchToken = async() => {
+
+    await getTokenSocialInfofromCoingeckoAPI("0xba2ae424d960c26247dd6c32edc70b295c744c43", constant.BINANCE_NETOWRK);
+
     if (debouncedQuery[0] == "0" && debouncedQuery[1] == "x") {
       let foundFlag = false;
       let foundEthToken:ERC20Token={
@@ -97,6 +101,8 @@ export default function TokenList() {
         if (res_eth != constant.NOT_FOUND_TOKEN) {
           foundFlag = true;
           const logo = await getTokenLogoURL(debouncedQuery, constant.ETHEREUM_NETWORK, res_eth[1]);
+          const social = await getTokenSocialInfofromCoingeckoAPI(debouncedQuery, constant.ETHEREUM_NETWORK);
+          console.log('social',social);
           const token = {
             name: res_eth[0],
             contractAddress: debouncedQuery.toLowerCase(),
@@ -110,6 +116,9 @@ export default function TokenList() {
             image: logo,
             network: constant.ETHEREUM_NETWORK,
             pinSetting: false,
+            website: social![0],
+            twitter: social![1],
+            facebook: social![2]
           } as ERC20Token;
           foundEthToken = token;
         }
@@ -119,6 +128,8 @@ export default function TokenList() {
           if (res_bsc != constant.NOT_FOUND_TOKEN) {
             foundFlag = true;
             const logo = await getTokenLogoURL(debouncedQuery, constant.BINANCE_NETOWRK, res_bsc[1]);
+            const social = await getTokenSocialInfofromCoingeckoAPI(debouncedQuery, constant.BINANCE_NETOWRK);
+            console.log('social',social);
             const token = {
               name: res_bsc[0],
               contractAddress: debouncedQuery.toLowerCase(),
@@ -132,6 +143,9 @@ export default function TokenList() {
               image: logo,
               network: constant.BINANCE_NETOWRK,
               pinSetting: false,
+              website: social![0],
+              twitter: social![1],
+              facebook: social![2]
             } as ERC20Token;
             foundBscToken = token;
           } 

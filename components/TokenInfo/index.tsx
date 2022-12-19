@@ -69,7 +69,7 @@ export default function TokenInfo() {
       setLPTokenAddress(lpTokenPinList[findInd]);
     }
     const token0_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token1);
-    const token1_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token0);
+    // const token1_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token0);
 
     setLPTokenList([]);
     const lptoken_Res = token0_Res;//token0_Res.concat(token1_Res);
@@ -280,7 +280,7 @@ export default function TokenInfo() {
   return (
     <Box className={infoClass}>
       <Box className={style.tokenSocialInfo}>
-        <Box display={"flex"} flexDirection={"row"} width={"83%"} alignItems={"center"}>
+        <Box display={"flex"} flexDirection={"row"} width={"83%"} alignItems={"center"} justifyContent={"space-between"}>
           <Box display={"flex"} flexDirection={"row"} width={"59%"} alignItems={"center"}>
             <img src={tokenData.image} width={"50rem"}/>
             <Box display={"flex"} flexDirection={"column"} paddingLeft={"1rem"} alignItems={"flex-start"}>
@@ -307,13 +307,13 @@ export default function TokenInfo() {
             flexDirection={"row"}
             alignItems={"center"}
           >
-            <a className={style.socialUrl} href={tokenData.website}>
+            <a className={style.socialUrl} href={tokenData.website} style={{marginRight:"0.5rem"}}>
               <WebSite/>
             </a>            
-            <a className={style.socialUrl} href={tokenData.facebook}>
+            <a className={style.socialUrl} href={tokenData.facebook} style={{marginRight:"0.5rem"}}>
               <FaceBook className={style.socialUrl}/>
             </a>
-            <a className={style.socialUrl} href={tokenData.twitter}>
+            <a className={style.socialUrl} href={tokenData.twitter} style={{marginRight:"0.7rem"}}>
               <Twitter className={style.socialUrl}/>
             </a>
           </Box>
@@ -329,8 +329,8 @@ export default function TokenInfo() {
             display={"flex"}
             flexDirection={"column"}         
           >
-            <p className={style.totalSupply}>Total Supply</p>
-            <p className={style.tokenTotalSupply} style={{color:textColor}}>{tokenData.totalSupply != null ? 
+            <p className={style.holder} style={{color:textColor}}>Total Supply</p>
+            <p className={style.tokenTotalSupply} color={whiteBlackMode}>{tokenData.totalSupply != null ? 
               numberWithCommasNoDecimals(tokenData.totalSupply) :
               0}</p>
           </Box>
@@ -353,7 +353,7 @@ export default function TokenInfo() {
           <Box 
             display={"flex"} 
             flexDirection={"column"} 
-            width={"29%"} 
+            width={"40%"} 
             position={"relative"} 
             height={"100%"}
             top={"0.4rem"}
@@ -408,7 +408,7 @@ export default function TokenInfo() {
               <p className={style.marketCap} style={{color:textColor}}>Balance</p>
               <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
                 <p className={style.tokenMarketCap} style={{marginRight:"1rem"}} color={whiteBlackMode}>{numberWithCommasTwoDecimals(balance)}</p>
-                <p className={style.tokenMarketCap} style={{color:"#00B112"}}>({convertBalanceCurrency(balanceUSD)})</p>
+                <p className={style.tokenMarketCap} style={{color:"#00B112"}}>({convertBalanceCurrency(balanceUSD, 2)})</p>
               </Box>
           </Box>          
         </Box>
@@ -429,7 +429,7 @@ export default function TokenInfo() {
       <nav>
         <hr aria-orientation='horizontal'></hr>
       </nav>
-      <Box 
+      {/* <Box 
         display={"flex"}
         flexDirection={"row"}
         padding={"0.5rem 0rem 0.5rem 1.5rem"}
@@ -465,7 +465,7 @@ export default function TokenInfo() {
             <p color={whiteBlackMode}> 5%</p>
           </Box>
         </Box>
-      </Box>
+      </Box> */}
     </Box>
   );
 }

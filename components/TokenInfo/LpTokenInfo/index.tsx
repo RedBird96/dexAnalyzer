@@ -109,7 +109,7 @@ export default function LpTokenInfo({
       width={"100%"} 
       justifyContent={"space-between"} 
       alignItems={"center"} 
-      paddingRight={showArrow?"0.5rem":"0rem"}
+      paddingRight={showArrow?"1rem":"0rem"}
       backgroundColor={showArrow?"transparent":backgroundColor}
       cursor={showArrow ? "":"pointer"}
     >
@@ -130,7 +130,7 @@ export default function LpTokenInfo({
             style={{marginRight:"0.2rem"}}  
             color={whiteBlackMode}
           >
-            {numberWithCommasTwoDecimals(reserve)} 
+            {numberWithCommasTwoDecimals(reserve, 2)} 
           </p>
           <p
             className={style.tokenMarketCap} 
@@ -143,7 +143,7 @@ export default function LpTokenInfo({
             className={style.tokenMarketCap} 
             style={{color:"#00B112"}}
           >
-            ({convertBalanceCurrency(reserveUSD)})
+            ({convertBalanceCurrency(reserveUSD, 0)})
           </p>
         </Box>
       </Box>

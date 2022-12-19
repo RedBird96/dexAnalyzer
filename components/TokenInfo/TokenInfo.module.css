@@ -31,8 +31,7 @@
 }
 
 .socialUrl {
-  width: 2rem;
-  margin-right: 1rem;
+  width: 25px;
   cursor: pointer;
 }
 
@@ -87,8 +86,8 @@
 .tokenTotalSupply {
   font-family: 'Inter';
   font-style: normal;
+  font-weight: 700;
   font-size: calc(0rem + 0.5vw);
-  color: #A7A7A7;
 }
 
 .marketCap {
@@ -169,6 +168,7 @@
 .itemvalue {
   font-family: 'Inter';
   font-style: normal;
+  font-weight: 700;
   font-size: calc(0.1rem + 0.5vw);
   line-height: 1.8rem;
   display: flex;

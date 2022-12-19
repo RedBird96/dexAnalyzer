@@ -41,7 +41,7 @@ export function LPTransactionProvider({children}:any) {
           lpTokenAddress.contractAddress
         );
       }
-
+      
       const filterSync = PairContractWSS.filters.Swap()
       const event = PairContractWSS.on(filterSync, async(sender, amount0In, 
         amount1In, amount0Out, amount1Out, to, event) => {
@@ -49,7 +49,17 @@ export function LPTransactionProvider({children}:any) {
           let time = new Date().toJSON();
           time = time.replace('T', ' ');
           time = time.slice(0, 19);
-          const buy = amount0In == 0 && amount1Out == 0 ? "Buy" :"Sell";
+          const buy = lpTokenAddress.network == constant.BINANCE_NETOWRK ? 
+            amount0In == 0 && amount1Out == 0 ? "Buy" :"Sell":
+            amount1In == 0 && amount0Out == 0 ? "Buy" : "Sell";
+          
+          const baseAmount = lpTokenAddress.network == constant.BINANCE_NETOWRK ?
+            buy == "Buy" ? amount0Out / Math.pow(10, lpTokenAddress.baseCurrency_decimals!): amount0In / Math.pow(10, lpTokenAddress.baseCurrency_decimals!) :
+            buy == "Buy" ? amount1Out /  Math.pow(10, lpTokenAddress.baseCurrency_decimals!): amount1In / Math.pow(10, lpTokenAddress.baseCurrency_decimals!) ;
+          const quoteAmount = lpTokenAddress.network == constant.BINANCE_NETOWRK ?
+            buy == "Buy" ? amount1In / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) : amount1Out / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) :
+            buy == "Buy" ? amount0In / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) : amount0Out / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!);
+
           const item = {
             buyCurrency:{
               address: lpTokenAddress.baseCurrency_contractAddress
@@ -58,8 +68,8 @@ export function LPTransactionProvider({children}:any) {
               address: amount0In == 0 && amount1Out == 0 ?  lpTokenAddress.baseCurrency_contractAddress: lpTokenAddress.quoteCurrency_contractAddress
             },
             any: event.transactionHash,
-            baseAmount: buy == "Buy" ? amount0Out / Math.pow(10, lpTokenAddress.baseCurrency_decimals!): amount0In / Math.pow(10, lpTokenAddress.baseCurrency_decimals!),
-            quoteAmount: buy == "Buy" ? amount1In / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) : amount1Out / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!),
+            baseAmount: baseAmount,
+            quoteAmount: quoteAmount,
             timeInterval :{
               second:time
             }
