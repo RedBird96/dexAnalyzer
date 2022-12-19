@@ -55,7 +55,7 @@ export function LpTokenPriceProvider({children}:any) {
     token0_contractAddress: "0x55d398326f99059ff775485246999027b3197955",
     token1_contractAddress: "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
     tokenside: TokenSide.token0,
-    ownerToken: "0x55d398326f99059ff775485246999027b3197955",
+    ownerToken: "",
     token0_decimal: 18,
     token1_decimal: 18,
   } as LPTokenPair);

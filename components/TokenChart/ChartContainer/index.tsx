@@ -114,10 +114,17 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       onHistoryCallback: any,
       onErrorCallback: any,
     ) => {
-      console.log('resolution', resolution);
       try {
         let bars: any = []
         const { from, to, firstDataRequest } = periodParams
+        
+        if (lpTokenAddress.ownerToken == undefined || lpTokenAddress.ownerToken == "") {
+          onHistoryCallback([], {
+            noData: true,
+          })
+          return;
+        }
+
         console.log('getBars firstDataRequest', new Date(from * 1000).toISOString(), new Date(to * 1000).toISOString(),  firstDataRequest);
         if (checksumAddress) {
           // setLoader(true);

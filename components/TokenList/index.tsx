@@ -48,8 +48,6 @@ export default function TokenList() {
  
   const searchToken = async() => {
 
-    await getTokenSocialInfofromCoingeckoAPI("0xba2ae424d960c26247dd6c32edc70b295c744c43", constant.BINANCE_NETOWRK);
-
     if (debouncedQuery[0] == "0" && debouncedQuery[1] == "x") {
       let foundFlag = false;
       let foundEthToken:ERC20Token={

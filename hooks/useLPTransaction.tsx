@@ -83,7 +83,9 @@ export function LPTransactionProvider({children}:any) {
 
     }
 
-    init();
+    if (lpTokenAddress.ownerToken !=undefined && lpTokenAddress.ownerToken != "") {
+      init();
+    }
 
     return(() => {
 
