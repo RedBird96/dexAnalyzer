@@ -141,9 +141,9 @@ export const getLPPairs = async (
   baseAddress: string, 
   network: number
 ) => {
-  const stable_coin1 = network == constant.BINANCE_NETOWRK ? constant.WHITELIST_TOKENS.BSC.USDT : constant.WHITELIST_TOKENS.ETH.USDT;
+  const stable_coin1 = network == constant.BINANCE_NETOWRK ? constant.WHITELIST_TOKENS.BSC.BNB : constant.WHITELIST_TOKENS.ETH.ETH;
   const stable_coin2 = network == constant.BINANCE_NETOWRK ? constant.WHITELIST_TOKENS.BSC.USDC : constant.WHITELIST_TOKENS.ETH.USDC;
-  const stable_coin3 = network == constant.BINANCE_NETOWRK ? constant.WHITELIST_TOKENS.BSC.BNB : constant.WHITELIST_TOKENS.ETH.ETH;
+  const stable_coin3 = network == constant.BINANCE_NETOWRK ? constant.WHITELIST_TOKENS.BSC.USDT : constant.WHITELIST_TOKENS.ETH.USDT;
   const stable_coin4 = network == constant.BINANCE_NETOWRK ? constant.WHITELIST_TOKENS.BSC.DAI : constant.WHITELIST_TOKENS.ETH.DAI;
   const stable_coin5 = network == constant.BINANCE_NETOWRK ? constant.WHITELIST_TOKENS.BSC.CAKE : constant.WHITELIST_TOKENS.ETH.UNI;
   const stable_coin6 = network == constant.BINANCE_NETOWRK ? constant.WHITELIST_TOKENS.BSC.BUSD : constant.WHITELIST_TOKENS.ETH.UNI;

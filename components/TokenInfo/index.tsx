@@ -37,6 +37,7 @@ import {io} from 'socket.io-client'
 import { LPTokenPair, TokenSide, TransactionType } from '../../utils/type'
 import { ethers } from 'ethers'
 import { appendPastTransactions } from '../TokenTransaction/module'
+import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
 
 
 export default function TokenInfo() {
@@ -56,6 +57,7 @@ export default function TokenInfo() {
   const [copyStatus, setCopyStatus] = useState<boolean>(false);
   const [holdersCount, setHoldersCount] = useState<number>(0);
   const [transactionCount, setTransactionCount] = useState<number>(0);
+  const {coinPrice} = useStableCoinPrice();
   const infoClass = useColorModeValue(
     style.tokenInfo + " " + style.tokenInfoLight,
     style.tokenInfo + " " + style.tokenInfoDark
@@ -75,32 +77,34 @@ export default function TokenInfo() {
 
     setLPTokenList([]);
     const lptoken_Res = token0_Res;//token0_Res.concat(token1_Res);
+    const emptyLP = {
+      name:"/",
+      symbol:"/",
+      contractAddress:"",
+      price: 0,
+      marketCap: "",
+      totalSupply: 0,
+      holdersCount: 0,
+      balance: 0,
+      decimals: 18,
+      image: "",
+      network: constant.BINANCE_NETOWRK,
+      token0_name: "0",
+      token1_name: "0",
+      token0_reserve: 0,
+      token1_reserve: 0,
+      token0_contractAddress: "",
+      token1_contractAddress: "",
+      tokenside: TokenSide.token1,
+      protocolType: "",
+    } as LPTokenPair;
     let index = 0;
     if (lptoken_Res.length == 0) {
-      setLPTokenAddress({
-        name:"/",
-        symbol:"/",
-        contractAddress:"",
-        price: 0,
-        marketCap: "",
-        totalSupply: 0,
-        holdersCount: 0,
-        balance: 0,
-        decimals: 18,
-        image: "",
-        network: constant.BINANCE_NETOWRK,
-        token0_name: "0",
-        token1_name: "0",
-        token0_reserve: 0,
-        token1_reserve: 0,
-        token0_contractAddress: "",
-        token1_contractAddress: "",
-        tokenside: TokenSide.token1,
-        protocolType: "",
-      } as LPTokenPair);       
+      setLPTokenAddress(emptyLP);       
       return;
     }
     let lpToken_temp: LPTokenPair[] = [];
+    let selectLP_temp : LPTokenPair = emptyLP;
     for await (const value of lptoken_Res) {
       if (value.protocolType == "Uniswap v3")
         continue;
@@ -143,15 +147,28 @@ export default function TokenInfo() {
         value.price = value.token0_reserve / value.token1_reserve;  
       }
 
+      let price = 1;
+      const coin = coinPrice.find((coinToken:any) => coinToken.contractAddress.toLowerCase() + coinToken.network ==
+                    value.token1_contractAddress + value.network);
+      
+      if (coin != undefined)
+      price = coin.price;
+
       if (index == 0) {
-        setLPTokenAddress(value);
+        selectLP_temp = value;
       }
-      else{
+      else if (value.token0_reserve> selectLP_temp.token0_reserve) {
+        console.log('update lp', value.token1_reserve, selectLP_temp.token1_reserve);
+        lpToken_temp.push(selectLP_temp);
+        selectLP_temp = value;
+      }
+      else {
         lpToken_temp.push(value);
       }
       index ++;
 
     }
+    setLPTokenAddress(selectLP_temp);
     setLPTokenList(lpToken_temp);    
   }
   const setTokenInfo = async() => {
