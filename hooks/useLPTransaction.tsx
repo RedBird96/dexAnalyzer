@@ -22,8 +22,18 @@ const LPTransactionContext: React.Context<null | LPTransactionInterface> =
 export function LPTransactionProvider({children}:any) {
 
   const [transactionList, setTransactionList] = useState<TransactionType[]>([]);
+  const [tempTransactionList, setTempTransactionList] = useState<TransactionType[]>([]);
   const {lpTokenAddress} = useLPTokenPrice();
   let web3Wss: any, web3Http: any, PairContractWSS:Contract, PairContractHttp:Contract;
+
+  useEffect(() => {
+    if (tempTransactionList.length > 0) {
+      const temp = [...transactionList];
+      temp.unshift(...tempTransactionList);
+      setTransactionList(temp);
+      setTempTransactionList([]);
+    }
+  }, [transactionList, tempTransactionList]);
 
   useEffect(() => {
 
@@ -77,10 +87,8 @@ export function LPTransactionProvider({children}:any) {
             transaction_local_time: date.replace('T', ' ').slice(0, 19),
             transaction_utc_time: date
           } as TransactionType;
-          console.log('transactionList', transactionList);
-          const temp = transactionList;
-          temp.unshift(item);
-          setTransactionList(temp);
+          console.log('new item', item);
+          setTempTransactionList([item]);
       });
 
     }
