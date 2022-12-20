@@ -100,7 +100,6 @@ export default function TokenList() {
           foundFlag = true;
           const logo = await getTokenLogoURL(debouncedQuery, constant.ETHEREUM_NETWORK, res_eth[1]);
           const social = await getTokenSocialInfofromCoingeckoAPI(debouncedQuery, constant.ETHEREUM_NETWORK);
-          console.log('social',social);
           const token = {
             name: res_eth[0],
             contractAddress: debouncedQuery.toLowerCase(),
@@ -127,7 +126,6 @@ export default function TokenList() {
             foundFlag = true;
             const logo = await getTokenLogoURL(debouncedQuery, constant.BINANCE_NETOWRK, res_bsc[1]);
             const social = await getTokenSocialInfofromCoingeckoAPI(debouncedQuery, constant.BINANCE_NETOWRK);
-            console.log('social',social);
             const token = {
               name: res_bsc[0],
               contractAddress: debouncedQuery.toLowerCase(),

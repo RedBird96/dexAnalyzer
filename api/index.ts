@@ -143,6 +143,37 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
 
 }
 
+export async function getCurrentBlockNumber(network: number) {
+  const provider = new ethers.providers.JsonRpcProvider(network == constant.ETHEREUM_NETWORK ? constant.ETHRPC_URL : constant.BSCRPC_URL);
+  const blockNumber = await provider.getBlockNumber();
+  return blockNumber;
+
+}
+
+export async function getLastTransactionsLogsByTopic(address:string, network: number) {
+  
+  const backTime = 3600;
+  const topic = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822";
+  let client, response;
+  if (network == constant.ETHEREUM_NETWORK) {
+    client = new EtherscanClient(ETH_MAINNET_CONNECTION);
+  } else {
+    client = new EtherscanClient(BSC_MAINNET_CONNECTION);
+  }
+  const blockCount = network == constant.ETHEREUM_NETWORK ? backTime / 12 : backTime / 3;
+  const currentBlock = await getCurrentBlockNumber(network);
+  response = await client.call(Action.logs_getLogs, {
+    fromBlock:currentBlock - blockCount, 
+    toBlock:'latest',
+    topic0: topic,
+    address:address
+  });
+  if (response.message == "OK") {
+    return response.result;
+  }
+
+  return constant.NOT_FOUND_TOKEN;
+}
 
 export async function getTokenInfoFromWalletAddress(address:string) {
 
@@ -255,7 +286,6 @@ export async function getTokenSocialInfofromCoingeckoAPI(address: string, networ
     if (facebook != "") {
       facebook = "https://www.facebook.com/" + facebook;
     }
-    console.log("website, twitter, facebook", website, twitter, facebook);
     return [website, twitter, facebook]
   }
   return undefined  

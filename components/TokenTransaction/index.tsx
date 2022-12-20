@@ -16,8 +16,8 @@ import style from './TokenTransaction.module.css'
 import { convertBalanceCurrency, makeShortTxHash, numberWithCommasTwoDecimals } from '../../utils'
 import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
 import * as constant from '../../utils/constant'
-import { getlimitHistoryData } from '../../api/bitquery_graphql'
-import { TokenSide } from '../../utils/type'
+import { TokenSide, TransactionType } from '../../utils/type'
+import { appendPastTransactions } from './module'
 
 export default function TokenTransaction() {
   const transactionClass = useColorModeValue(
@@ -25,12 +25,13 @@ export default function TokenTransaction() {
     style.tokenTransaction + " " + style.tokenTransactionDark
   );
   const headerColor = useColorModeValue("#FFFFFF", "#1C1C1C");
-  const {transactionData} = useLPTransaction();
+  const {transactionData, setTransactionData} = useLPTransaction();
   const {lpTokenAddress} = useLPTokenPrice();
   const {tokenData} = useTokenInfo();
   const {coinPrice} = useStableCoinPrice();
   const [quotePrice, setquotePrice] = useState(1);
-  const [txTransaction, setTXTransaction] = useState<any[]>([]);
+  const [bottomHandle, setBottomHandle] = useState<Boolean>(false);
+  const [txTransaction, setTXTransaction] = useState<TransactionType[]>([]);
   const LINK_BSCNETWORK = "https://bscscan.com/tx/";
   const LINK_ETHNETWORK = "https://etherscan.io/tx/";
   const listInnerRef = useRef();
@@ -49,10 +50,16 @@ export default function TokenTransaction() {
   //   init();
   // }, [lpTokenAddress.contractAddress])
 
-  const handleScroll = (e:any) => {
+  const handleScroll = async (e:any) => {
     const bottom = e.target.scrollHeight - e.target.scrollTop <= (e.target.clientHeight + 20);
-    if (bottom) { 
-        console.log("bottom")
+    if (bottom && !bottomHandle) { 
+      setBottomHandle(true);
+      const tempTransaction = await appendPastTransactions(transactionData, lpTokenAddress, false);
+      let transaction = transactionData;
+      transaction = transaction.concat(tempTransaction);
+      console.log('bottom', transaction.length);
+      setTransactionData(transaction);
+      setBottomHandle(false);
     }
   }
 
@@ -61,6 +68,7 @@ export default function TokenTransaction() {
     lpTokenAddress.quoteCurrency_contractAddress! + lpTokenAddress.network);
     if (coin != undefined)
       setquotePrice(coin.price);
+    console.log('updated data', transactionData);
     setTXTransaction(transactionData);
   }, [transactionData])
   useEffect(() => {
@@ -99,24 +107,22 @@ export default function TokenTransaction() {
           {
             txTransaction.map((data, index) => {
               if (data != null) {
-                const buy_sell = data.buyCurrency.address == data.quoteCurrency.address ? 
-                  lpTokenAddress.network == constant.BINANCE_NETOWRK ? "Buy" : "Sell": 
-                  lpTokenAddress.network == constant.BINANCE_NETOWRK ? "Sell" : "Buy"; 
+                const buy_sell = data.buy_sell;
                 const color = buy_sell == "Buy" ? "#00C414": "#FF002E";               
-                const usdVal = quotePrice * data.quoteAmount;
-                const txHash = data.any;
-                const currentTime = new Date(data.timeInterval.second).toLocaleTimeString();
+                const usdVal = quotePrice * data.quoteToken_amount;
+                const txHash = data.transaction_hash;
+                const currentTime = new Date(data.transaction_utc_time);
                 const linkAddr = tokenData.network == constant.BINANCE_NETOWRK ? LINK_BSCNETWORK + txHash: LINK_ETHNETWORK + txHash;
                 return (
-                <Tr key={data.any + data.baseAmount + usdVal + index} color={color}>
+                <Tr key={index} color={color}>
                   <Td width={"8%"} paddingLeft={"1.5rem"}>{buy_sell}</Td>
-                  <Td width={"24%"} paddingLeft={"0.7rem"}>{numberWithCommasTwoDecimals(data.baseAmount)}</Td>
+                  <Td width={"24%"} paddingLeft={"0.7rem"}>{numberWithCommasTwoDecimals(data.baseToken_amount)}</Td>
                   <Td width={"32%"} paddingLeft={"2rem"}>
                     {convertBalanceCurrency(usdVal) + " (" + 
-                    numberWithCommasTwoDecimals(data.quoteAmount) + " " +
+                    numberWithCommasTwoDecimals(data.quoteToken_amount) + " " +
                     lpTokenAddress.quoteCurrency_name! + ")"}
                   </Td>
-                  <Td width={"24%"} paddingLeft={"3rem"}>{data.timeInterval.second}</Td>
+                  <Td width={"24%"} paddingLeft={"3rem"}>{data.transaction_local_time}</Td>
                   <Td width={"16%"} paddingLeft={"0rem"}>
                     <Box
                      _hover={{"textDecoration":"underline"}}

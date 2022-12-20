@@ -4,7 +4,7 @@ import { Block } from '../utils/type'
 import { BITQUERY_ENDPOINT, BITQUERY_API_KEY } from './index'
 import * as constant from '../utils/constant'
 
-export const getlimitHistoryData = async (
+export const getRangeHistoryData = async (
   baseAddress: string, 
   quoteAddress: string, 
   network: number,
@@ -52,17 +52,83 @@ export const getlimitHistoryData = async (
 
   const raw = JSON.stringify({query,"variables": "{}"});
 
-  const response = await fetch(BITQUERY_ENDPOINT, {
-    method: 'POST',
-    headers: {'X-API-KEY': BITQUERY_API_KEY,
-              "Content-Type":"application/json"},
-    body:raw,
-    redirect:'follow'
-  });  
-  if (response.status != 200) {
+  try {
+    const response = await fetch(BITQUERY_ENDPOINT, {
+      method: 'POST',
+      headers: {'X-API-KEY': BITQUERY_API_KEY,
+                "Content-Type":"application/json"},
+      body:raw,
+      redirect:'follow'
+    });  
+    if (response.status != 200) {
+      return constant.NOT_FOUND_TOKEN;
+    }
+    const text = await response.json();
+    return text["data"].ethereum.dexTrades;
+  } catch (err:any) {
     return constant.NOT_FOUND_TOKEN;
   }
+
+}
+
+export const getLimitHistoryData = async (
+  baseAddress: string, 
+  quoteAddress: string, 
+  network: number,
+  before: string,
+  limit: number
+) => {
+  const query = `
+  {
+    ethereum(network: ${network == constant.ETHEREUM_NETWORK ? "ethereum" : "bsc"}) {
+      dexTrades(
+        options: {desc: "timeInterval.second" limit:${limit}}
+        exchangeName: {in: ["Pancake v2", "Uniswap"]}
+        baseCurrency: {is: "${baseAddress}"}
+        quoteCurrency: {is: "${quoteAddress}"}
+        time: {before: "${before}"}
+    ) {
+        timeInterval {
+          second(count: 1)
+        }
+        baseCurrency {
+          symbol
+          address
+        }
+        baseAmount
+        quoteCurrency {
+          symbol
+          address
+        }
+        quoteAmount
+        quotePrice
+        high: quotePrice(calculate: maximum)
+        low: quotePrice(calculate: minimum)
+        open: minimum(of: block, get: quote_price)
+        close: maximum(of: block, get: quote_price)
+        volume: quoteAmount
+        any(of: tx_hash)
+        buyCurrency {
+          address
+        }
+      }
+    }
+  }
+  `;
+
+  const raw = JSON.stringify({query,"variables": "{}"});
+
   try {
+    const response = await fetch(BITQUERY_ENDPOINT, {
+      method: 'POST',
+      headers: {'X-API-KEY': BITQUERY_API_KEY,
+                "Content-Type":"application/json"},
+      body:raw,
+      redirect:'follow'
+    });  
+    if (response.status != 200) {
+      return constant.NOT_FOUND_TOKEN;
+    }
     const text = await response.json();
     return text["data"].ethereum.dexTrades;
   } catch (err:any) {

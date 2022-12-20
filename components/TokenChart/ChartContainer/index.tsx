@@ -12,10 +12,11 @@ import axios from 'axios'
 import { getUnixTime, startOfHour, Duration, sub } from 'date-fns'
 import fetchTokenPriceData from '../../../api/priceDataforChart'
 import { useLPTokenPrice, useLPTransaction } from '../../../hooks'
-import { getlimitHistoryData } from '../../../api/bitquery_graphql'
+import { getRangeHistoryData } from '../../../api/bitquery_graphql'
 import * as constant from '../../../utils/constant'
 import { LPTokenPair, TokenSide } from '../../../utils/type'
 import { makeTemplateDate } from '../../../utils'
+import { getLastTransactionsLogsByTopic } from '../../../api'
 
 // eslint-disable-next-line import/extensions
 
@@ -165,7 +166,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
           if (afterIndex != -1) {
             priceData.splice(afterIndex, priceData.length - 1);
           }
-          bar_data = await getlimitHistoryData(
+          bar_data = await getRangeHistoryData(
             lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token1_contractAddress : lpTokenAddress.token0_contractAddress, 
             lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token0_contractAddress : lpTokenAddress.token1_contractAddress, 
             lpTokenAddress.network,
@@ -174,7 +175,6 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
             1
           );
           priceData = priceData.concat(bar_data);
-          setTransactionData(priceData);
         }
 
         console.log('priceData', priceData);

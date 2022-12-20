@@ -11,7 +11,8 @@ import {
 import {
   useTokenInfo,
   useLPTokenPrice,
-  useWalletTokenBalance
+  useWalletTokenBalance,
+  useLPTransaction
 } from '../../hooks'
 import { 
   convertBalanceCurrency,
@@ -33,15 +34,16 @@ import style from './TokenInfo.module.css'
 import * as constant from '../../utils/constant'
 import LpTokenInfo from './LpTokenInfo'
 import {io} from 'socket.io-client'
-import { LPTokenPair, TokenSide } from '../../utils/type'
-import { getlimitHistoryData } from '../../api/bitquery_graphql'
+import { LPTokenPair, TokenSide, TransactionType } from '../../utils/type'
 import { ethers } from 'ethers'
+import { appendPastTransactions } from '../TokenTransaction/module'
 
 
 export default function TokenInfo() {
 
   const colorMode = useColorMode();
   const {tokenData, setTokenData} = useTokenInfo();
+  const {transactionData, setTransactionData} = useLPTransaction();
   const {walletTokens} = useWalletTokenBalance();
   const {lpTokenPrice, lpTokenAddress ,setLPTokenAddress} = useLPTokenPrice();
   const [tokenPriceshow, setTokenPriceShow] = useState<number>(0.0);
@@ -277,6 +279,7 @@ export default function TokenInfo() {
     }
     setTokenPriceShow(tp);
   }, [walletTokens, tokenData, lpTokenPrice])
+
   return (
     <Box className={infoClass}>
       <Box className={style.tokenSocialInfo}>

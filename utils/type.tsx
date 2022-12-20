@@ -62,3 +62,13 @@ export interface PriceChartEntry {
   high: number
   low: number
 }
+
+export interface TransactionType {
+  buy_sell: string
+  baseToken_amount: number;
+  quoteToken_symbol: string;
+  quoteToken_amount: number;
+  transaction_utc_time: string;
+  transaction_local_time: string;
+  transaction_hash: string;
+}
