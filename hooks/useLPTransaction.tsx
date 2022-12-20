@@ -8,7 +8,7 @@ import PancakeswapV2Pair from '../config/IPancakeswapV2Pair.json';
 import * as constant from '../utils/constant'
 import { getLastTransactionsLogsByTopic } from "../api";
 import { getLimitHistoryData } from "../api/bitquery_graphql";
-import { TransactionType } from "../utils/type";
+import { TokenSide, TransactionType } from "../utils/type";
 import { appendPastTransactions } from "../components/TokenTransaction/module";
 
 interface LPTransactionInterface {
@@ -64,17 +64,32 @@ export function LPTransactionProvider({children}:any) {
       const event = PairContractWSS.on(filterSync, async(sender, amount0In, 
         amount1In, amount0Out, amount1Out, to, event) => {
           const date = new Date().toISOString();
-          const buy = lpTokenAddress.network == constant.BINANCE_NETOWRK ? 
-            amount0In == 0 && amount1Out == 0 ? "Sell" :"Buy":
-            amount1In == 0 && amount0Out == 0 ? "Buy" : "Sell";
-          
-          const baseAmount = lpTokenAddress.network == constant.BINANCE_NETOWRK ?
-            buy == "Buy" ? amount1Out / Math.pow(10, lpTokenAddress.baseCurrency_decimals!): amount1In / Math.pow(10, lpTokenAddress.baseCurrency_decimals!) :
-            buy == "Buy" ? amount1Out /  Math.pow(10, lpTokenAddress.baseCurrency_decimals!): amount1In / Math.pow(10, lpTokenAddress.baseCurrency_decimals!) ;
-          const quoteAmount = lpTokenAddress.network == constant.BINANCE_NETOWRK ?
-            buy == "Buy" ? amount0In / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) : amount0Out / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) :
-            buy == "Buy" ? amount0In / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) : amount0Out / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!);
+          let buy, baseAmount, quoteAmount;
 
+          if (lpTokenAddress.tokenside == TokenSide.token1) {
+            buy = lpTokenAddress.network == constant.BINANCE_NETOWRK ? 
+              amount0In == 0 && amount1Out == 0 ? "Sell" :"Buy":
+              amount1In == 0 && amount0Out == 0 ? "Buy" : "Sell";
+            
+            baseAmount = lpTokenAddress.network == constant.BINANCE_NETOWRK ?
+              buy == "Buy" ? amount1Out / Math.pow(10, lpTokenAddress.baseCurrency_decimals!): amount1In / Math.pow(10, lpTokenAddress.baseCurrency_decimals!) :
+              buy == "Buy" ? amount1Out /  Math.pow(10, lpTokenAddress.baseCurrency_decimals!): amount1In / Math.pow(10, lpTokenAddress.baseCurrency_decimals!) ;
+            quoteAmount = lpTokenAddress.network == constant.BINANCE_NETOWRK ?
+              buy == "Buy" ? amount0In / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) : amount0Out / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) :
+              buy == "Buy" ? amount0In / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) : amount0Out / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!);
+          } else {
+            console.log('lpTokenAddress.tokenside', lpTokenAddress.tokenside);
+            buy = lpTokenAddress.network == constant.BINANCE_NETOWRK ? 
+              amount0In == 0 && amount1Out == 0 ? "Buy" :"Sell":
+              amount1In == 0 && amount1Out == 0 ? "Buy" : "Sell";            
+  
+            baseAmount = lpTokenAddress.network == constant.BINANCE_NETOWRK ?
+              buy == "Buy" ? amount0Out / Math.pow(10, lpTokenAddress.baseCurrency_decimals!): amount0In / Math.pow(10, lpTokenAddress.baseCurrency_decimals!) :
+              buy == "Buy" ? amount0Out /  Math.pow(10, lpTokenAddress.baseCurrency_decimals!): amount0In / Math.pow(10, lpTokenAddress.baseCurrency_decimals!) ;
+            quoteAmount = lpTokenAddress.network == constant.BINANCE_NETOWRK ?
+              buy == "Buy" ? amount1In / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) : amount1Out / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) :
+              buy == "Buy" ? amount1In / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) : amount1Out / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!);
+          }
           const item = {
             buy_sell: buy,
             baseToken_amount: baseAmount,

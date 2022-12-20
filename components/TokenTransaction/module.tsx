@@ -3,7 +3,7 @@ import { getLastTransactionsLogsByTopic } from "../../api";
 import { getLimitHistoryData } from "../../api/bitquery_graphql";
 import { useLPTokenPrice, useLPTransaction } from "../../hooks";
 import * as constant from '../../utils/constant'
-import { LPTokenPair, TransactionType } from "../../utils/type";
+import { LPTokenPair, TokenSide, TransactionType } from "../../utils/type";
 
 const TRANSACTION_BLOCK_SHOW = 50;
 
@@ -51,27 +51,31 @@ export async function appendPastTransactions(
         const amount0Out = parseInt(datas[2], 16);
         const amount1Out = parseInt(datas[3], 16);
 
-        const buy = lpTokenAddress.network == constant.BINANCE_NETOWRK ? 
-        amount0In == 0 && amount1Out == 0 ? "Sell" :"Buy":
-        amount1In == 0 && amount0Out == 0 ? "Buy" : "Sell";
-      
-      const baseAmount = lpTokenAddress.network == constant.BINANCE_NETOWRK ?
-        buy == "Buy" ? amount1Out / Math.pow(10, lpTokenAddress.baseCurrency_decimals!): amount1In / Math.pow(10, lpTokenAddress.baseCurrency_decimals!) :
-        buy == "Buy" ? amount1Out /  Math.pow(10, lpTokenAddress.baseCurrency_decimals!): amount1In / Math.pow(10, lpTokenAddress.baseCurrency_decimals!) ;
-      const quoteAmount = lpTokenAddress.network == constant.BINANCE_NETOWRK ?
-        buy == "Buy" ? amount0In / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) : amount0Out / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) :
-        buy == "Buy" ? amount0In / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) : amount0Out / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!);
+        let buy, baseAmount, quoteAmount;
 
-        // const buy = lpTokenAddress.network == constant.BINANCE_NETOWRK ? 
-        // amount0In == 0 && amount1Out == 0 ? "Sell" :"Buy":
-        // amount1In == 0 && amount0Out == 0 ? "Sell" : "Buy";
-      
-        // const baseAmount = lpTokenAddress.network == constant.BINANCE_NETOWRK ?
-        //   buy == "Buy" ? amount1Out / Math.pow(10, lpTokenAddress.baseCurrency_decimals!): amount1In / Math.pow(10, lpTokenAddress.baseCurrency_decimals!) :
-        //   buy == "Buy" ? amount1In /  Math.pow(10, lpTokenAddress.baseCurrency_decimals!): amount1Out / Math.pow(10, lpTokenAddress.baseCurrency_decimals!) ;
-        // const quoteAmount = lpTokenAddress.network == constant.BINANCE_NETOWRK ?
-        //   buy == "Buy" ? amount0In / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) : amount0Out / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) :
-        //   buy == "Buy" ? amount0Out / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) : amount0In / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!);        
+        if (lpTokenAddress.tokenside == TokenSide.token1) {
+          buy = lpTokenAddress.network == constant.BINANCE_NETOWRK ? 
+            amount0In == 0 && amount1Out == 0 ? "Sell" :"Buy":
+            amount1In == 0 && amount0Out == 0 ? "Buy" : "Sell";
+          
+          baseAmount = lpTokenAddress.network == constant.BINANCE_NETOWRK ?
+            buy == "Buy" ? amount1Out / Math.pow(10, lpTokenAddress.baseCurrency_decimals!): amount1In / Math.pow(10, lpTokenAddress.baseCurrency_decimals!) :
+            buy == "Buy" ? amount1Out /  Math.pow(10, lpTokenAddress.baseCurrency_decimals!): amount1In / Math.pow(10, lpTokenAddress.baseCurrency_decimals!) ;
+          quoteAmount = lpTokenAddress.network == constant.BINANCE_NETOWRK ?
+            buy == "Buy" ? amount0In / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) : amount0Out / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) :
+            buy == "Buy" ? amount0In / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) : amount0Out / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!);
+        } else {
+          buy = lpTokenAddress.network == constant.BINANCE_NETOWRK ? 
+            amount0In == 0 && amount1Out == 0 ? "Buy" :"Sell":
+            amount1In == 0 && amount1Out == 0 ? "Buy" : "Sell";            
+
+          baseAmount = lpTokenAddress.network == constant.BINANCE_NETOWRK ?
+            buy == "Buy" ? amount0Out / Math.pow(10, lpTokenAddress.baseCurrency_decimals!): amount0In / Math.pow(10, lpTokenAddress.baseCurrency_decimals!) :
+            buy == "Buy" ? amount0Out /  Math.pow(10, lpTokenAddress.baseCurrency_decimals!): amount0In / Math.pow(10, lpTokenAddress.baseCurrency_decimals!) ;
+          quoteAmount = lpTokenAddress.network == constant.BINANCE_NETOWRK ?
+            buy == "Buy" ? amount1In / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) : amount1Out / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) :
+            buy == "Buy" ? amount1In / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) : amount1Out / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!);
+        }
         
         const item = {
           buy_sell: buy,
@@ -99,15 +103,13 @@ export async function appendPastTransactions(
     TRANSACTION_BLOCK_SHOW - tempTransaction.length
   );
 
-  console.log('transactions beforeTime', transactions, beforeTime,TRANSACTION_BLOCK_SHOW - tempTransaction.length);
-
   if (transactions != constant.NOT_FOUND_TOKEN){
 
     transactions?.forEach((value:any, index:number) => {
       
-      const buy_sell = value.buyCurrency.address == lpTokenAddress.quoteCurrency_contractAddress ? 
-        lpTokenAddress.network == constant.BINANCE_NETOWRK ? "Buy" : "Sell": 
-        lpTokenAddress.network == constant.BINANCE_NETOWRK ? "Sell" : "Buy"; 
+      let buy_sell;
+
+      buy_sell = value.buyCurrency.address == lpTokenAddress.quoteCurrency_contractAddress ? "Buy" : "Sell";
 
       const baseAmount = value.baseAmount;
       const quoteAmount = value.quoteAmount;
@@ -127,8 +129,6 @@ export async function appendPastTransactions(
 
     });
   }
-
-  console.log('return tempTransaction', tempTransaction);
 
   return tempTransaction; 
   
