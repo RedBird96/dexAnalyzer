@@ -78,10 +78,9 @@ export function LPTransactionProvider({children}:any) {
               buy == "Buy" ? amount0In / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) : amount0Out / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) :
               buy == "Buy" ? amount0In / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!) : amount0Out / Math.pow(10, lpTokenAddress.quoteCurrency_decimals!);
           } else {
-            console.log('lpTokenAddress.tokenside', lpTokenAddress.tokenside);
             buy = lpTokenAddress.network == constant.BINANCE_NETOWRK ? 
               amount0In == 0 && amount1Out == 0 ? "Buy" :"Sell":
-              amount1In == 0 && amount1Out == 0 ? "Buy" : "Sell";            
+              amount0In == 0 && amount1Out == 0 ? "Buy" : "Sell";            
   
             baseAmount = lpTokenAddress.network == constant.BINANCE_NETOWRK ?
               buy == "Buy" ? amount0Out / Math.pow(10, lpTokenAddress.baseCurrency_decimals!): amount0In / Math.pow(10, lpTokenAddress.baseCurrency_decimals!) :
