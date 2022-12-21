@@ -114,7 +114,7 @@ export default function TokenTransaction() {
                 const currentTime = new Date(data.transaction_utc_time);
                 const linkAddr = tokenData.network == constant.BINANCE_NETOWRK ? LINK_BSCNETWORK + txHash: LINK_ETHNETWORK + txHash;
                 return (
-                <Tr key={index} color={color}>
+                <Tr key={index} color={color} className={style.txData}>
                   <Td width={"8%"} paddingLeft={"1.5rem"}>{buy_sell}</Td>
                   <Td width={"24%"} paddingLeft={"0.7rem"}>{numberWithCommasTwoDecimals(data.baseToken_amount)}</Td>
                   <Td width={"32%"} paddingLeft={"2rem"}>

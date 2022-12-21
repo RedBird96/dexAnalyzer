@@ -17,6 +17,9 @@
   line-height: calc(0.3rem + 0.5vw); 
 }
 
+.txData {
+  font-family: "Intern";
+}
 @media only screen and (max-height: 900px) {
   .tokenTransaction {
     display: flex;

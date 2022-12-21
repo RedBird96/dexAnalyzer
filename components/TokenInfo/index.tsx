@@ -158,7 +158,6 @@ export default function TokenInfo() {
         selectLP_temp = value;
       }
       else if (value.token0_reserve> selectLP_temp.token0_reserve) {
-        console.log('update lp', value.token1_reserve, selectLP_temp.token1_reserve);
         lpToken_temp.push(selectLP_temp);
         selectLP_temp = value;
       }
