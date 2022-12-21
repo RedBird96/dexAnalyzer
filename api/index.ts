@@ -168,6 +168,7 @@ export async function getLastTransactionsLogsByTopic(address:string, network: nu
     topic0: topic,
     address:address
   });
+  console.log('response', response);
   if (response.message == "OK") {
     return response.result;
   }
@@ -275,20 +276,25 @@ export async function getTokenSocialInfofromCoingeckoAPI(address: string, networ
   if (response.ok) {
     const obj = await response.json();
     let website = "", facebook = "", twitter = "";
-    if (obj["links"].hasOwnProperty('homepage')) {
-      website = obj["links"].homepage[0];
-      twitter= obj["links"].twitter_screen_name;
-      facebook = obj["links"].facebook_username;
+    try{
+      if (obj["links"].hasOwnProperty('homepage')) {
+        website = obj["links"].homepage[0];
+        twitter= obj["links"].twitter_screen_name;
+        facebook = obj["links"].facebook_username;
+      }
+      if (twitter != "") {
+        twitter = "https://twitter.com/" + twitter;
+      }
+      if (facebook != "") {
+        facebook = "https://www.facebook.com/" + facebook;
+      }
+      return [website, twitter, facebook]
     }
-    if (twitter != "") {
-      twitter = "https://twitter.com/" + twitter;
+    catch {
+      return ["","",""]
     }
-    if (facebook != "") {
-      facebook = "https://www.facebook.com/" + facebook;
-    }
-    return [website, twitter, facebook]
   }
-  return undefined  
+  return ["","",""]
 }
 
 export async function getTokenPricefromCoingeckoAPI(addresses: string, network: number) {
