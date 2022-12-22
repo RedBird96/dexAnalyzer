@@ -61,7 +61,7 @@ const TokenListItem = ({
           <img src={tokenData?.image} width={"40rem"}/>
           <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
             <Box display={"flex"} flexDirection={"row"} >
-              <p className={style.tokenName}>{makeShortTokenName(tokenData?.name, 13)}</p>
+              <p className={style.tokenName} style={{color:isActive || isHover ? "#FFFFFF" : textColor}}>{makeShortTokenName(tokenData?.name, 13)}</p>
               <p className={style.tokenName} style={{color:isActive || isHover ? textColorActive : textColor}}>&nbsp;({makeShortTokenName(tokenData?.symbol, 5)})</p>
             </Box>
             <p className={style.tokenAddress} style ={{color:isActive || isHover ? addressColorActive : addressColor}}>{makeShortAddress(tokenData?.contractAddress!)}</p>

@@ -372,7 +372,6 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
           lastBarsCache.isLastBar = true;
           lastBarsCache.isBarClosed = false;
           onRealtimeCallback(lastBarsCache)
-          onResetCacheNeededCallback();
         }
         preReserve0 = currentReserve0;
         preReserve1 = currentReserve1;

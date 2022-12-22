@@ -29,6 +29,7 @@ import {Refresh} from '../../assests/icon'
 import style from './WalletInfo.module.css'
 import * as constant from '../../utils/constant'
 import { 
+  useLPTokenPrice,
   useTokenInfo,
   useWalletTokenBalance 
 } from '../../hooks'
@@ -55,6 +56,7 @@ export default function WalletInfo() {
   const refreshBtnBgColor = useColorModeValue("#FFFFFF","#1C1C1C");
   const refreshBtnBorderColor = useColorModeValue("#CFCFCF","#5c5c5c");
   const headerColor = useColorModeValue("#FFFFFF", "#262626");
+  const priceColor = useColorModeValue("#00B112","#00C514");
   const tableBodyBorder = useColorModeValue(style.walletTokenBodyBorderLight,style.walletTokenBodyBorderDark);
   const tableHeadBorder = useColorModeValue(style.walletTokenHeadBorderLight,style.walletTokenHeadBorderDark);
   const address = useAddress();
@@ -64,6 +66,7 @@ export default function WalletInfo() {
   const [walletBalance, setWalletBalance] = useState(0);
   const [tokensInfo, setTokensInfo] = useState<ERC20Token[]>([]);
   const [initTokensInfo, setInitTokensInfo] = useState<ERC20Token[]>([]);
+  const {lpTokenAddress, setLPTokenAddress} = useLPTokenPrice();
 
   const handleSearchChange = (e: { target: { value: string; }; }) => {
     const { value } = e.target;
@@ -180,7 +183,7 @@ export default function WalletInfo() {
         }}>
           <Box className={style.walletBalance}>
             <p className={style.myWallet}> My Wallet: </p>
-            <p className={style.myBalance}> {convertBalanceCurrency(walletBalance)} </p>
+            <p className={style.myBalance} style={{color:priceColor}}> {convertBalanceCurrency(walletBalance)} </p>
           </Box>
           <Button
             border={'1px'}
@@ -292,8 +295,8 @@ export default function WalletInfo() {
                               <p style={{marginRight:"5px", color:tokenColor}}>
                                 {numberWithCommasTwoDecimals(token.balance)}
                               </p>
-                              <p style={{color:"#00C514"}}>
-                                ({convertBalanceCurrency(token.usdBalance)})
+                              <p style={{color:priceColor}}>
+                                {convertBalanceCurrency(token.usdBalance)}
                               </p>
                             </div>
                           </Th>

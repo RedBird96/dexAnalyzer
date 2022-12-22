@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react'
 import { useLPTokenPrice, useLPTransaction, useTokenInfo } from '../../hooks'
 import style from './TokenTransaction.module.css'
-import { convertBalanceCurrency, makeShortTxHash, numberWithCommasTwoDecimals } from '../../utils'
+import { convertBalanceCurrency, makeShortTxHash, numberWithCommasNoDecimals, numberWithCommasTwoDecimals } from '../../utils'
 import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
 import * as constant from '../../utils/constant'
 import { TokenSide, TransactionType } from '../../utils/type'
@@ -25,6 +25,7 @@ export default function TokenTransaction() {
     style.tokenTransaction + " " + style.tokenTransactionDark
   );
   const headerColor = useColorModeValue("#FFFFFF", "#1C1C1C");
+  const priceColor = useColorModeValue("#00B112","#00C514");
   const {transactionData, setTransactionData} = useLPTransaction();
   const {lpTokenAddress} = useLPTokenPrice();
   const {tokenData} = useTokenInfo();
@@ -32,6 +33,7 @@ export default function TokenTransaction() {
   const [quotePrice, setquotePrice] = useState(1);
   const [bottomHandle, setBottomHandle] = useState<Boolean>(false);
   const [txTransaction, setTXTransaction] = useState<TransactionType[]>([]);
+  const infoborderColorMode = useColorModeValue("#E2E8F0","#505050");
   const LINK_BSCNETWORK = "https://bscscan.com/tx/";
   const LINK_ETHNETWORK = "https://etherscan.io/tx/";
   const listInnerRef = useRef();
@@ -98,7 +100,7 @@ export default function TokenTransaction() {
           <Tr>
             <Th color={"#7C7C7C"} width={"8%"} textTransform={"initial"} paddingLeft={"1.5rem"}>Activity</Th>
             <Th color={"#7C7C7C"} width={"24%"} textTransform={"initial"} paddingLeft={"0.7rem"}>Tokens</Th>
-            <Th color={"#7C7C7C"} width={"32%"} textTransform={"initial"} paddingLeft={"2rem"}>Amount</Th>
+            <Th color={"#7C7C7C"} width={"32%"} textTransform={"initial"} paddingLeft={"5rem"}>Amount</Th>
             <Th color={"#7C7C7C"} width={"24%"} textTransform={"initial"} paddingLeft={"3rem"}>Date</Th>
             <Th color={"#7C7C7C"} width={"16%"} textTransform={"initial"} paddingLeft={"0rem"}>Txn</Th>
           </Tr>
@@ -108,7 +110,7 @@ export default function TokenTransaction() {
             txTransaction.map((data, index) => {
               if (data != null) {
                 const buy_sell = data.buy_sell;
-                const color = buy_sell == "Buy" ? "#00C414": "#FF002E";               
+                const color = buy_sell == "Buy" ? priceColor: "#FF002E";               
                 const usdVal = quotePrice * data.quoteToken_amount;
                 const txHash = data.transaction_hash;
                 const currentTime = new Date(data.transaction_utc_time);
@@ -116,11 +118,25 @@ export default function TokenTransaction() {
                 return (
                 <Tr key={index} color={color} className={style.txData}>
                   <Td width={"8%"} paddingLeft={"1.5rem"}>{buy_sell}</Td>
-                  <Td width={"24%"} paddingLeft={"0.7rem"}>{numberWithCommasTwoDecimals(data.baseToken_amount)}</Td>
-                  <Td width={"32%"} paddingLeft={"2rem"}>
-                    {convertBalanceCurrency(usdVal) + " (" + 
-                    numberWithCommasTwoDecimals(data.quoteToken_amount) + " " +
-                    lpTokenAddress.quoteCurrency_name! + ")"}
+                  <Td width={"24%"} paddingLeft={"0.7rem"}>{numberWithCommasNoDecimals(data.baseToken_amount)}</Td>
+                  <Td width={"32%"} paddingLeft={"2rem"} style={{
+                    paddingLeft:"0rem"
+                  }}>
+                    <Box style={{
+                    display:"flex",
+                    flexDirection:"row",
+                    width:"100%"
+                    }}>
+                    <p style={{
+                      width:"20%",
+                      textAlign:"right"
+                    }}>{convertBalanceCurrency(usdVal, 2)}</p>
+                    <div className={style.border} style={{borderColor:infoborderColorMode}}/>
+                    <p style={{
+                      width:"80%",
+                      textAlign:"left"
+                    }}>{numberWithCommasTwoDecimals(data.quoteToken_amount) + " " + lpTokenAddress.quoteCurrency_name}</p>
+                    </Box>
                   </Td>
                   <Td width={"24%"} paddingLeft={"3rem"}>{data.transaction_local_time}</Td>
                   <Td width={"16%"} paddingLeft={"0rem"}>
@@ -140,19 +156,40 @@ export default function TokenTransaction() {
           }
           {/* <Tr color={"#00C414"}>
             <Td width={"8%"} paddingLeft={"1.5rem"}>Buy</Td>
-            <Td width={"24%"} paddingLeft={"0.7rem"}>59,034,543,124,564,247</Td>
-            <Td width={"32%"} paddingLeft={"2rem"}>$ 50.30 (0.2 BNB)</Td>
+            <Td width={"24%"} paddingLeft={"0.7rem"}>59,034,543,124</Td>
+            <Td width={"32%"}>
+              <Box style={{
+                display:"flex",
+                flexDirection:"row"
+              }}>
+              <p style={{
+                      width:"20%",
+                      textAlign:"right"
+                    }} 
+              >
+                $ 50.30
+              </p>
+              <p style={{
+                      width:"50%",
+                      textAlign:"left",
+                      marginLeft:"0.5rem"
+                    }}
+              >
+                0.2 BNB
+              </p>
+              </Box>
+            </Td>
             <Td width={"24%"} paddingLeft={"3rem"}>Dec-01-2022 (04:35:49 PM + UTC)</Td>
             <Td width={"16%"} paddingLeft={"0rem"}>0xe2.....6f8</Td>
           </Tr>
           <Tr color={"#00C414"}>
             <Td width={"8%"} paddingLeft={"1.5rem"}>Buy</Td>
-            <Td width={"24%"} paddingLeft={"0.7rem"}>59,034,543,124,564,247</Td>
+            <Td width={"24%"} paddingLeft={"0.7rem"}>59,034,543,124</Td>
             <Td width={"32%"} paddingLeft={"2rem"}>$ 50.30 (0.2 BNB)</Td>
             <Td width={"24%"} paddingLeft={"3rem"}>Dec-01-2022 (04:35:49 PM + UTC)</Td>
             <Td width={"16%"} paddingLeft={"0rem"}>0xe2.....6f8</Td>
-          </Tr>
-          <Tr color={"#00C414"}>
+          </Tr> */}
+          {/* <Tr color={"#00C414"}>
             <Td width={"8%"} paddingLeft={"1.5rem"}>Buy</Td>
             <Td width={"24%"} paddingLeft={"0.7rem"}>59,034,543,124,564,247</Td>
             <Td width={"32%"} paddingLeft={"2rem"}>$ 50.30 (0.2 BNB)</Td>

@@ -53,6 +53,7 @@ export default function TokenInfo() {
   const [lpTokenPinList, setLPTokenPinList] = useState<LPTokenPair[]>([]);
   const [balance, setBalance] = useState<number>(0);
   const [balanceUSD, setBalanceUSD] = useState<number>(0);
+  const priceColor = useColorModeValue("#00B112","#00C514");
 
   const [copyStatus, setCopyStatus] = useState<boolean>(false);
   const [holdersCount, setHoldersCount] = useState<number>(0);
@@ -306,7 +307,7 @@ export default function TokenInfo() {
               <Box display={"flex"} flexDirection={"row"}>
                 <p className={style.tokenName}>{tokenData.symbol}</p>
                 <p className={style.tokenName} style={{color:"#767676"}}>&nbsp;({lpTokenAddress.symbol})</p>
-                <p className={style.tokenPrice}>{convertBalanceCurrency( tokenPriceshow, 6)}</p>
+                <p className={style.tokenPrice} style={{color:priceColor}}>{convertBalanceCurrency( tokenPriceshow, 6)}</p>
               </Box>
               <Box display={"flex"} flexDirection={"row"} alignItems={"center"} justifyContent={"center"}>
                 <p className={style.tokenAddress} style={{color:textColor}}>{tokenData.contractAddress}</p>
@@ -362,7 +363,7 @@ export default function TokenInfo() {
         <Box display={"flex"} flexDirection={"row"} width={"83%"} height={"100%"} alignItems={"center"}>
           <Box display={"flex"} flexDirection={"column"} width={"28%"} paddingLeft={"4rem"}>
             <p className={style.marketCap} style={{color:textColor}} >Market Cap</p>
-            <p className={style.tokenMarketCap} style={{color:"#00B112"}}>{convertBalanceCurrency(tokenData.totalSupply * tokenPriceshow, 0)}</p>
+            <p className={style.tokenMarketCap} style={{color:priceColor}}>{convertBalanceCurrency(tokenData.totalSupply * tokenPriceshow, 0)}</p>
           </Box>
           <div style={{
             height:"90%",
@@ -427,7 +428,7 @@ export default function TokenInfo() {
               <p className={style.marketCap} style={{color:textColor}}>Balance</p>
               <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
                 <p className={style.tokenMarketCap} style={{marginRight:"1rem"}} color={whiteBlackMode}>{numberWithCommasTwoDecimals(balance)}</p>
-                <p className={style.tokenMarketCap} style={{color:"#00B112"}}>({convertBalanceCurrency(balanceUSD, 2)})</p>
+                <p className={style.tokenMarketCap}  style={{color:priceColor}}>({convertBalanceCurrency(balanceUSD, 2)})</p>
               </Box>
           </Box>          
         </Box>

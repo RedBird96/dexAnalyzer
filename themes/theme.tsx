@@ -27,6 +27,10 @@ export const theme = extendTheme({
   //     },
   //   },
   // },
+  letterSpacings:
+  {
+    wider:'0em'
+  },
   colors: {
     borderColor: 'white',
     transactionTable: {
