@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, KeyboardEvent } from 'react'
-import { Box, Input, Button, useColorModeValue, useColorMode } from "@chakra-ui/react"
+import { Box, Input, useColorModeValue, useColorMode } from "@chakra-ui/react"
 import {
   useAddress,
   useNetwork,
@@ -22,7 +22,6 @@ import {
 import * as constant from '../../utils/constant'
 import TokenListItem from './TokenListItem'
 import style from './TokenList.module.css'
-import { BigNumber } from 'ethers'
 
 export default function TokenList() {
   const colorMode = useColorMode();

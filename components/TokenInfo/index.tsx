@@ -22,7 +22,8 @@ import {
 import {
   getLPTokenReserve,
   getTokenHolderandTransactionCount,
-  getLPTokenList
+  getLPTokenList,
+  getTokenBurnAmount
 } from '../../api'
 import {
   setCookie,
@@ -52,6 +53,7 @@ export default function TokenInfo() {
   const priceColor = useColorModeValue("#00B112","#00C514");
 
   const [copyStatus, setCopyStatus] = useState<boolean>(false);
+  const [burnAmount, setBurnAmount] = useState<number>(0);
   const [holdersCount, setHoldersCount] = useState<number>(0);
   const [transactionCount, setTransactionCount] = useState<number>(0);
   const {coinPrice} = useStableCoinPrice();
@@ -168,9 +170,11 @@ export default function TokenInfo() {
     setLPTokenList(lpToken_temp);    
   }
   const setTokenInfo = async() => {
+    const burn_res = await getTokenBurnAmount(tokenData.contractAddress, tokenData.network);
     const res = await getTokenHolderandTransactionCount(tokenData.contractAddress, tokenData.network);
     setHoldersCount(res[0]);
     setTransactionCount(res[1]);
+    setBurnAmount(burn_res);
   }
 
   const setLpTokenItem = (clickLp: LPTokenPair) => {
@@ -362,7 +366,7 @@ export default function TokenInfo() {
         <Box display={"flex"} flexDirection={"row"} width={"83%"} height={"100%"} alignItems={"center"}>
           <Box display={"flex"} flexDirection={"column"} width={"28%"} paddingLeft={"4rem"}>
             <p className={style.marketCap} style={{color:textColor}} >Market Cap</p>
-            <p className={style.tokenMarketCap} style={{color:priceColor}}>{convertBalanceCurrency(tokenData.totalSupply * tokenPriceshow, 0)}</p>
+            <p className={style.tokenMarketCap} style={{color:priceColor}}>{convertBalanceCurrency((tokenData.totalSupply-burnAmount) * tokenPriceshow, 0)}</p>
           </Box>
           <div style={{
             height:"90%",

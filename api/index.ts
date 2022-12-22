@@ -128,6 +128,27 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
 
 }
 
+export async function getTokenBurnAmount(address:string, network: number) {
+  let client;
+  if (network == constant.BINANCE_NETOWRK)
+    client =  new EtherscanClient(BSC_MAINNET_CONNECTION);
+  else
+    client =  new EtherscanClient(ETH_MAINNET_CONNECTION);
+  const deadAddress = "0x000000000000000000000000000000000000dEaD";
+  const res = await client.call(Action.account_tokentx, {
+    contractaddress:address,
+    address:deadAddress
+  });
+  try {
+    const value = res.result[0].value;
+    const decimal = res.result[0].tokenDecimal;
+    return (value / Math.pow(10, decimal));
+  }catch{
+
+  }
+  return 0;
+}
+
 export async function getCurrentBlockNumber(network: number) {
   const provider = new ethers.providers.JsonRpcProvider(network == constant.ETHEREUM_NETWORK ? constant.ETHRPC_URL : constant.BSCRPC_URL);
   const blockNumber = await provider.getBlockNumber();
@@ -163,7 +184,6 @@ export async function getLastTransactionsLogsByTopic(address:string, network: nu
 export async function getTokenHolderandTransactionCount(address:string, network: number) {
 
   const response = await getHoldTransferCount(address, network);
-  console.log('response', response);
   if (response != constant.NOT_FOUND_TOKEN) {
     try{
       const holder = response[0].count;
