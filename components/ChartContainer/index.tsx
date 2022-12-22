@@ -457,7 +457,11 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
   }, [colorMode])
 
   return (
-    <div style={{height:props.height, pointerEvents:props.resize ? "none" : "inherit"}}>
+    <div style={{
+      height:props.height, 
+      pointerEvents:props.resize ? "none" : "inherit",
+      userSelect: "none"
+    }}>
       <div id={ChartContainerProps.containerId} style={{ height: "100%"}} />
     </div>
   )

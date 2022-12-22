@@ -35,8 +35,19 @@ export default function TokenBody() {
   }
 
   useEffect(() => {
+    if (hasWindow) {
+      const handleResize = () => {
+        setWindowDimensions(getWindowDimensions());
+      }
+
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+
+  useEffect(() => {
     setChartHeight(sidebarRef.current.clientHeight - 400);
-  }, [])
+  }, [windowDimensions])
 
   const startResizing = React.useCallback((_mouseDownEvent: any) => {
     setIsResizing(true);

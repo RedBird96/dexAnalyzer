@@ -38,20 +38,6 @@ export default function TokenTransaction() {
   const LINK_ETHNETWORK = "https://etherscan.io/tx/";
   const listInnerRef = useRef();
 
-  // useEffect(() => {
-  //   const init = async () => {
-  //   const bar_data = await getlimitHistoryData(
-  //     lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token1_contractAddress : lpTokenAddress.token0_contractAddress, 
-  //     lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token0_contractAddress : lpTokenAddress.token1_contractAddress, 
-  //     lpTokenAddress.network,
-  //     after,
-  //     before,
-  //     1
-  //   );
-  //   }
-  //   init();
-  // }, [lpTokenAddress.contractAddress])
-
   const handleScroll = async (e:any) => {
     const bottom = e.target.scrollHeight - e.target.scrollTop <= (e.target.clientHeight + 20);
     if (bottom && !bottomHandle) { 
@@ -98,8 +84,8 @@ export default function TokenTransaction() {
         <Thead position="sticky" top={0} zIndex="docked" backgroundColor={headerColor}>
           <Tr>
             <Th color={"#7C7C7C"} width={"8%"} textTransform={"initial"} paddingLeft={"1.5rem"}>Activity</Th>
-            <Th color={"#7C7C7C"} width={"24%"} textTransform={"initial"} paddingLeft={"0.7rem"}>Tokens</Th>
-            <Th color={"#7C7C7C"} width={"32%"} textTransform={"initial"} paddingLeft={"5rem"}>Amount</Th>
+            <Th color={"#7C7C7C"} width={"10%"} textTransform={"initial"} paddingLeft={"0.7rem"}>Tokens</Th>
+            <Th color={"#7C7C7C"} width={"42%"} textTransform={"initial"} paddingLeft={"10rem"}>Amount</Th>
             <Th color={"#7C7C7C"} width={"24%"} textTransform={"initial"} paddingLeft={"3rem"}>Date</Th>
             <Th color={"#7C7C7C"} width={"16%"} textTransform={"initial"} paddingLeft={"0rem"}>Txn</Th>
           </Tr>
@@ -117,8 +103,8 @@ export default function TokenTransaction() {
                 return (
                 <Tr key={index} color={color} className={style.txData}>
                   <Td width={"8%"} paddingLeft={"1.5rem"}>{buy_sell}</Td>
-                  <Td width={"24%"} paddingLeft={"0.7rem"}>{numberWithCommasNoDecimals(data.baseToken_amount)}</Td>
-                  <Td width={"32%"} paddingLeft={"2rem"} style={{
+                  <Td width={"10%"} paddingLeft={"0.7rem"}>{numberWithCommasNoDecimals(data.baseToken_amount)}</Td>
+                  <Td width={"42%"} paddingLeft={"2rem"} style={{
                     paddingLeft:"0rem"
                   }}>
                     <Box style={{
@@ -127,7 +113,7 @@ export default function TokenTransaction() {
                     width:"100%"
                     }}>
                     <p style={{
-                      width:"20%",
+                      width:"12rem",
                       textAlign:"right"
                     }}>{convertBalanceCurrency(usdVal, 2)}</p>
                     <div className={style.border} style={{borderColor:infoborderColorMode}}/>
@@ -153,10 +139,10 @@ export default function TokenTransaction() {
               }
             })
           }
-          {/* <Tr color={"#00C414"}>
+           {/* <Tr color={"#00C414"}>
             <Td width={"8%"} paddingLeft={"1.5rem"}>Buy</Td>
-            <Td width={"24%"} paddingLeft={"0.7rem"}>59,034,543,124</Td>
-            <Td width={"32%"}>
+            <Td width={"10%"} paddingLeft={"0.7rem"}>59,034,543,124</Td>
+            <Td width={"42%"}>
               <Box style={{
                 display:"flex",
                 flexDirection:"row"
@@ -183,8 +169,8 @@ export default function TokenTransaction() {
           </Tr>
           <Tr color={"#00C414"}>
             <Td width={"8%"} paddingLeft={"1.5rem"}>Buy</Td>
-            <Td width={"24%"} paddingLeft={"0.7rem"}>59,034,543,124</Td>
-            <Td width={"32%"} paddingLeft={"2rem"}>$ 50.30 (0.2 BNB)</Td>
+            <Td width={"18%"} paddingLeft={"0.7rem"}>59,034,543,124</Td>
+            <Td width={"42%"} paddingLeft={"2rem"}>$ 50.30 (0.2 BNB)</Td>
             <Td width={"24%"} paddingLeft={"3rem"}>Dec-01-2022 (04:35:49 PM + UTC)</Td>
             <Td width={"16%"} paddingLeft={"0rem"}>0xe2.....6f8</Td>
           </Tr> */}
