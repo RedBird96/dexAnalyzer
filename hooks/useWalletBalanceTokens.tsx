@@ -1,7 +1,4 @@
 import React, { useContext, useEffect, useState } from "react";
-import {
-  getTokenInfoFromWalletAddress
-} from '../api'
 import { ERC20Token } from '../utils/type'
 
 interface WalletTokenBalanceInterface {

@@ -98,6 +98,7 @@ export default function TokenList() {
         const res_eth = await getTokenSymbol(debouncedQuery, constant.ETHEREUM_NETWORK);
         if (res_eth != constant.NOT_FOUND_TOKEN) {
           foundFlag = true;
+          const ETHLINK = "  https://etherscan.io/";
           const logo = await getTokenLogoURL(debouncedQuery, constant.ETHEREUM_NETWORK, res_eth[1]);
           const social = await getTokenSocialInfofromCoingeckoAPI(debouncedQuery, constant.ETHEREUM_NETWORK);
           const token = {
@@ -115,12 +116,17 @@ export default function TokenList() {
             pinSetting: false,
             website: social![0],
             twitter: social![1],
-            facebook: social![2]
+            facebook: social![2],
+            contractCodeURL: ETHLINK + "address/" + debouncedQuery +"#code",
+            contractBalanceWalletURL: ETHLINK + "token/" + debouncedQuery + "?a=" + walletAddress,
+            contractBalanceURL: ETHLINK + "token/" + debouncedQuery + "#balances",
+            contractPage:ETHLINK + "token/" + debouncedQuery
           } as ERC20Token;
           foundEthToken = token;
         }
       }
       if (foundBscToken.contractAddress == "0x00") {
+        const BSCLINK = " https://bscscan.com/";
           const res_bsc = await getTokenSymbol(debouncedQuery, constant.BINANCE_NETOWRK);
           if (res_bsc != constant.NOT_FOUND_TOKEN) {
             foundFlag = true;
@@ -141,7 +147,11 @@ export default function TokenList() {
               pinSetting: false,
               website: social![0],
               twitter: social![1],
-              facebook: social![2]
+              facebook: social![2],
+              contractCodeURL: BSCLINK + "address/" + debouncedQuery +"#code",
+              contractBalanceWalletURL: BSCLINK + "token/" + debouncedQuery + "?a=" + walletAddress,
+              contractBalanceURL: BSCLINK + "token/" + debouncedQuery + "#balances",
+              contractPage:BSCLINK + "token/" + debouncedQuery
             } as ERC20Token;
             foundBscToken = token;
           } 

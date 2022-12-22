@@ -1,7 +1,4 @@
 import React, { useContext, useEffect, useState } from "react";
-import {
-  getTokenInfoFromWalletAddress
-} from '../api'
 import { ERC20Token } from '../utils/type'
 
 interface TokenInfoInterface {
@@ -15,19 +12,19 @@ const TokenInfoContext: React.Context<null | TokenInfoInterface> =
 export function TokenInfoProvider({children}:any) {
 
   let temp:ERC20Token;
-  const usdtAddress = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
+  const usdtAddress = "";
     temp = {
       name:"USDT",
       symbol:"USDT",
       contractAddress:usdtAddress,
-      price: 1.0000656382416633,
-      marketCap: "65448727018.6056",
-      totalSupply: 32297366521996886,
-      holdersCount: 4408623,
+      price: 1,
+      marketCap: "0",
+      totalSupply: 0,
+      holdersCount: 0,
       balance: 0,
       usdBalance: 0,
       decimals: 6,
-      image: "https://s2.coinmarketcap.com/static/img/coins/64x64/825.png"
+      image: "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png"
     } as ERC20Token
   
   const [token, setToken] = useState<ERC20Token>(temp);

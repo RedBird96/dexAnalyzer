@@ -29,17 +29,14 @@ export function LpTokenPriceProvider({children}:any) {
 
   const {coinPrice} = useStableCoinPrice();
   const {tokenData} = useTokenInfo();
-  const [eventEmitter, setEventEmitter] = useState<any>();
   const [lptokenPrice, setlpTokenPrice] = useState<ownerTokenPrice>({
     tokenPrice:0,
     lpBaseTokenAddress:"0x55d398326f99059ff775485246999027b3197955"
   });
-  const [token0Reserve, setToken0Reserve] = useState<number>(0);
-  const [token1Reserve, setToken1Reserve] = useState<number>(0);
   const [lptokenAddress, setlpTokenAddress] = useState<LPTokenPair>({
     name:"BNB/USDT",
     symbol:"BNB/USDT",
-    contractAddress:"0x16b9a82891338f9bA80E2D6970FddA79D1eb0daE",
+    contractAddress:"",
     price: 0,
     marketCap: "",
     totalSupply: 0,
@@ -163,13 +160,6 @@ export function LpTokenPriceProvider({children}:any) {
       const event = PairContractWSS.on(filterSync, async(reserve0, reserve1, event) => {
         updateState(reserve0, reserve1);
       });
-      // const event = PairContractWSS.events.Sync({})
-      //   .on("data", (data:any) => updateState(data, lptokenAddress.ownerToken!));
-
-      setEventEmitter(event);
-
-      // console.log('subscribe', lptokenAddress);
-      // console.log('subscribe_event:', event);
     }
     if (lptokenAddress.contractAddress != undefined && lptokenAddress.contractAddress.length > 0){
       init();

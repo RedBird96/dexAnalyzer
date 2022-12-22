@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import { Box, color, Switch, useColorMode, useColorModeValue  } from "@chakra-ui/react"
+import { Box, useColorMode, useColorModeValue  } from "@chakra-ui/react"
 import {
   WebSite,
   FaceBook,
@@ -21,9 +21,8 @@ import {
 } from '../../utils'
 import {
   getLPTokenReserve,
-  getTokenInfoFromWalletAddress,
-  getLPTokenList,
-  getTokenPricefromllama
+  getTokenHolderandTransactionCount,
+  getLPTokenList
 } from '../../api'
 import {
   setCookie,
@@ -33,10 +32,7 @@ import {
 import style from './TokenInfo.module.css'
 import * as constant from '../../utils/constant'
 import LpTokenInfo from './LpTokenInfo'
-import {io} from 'socket.io-client'
-import { LPTokenPair, TokenSide, TransactionType } from '../../utils/type'
-import { ethers } from 'ethers'
-import { appendPastTransactions } from '../TokenTransaction/module'
+import { LPTokenPair, TokenSide } from '../../utils/type'
 import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
 
 
@@ -172,18 +168,9 @@ export default function TokenInfo() {
     setLPTokenList(lpToken_temp);    
   }
   const setTokenInfo = async() => {
-    if (tokenData.network == constant.ETHEREUM_NETWORK) {
-      const res = await getTokenInfoFromWalletAddress(tokenData.contractAddress);
-      if (res != constant.NOT_FOUND_TOKEN) {
-        const holdersCount = res['holdersCount'];
-        const transferCount = res['transfersCount'];
-        setHoldersCount(holdersCount);
-        setTransactionCount(transferCount);
-      }
-    } else {
-      setHoldersCount(0);
-      setTransactionCount(0);
-    }
+    const res = await getTokenHolderandTransactionCount(tokenData.contractAddress, tokenData.network);
+    setHoldersCount(res[0]);
+    setTransactionCount(res[1]);
   }
 
   const setLpTokenItem = (clickLp: LPTokenPair) => {
@@ -309,8 +296,20 @@ export default function TokenInfo() {
                 <p className={style.tokenName} style={{color:"#767676"}}>&nbsp;({lpTokenAddress.symbol})</p>
                 <p className={style.tokenPrice} style={{color:priceColor}}>{convertBalanceCurrency( tokenPriceshow, 6)}</p>
               </Box>
-              <Box display={"flex"} flexDirection={"row"} alignItems={"center"} justifyContent={"center"}>
-                <p className={style.tokenAddress} style={{color:textColor}}>{tokenData.contractAddress}</p>
+              <Box 
+                display={"flex"} 
+                flexDirection={"row"} 
+                alignItems={"center"} 
+                justifyContent={"center"} 
+                _hover={{"textDecoration":"underline"}}
+                cursor="pointer"
+              >
+                <a className={style.tokenAddress} 
+                  style={{color:textColor}}
+                  href = {tokenData.contractCodeURL}
+                >
+                  {tokenData.contractAddress}
+                </a>
                 <Box onClick={copyBtnClick}>
                   
                   {copyStatus ? <CoyAddressComfirm/> :
@@ -427,8 +426,10 @@ export default function TokenInfo() {
           <Box display={"flex"} flexDirection={"column"} width={"39%"}>
               <p className={style.marketCap} style={{color:textColor}}>Balance</p>
               <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
-                <p className={style.tokenMarketCap} style={{marginRight:"1rem"}} color={whiteBlackMode}>{numberWithCommasTwoDecimals(balance)}</p>
-                <p className={style.tokenMarketCap}  style={{color:priceColor}}>({convertBalanceCurrency(balanceUSD, 2)})</p>
+                <Box _hover={{"textDecoration":"underline"}} cursor="pointer" >
+                  <a className={style.tokenMarketCap} style={{marginRight:"1rem"}} color={whiteBlackMode} href={tokenData.contractBalanceWalletURL}>{numberWithCommasTwoDecimals(balance)}</a>
+                </Box>
+                <p className={style.tokenMarketCap}  style={{color:priceColor}} >({convertBalanceCurrency(balanceUSD, 2)})</p>
               </Box>
           </Box>          
         </Box>
@@ -437,11 +438,15 @@ export default function TokenInfo() {
           <Box display={"flex"} flexDirection={"row"} width={"100%"} paddingLeft={"0.1rem"}>
             <Box display={"flex"} flexDirection={"column"} width={"50%"}>
               <p className={style.holder} style={{color:textColor}}>Holders</p>
-              <p className={style.itemvalue} color={whiteBlackMode}>{holdersCount}</p>
+              <Box _hover={{"textDecoration":"underline"}} cursor="pointer" >
+                <a className={style.itemvalue} color={whiteBlackMode} href={tokenData.contractBalanceURL}>{holdersCount}</a>
+              </Box>
             </Box>
             <Box>
               <p className={style.holder} style={{color:textColor}}>Transactions</p>
-              <p className={style.itemvalue} color={whiteBlackMode}>{transactionCount}</p>
+              <Box _hover={{"textDecoration":"underline"}} cursor="pointer" >
+                <a className={style.itemvalue} color={whiteBlackMode} href={tokenData.contractPage}>{transactionCount}</a>
+              </Box>
             </Box>              
           </Box>        
         </Box>

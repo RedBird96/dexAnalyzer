@@ -16,6 +16,10 @@ export interface ERC20Token {
   facebook?: string;
   twitter?: string;
   pinSetting: boolean;
+  contractCodeURL?: string;
+  contractBalanceWalletURL?: string;
+  contractBalanceURL?: string;
+  contractPage?: string;
 }
 
 export enum SearchStatus {
@@ -48,6 +52,7 @@ export interface LPTokenPair extends ERC20Token {
   quoteCurrency_contractAddress?: string;
   quoteCurrency_name?: string;
   quoteCurrency_decimals?: number;
+  pairContractURL?: string;
 }
 
 export interface Block {

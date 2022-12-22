@@ -8,7 +8,7 @@ import EtherscanClient, {Action} from './ethers/etherscan-client';
 import {ERC20Token, LPTokenPair, TokenSide} from '../utils/type'
 import UniswapV2Pair from '../config/IUniswapV2Pair.json';
 import PancakeswapV2Pair from '../config/IPancakeswapV2Pair.json';
-import { getLPPairs } from "./bitquery_graphql";
+import { getHoldTransferCount, getLPPairs } from "./bitquery_graphql";
 import * as constant from '../utils/constant'
 import * as endpoint from '../utils/endpoints'
 
@@ -160,25 +160,20 @@ export async function getLastTransactionsLogsByTopic(address:string, network: nu
   return constant.NOT_FOUND_TOKEN;
 }
 
-export async function getTokenInfoFromWalletAddress(address:string) {
+export async function getTokenHolderandTransactionCount(address:string, network: number) {
 
-  const url = endpoint.ETH_MAINNET_PLORER_API_URL + 
-    "getTokenInfo/" + 
-    address + 
-    "?apiKey=" + 
-    endpoint.ETHPLORER_API_KEY;
-  let text: string;
-  const response = await fetch(url);
-  if (response.status != 200) {
-    return constant.NOT_FOUND_TOKEN;
-  }
-  try {
-    text = await response.text();
-  } catch (err:any) {
-    return constant.NOT_FOUND_TOKEN;
-  }
-  return JSON.parse(text);
+  const response = await getHoldTransferCount(address, network);
+  console.log('response', response);
+  if (response != constant.NOT_FOUND_TOKEN) {
+    try{
+      const holder = response[0].count;
+      const transfercnt = response[0].countBigInt;
+      return [holder, transfercnt];
+    }catch {
 
+    }
+  }
+  return [0, 0];
 }
 
 export async function getTokenInfoFromTokenName(_name: string) {
@@ -296,7 +291,9 @@ export async function getLPTokenList(address: string, network: number, tokenside
   let response;
   let checkTokenList: string[] = [];
   let lpTokenList: LPTokenPair[] = [];
-
+  const NETWORKURL = network == constant.ETHEREUM_NETWORK ? 
+    "https://etherscan.io/token/" :
+    "https://bscscan.com/token/";
   response = await getLPPairs(address, network);
   if (response != constant.NOT_FOUND_TOKEN && response != null) {
     response.forEach((value:any) => {
@@ -326,106 +323,10 @@ export async function getLPTokenList(address: string, network: number, tokenside
           quoteCurrency_name: value.quoteCurrency.symbol,
           quoteCurrency_contractAddress: value.quoteCurrency.address,
           protocolType: value.smartContract.protocolType,
+          pairContractURL: NETWORKURL + value.smartContract.address.address + "#balances"
         } as LPTokenPair);
     });
   }
-  // const url = network == constant.ETHEREUM_NETWORK ? SH_PAIRS : PC_PAIRS;
-  // if(network == constant.ETHEREUM_NETWORK) {
-  //   checkTokenList.push(constant.WHITELIST_TOKENS.ETH.USDC.toLowerCase());
-  //   checkTokenList.push(constant.WHITELIST_TOKENS.ETH.USDT.toLowerCase());
-  //   checkTokenList.push(constant.WHITELIST_TOKENS.ETH.ETH.toLowerCase());
-  //   checkTokenList.push(constant.WHITELIST_TOKENS.ETH.DAI.toLowerCase());
-  // } else {
-  //   checkTokenList.push(constant.WHITELIST_TOKENS.BSC.USDC.toLowerCase());
-  //   checkTokenList.push(constant.WHITELIST_TOKENS.BSC.USDT.toLowerCase());
-  //   checkTokenList.push(constant.WHITELIST_TOKENS.BSC.BNB.toLowerCase());
-  //   checkTokenList.push(constant.WHITELIST_TOKENS.BSC.BUSD.toLowerCase());
-  //   checkTokenList.push(constant.WHITELIST_TOKENS.BSC.DAI.toLowerCase());
-  //   checkTokenList.push(constant.WHITELIST_TOKENS.BSC.CAKE.toLowerCase());
-  // }
-  // if (tokenside == TokenSide.token0) {
-  //   response = await request(url,
-  //     gql`
-  //     query getLPTokenPairs($address:String){
-  //       pairs(where:{token0:$address}) {
-  //         id
-  //         token0 {
-  //           id
-  //           symbol
-  //           decimals
-  //         }
-  //         token1 {
-  //           id
-  //           symbol
-  //           decimals
-  //         }
-  //       }
-  //     }
-  //     `,
-  //     {
-  //       address
-  //     }
-  //   );
-  // } else {
-  //   response = await request(url,
-  //     gql`
-  //     query getLPTokenPairs($address:String){
-  //       pairs(where:{token1:$address}) {
-  //         id
-  //         token0 {
-  //           id
-  //           symbol
-  //           decimals
-  //         }
-  //         token1 {
-  //           id
-  //           symbol
-  //           decimals
-  //         }
-  //       }
-  //     }
-  //     `,
-  //     {
-  //       address
-  //     }
-  //   );    
-  // }
-  // if (response != undefined && response.pairs.length > 0) {
-  //   response.pairs.forEach((token: any) => {
-  //     const token0 = token.token0.id;
-  //     const token1 = token.token1.id;
-  //     if ( (tokenside == TokenSide.token0 && checkTokenList.includes(token1.toLowerCase())) ||
-  //          (tokenside == TokenSide.token1 && checkTokenList.includes(token0.toLowerCase()) )
-  //     ) {
-  //       lpTokenList.push({
-  //         name:  token.token0.symbol + "/" + token.token1.symbol,
-  //         symbol: token.token0.symbol + "/" + token.token1.symbol,
-  //         contractAddress: token.id,
-  //         price: 0,
-  //         marketCap: "",
-  //         totalSupply: 0,
-  //         holdersCount: 0,
-  //         balance: 0,
-  //         decimals: 18,
-  //         image: "",
-  //         network: network,
-  //         token0_name: token.token0.symbol,
-  //         token1_name: token.token1.symbol,
-  //         token0_reserve: 0,
-  //         token1_reserve: 0,
-  //         token0_contractAddress: token.token0.id,
-  //         token1_contractAddress: token.token1.id,
-  //         usdBalance: 0,
-  //         owner: "",
-  //         pinSetting: false,
-  //         tokenside: tokenside,
-  //         ownerToken: address,
-  //         token0_decimal: token.token0.decimals,
-  //         token1_decimal: token.token1.decimals,
-  //       } as LPTokenPair);
-  //     }
-  //   });
-  // }
   return lpTokenList;
 }
 

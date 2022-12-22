@@ -138,7 +138,14 @@ export default function WalletInfo() {
     setWalletBalance(usdBalance);
   }
 
+  const initAllInfos = () => {
+    setInitTokensInfo([]);
+    setTokensInfo([]);
+    setWalletBalance(0);
+    setWalletTokens([]);
+  }
   const getTokensFromWallet = async() => {
+    initAllInfos();
     if (network[0].data.chain?.id == 1) {
       const res = await getContractInfoFromWalletAddress(address!, constant.ETHEREUM_NETWORK);
       setETHTokensBalance(res);
@@ -164,9 +171,7 @@ export default function WalletInfo() {
   }
 
   useEffect(() => {
-    setInitTokensInfo([]);
-    setTokensInfo([]);
-    setWalletBalance(0);
+    initAllInfos();
     if (address != undefined) {
       getTokensFromWallet();
     }
