@@ -3,16 +3,14 @@ import { Box, GridItem, calc } from "@chakra-ui/react"
 import { ResizableBox } from 'react-resizable'
 import dynamic from 'next/dynamic'
 import TokenList from "../TokenList"
-import TokenHeader from "../TokenHeader"
 import TokenInfo from "../TokenInfo"
 import MenuBar from "../MenuBar"
-import TokenChart from "../TokenChart"
 import TokenTransaction from "../TokenTransaction"
 import WalletInfo from "../WalletInfo"
 import style from './TokenBody.module.css'
 import {ResizerDark, ResizerLight} from '../../assests/icon'
 
-const ChartContainer = dynamic(() => import("../TokenChart/ChartContainer"), { ssr: false })
+const ChartContainer = dynamic(() => import("../ChartContainer"), { ssr: false })
 // const ResizePanel = dynamic(() => import('react-resize-panel'), { ssr: false });
 
 export default function TokenBody() {

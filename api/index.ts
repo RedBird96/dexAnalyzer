@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-import { request, gql } from 'graphql-request';
 import fetch from 'cross-fetch';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils'
@@ -7,43 +6,29 @@ import ERC20TokenABI from '../config/ERC20ABI.json'
 import BEP20TokenABI from '../config/ERC20ABI.json'
 import EtherscanClient, {Action} from './ethers/etherscan-client';
 import {ERC20Token, LPTokenPair, TokenSide} from '../utils/type'
-import * as constant from '../utils/constant'
 import UniswapV2Pair from '../config/IUniswapV2Pair.json';
 import PancakeswapV2Pair from '../config/IPancakeswapV2Pair.json';
-import { useStableCoinPrice } from "../hooks/useStableCoinPrice";
 import { getLPPairs } from "./bitquery_graphql";
+import * as constant from '../utils/constant'
+import * as endpoint from '../utils/endpoints'
 
-export const ETH_MAINNET_API_URL = 'https://api.etherscan.io/api';
-export const BSC_MAINNET_API_URL = 'https://api.bscscan.com/api';
-export const ETH_MAINNET_PLORER_API_URL = 'https://api.ethplorer.io/';
-export const ETHPLORER_API_KEY = 'EK-32KDR-3MoJfLq-QoUAU';
-export const BITQUERY_API_KEY = 'BQY1hd2LPoxnm8ouc723BqPL47Jk7k46';
-export const COINMARKETCAP_API_KEY = 'd27ab07a-3853-4402-8d56-651767ba4da5';
 const ETH_MAINNET_CONNECTION = {
-  apiKey: 'DF8U1AYKKAW8NHQQJ2H34W6B49H38JI9SU',
-  apiUrl: ETH_MAINNET_API_URL
+  apiKey: endpoint.ETHERSCAN_API_KEY,
+  apiUrl: endpoint.ETH_MAINNET_API_URL
 };
 const BSC_MAINNET_CONNECTION = {
-  apiKey: '9JXFSN6Y82GSADZZRHHNDD29AMYFMB7XYS',
-  apiUrl: BSC_MAINNET_API_URL
+  apiKey: endpoint.BSCSCAN_API_KEY,
+  apiUrl: endpoint.BSC_MAINNET_API_URL
 }
-export const CMC_ENDPOINT = 'https://3rdparty-apis.coinmarketcap.com/v1/cryptocurrency/contract?address='
-export const CG_ENDPOINT = 'https://api.coingecko.com/api/v3/';
-export const PC_PAIRS = "https://api.thegraph.com/subgraphs/name/pancakeswap/pairs";
-export const SH_PAIRS = "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2";
-export const LLAMA_ENDPOINT = "https://coins.llama.fi/";
-export const BLOCKS_CLIENT = "https://api.thegraph.com/subgraphs/name/pancakeswap/blocks";
-export const INFO_CLIENT = 'https://bsc.streamingfast.io/subgraphs/name/pancakeswap/exchange-v2';
-export const BITQUERY_ENDPOINT = "https://graphql.bitquery.io";
 
 export async function getContractInfoFromWalletAddress(address:string, network: number) {
 
   if (network == constant.ETHEREUM_NETWORK) {
-    const url = ETH_MAINNET_PLORER_API_URL + 
+    const url = endpoint.ETH_MAINNET_PLORER_API_URL + 
       "getAddressInfo/" + 
       address + 
       "?apiKey=" + 
-      ETHPLORER_API_KEY;
+      endpoint.ETHPLORER_API_KEY;
     let text: string;
     const response = await fetch(url);
     if (response.status != 200) {
@@ -168,7 +153,6 @@ export async function getLastTransactionsLogsByTopic(address:string, network: nu
     topic0: topic,
     address:address
   });
-  console.log('response', response);
   if (response.message == "OK") {
     return response.result;
   }
@@ -178,11 +162,11 @@ export async function getLastTransactionsLogsByTopic(address:string, network: nu
 
 export async function getTokenInfoFromWalletAddress(address:string) {
 
-  const url = ETH_MAINNET_PLORER_API_URL + 
+  const url = endpoint.ETH_MAINNET_PLORER_API_URL + 
     "getTokenInfo/" + 
     address + 
     "?apiKey=" + 
-    ETHPLORER_API_KEY;
+    endpoint.ETHPLORER_API_KEY;
   let text: string;
   const response = await fetch(url);
   if (response.status != 200) {
@@ -201,7 +185,7 @@ export async function getTokenInfoFromTokenName(_name: string) {
   const url = "https://sandbox-api.coinmarketcap.com/v1/cryptocurrency/listings/latest";
   const response = await fetch(url, {
     method: 'POST',
-    headers: {'X-CMC_PRO_API_KEY': COINMARKETCAP_API_KEY}
+    headers: {'X-CMC_PRO_API_KEY': endpoint.COINMARKETCAP_API_KEY}
   });
   
   console.log('response', response.body);
@@ -225,12 +209,10 @@ export async function getTokenSymbol(address: string, network: number) {
   let TokenContract:ethers.Contract;
   if (network == constant.ETHEREUM_NETWORK) {
     const provider = new ethers.providers.JsonRpcProvider(constant.ETHRPC_URL, constant.ETHEREUM_NETWORK);
-    const signer = new ethers.Wallet(constant.WALLET_PRIVATE_KEY, provider);
-    TokenContract = new ethers.Contract(address, ERC20TokenABI, signer)
+    TokenContract = new ethers.Contract(address, ERC20TokenABI, provider)
   } else if (network == constant.BINANCE_NETOWRK) {
     const provider = new ethers.providers.JsonRpcProvider(constant.BSCRPC_URL, constant.BINANCE_NETOWRK);
-    const signer = new ethers.Wallet(constant.WALLET_PRIVATE_KEY, provider);
-    TokenContract = new ethers.Contract(address, BEP20TokenABI, signer)
+    TokenContract = new ethers.Contract(address, BEP20TokenABI, provider)
   }
   try {
     decimal = await TokenContract!.decimals()
@@ -244,7 +226,7 @@ export async function getTokenSymbol(address: string, network: number) {
 }
 
 const getTokenId = async (address: string): Promise<string[] | undefined> => {
-  const response = await fetch(`${CMC_ENDPOINT}${address}`)
+  const response = await fetch(`${endpoint.CMC_ENDPOINT}${address}`)
 
   if (response.ok) {
     const obj = await response.json();
@@ -271,7 +253,7 @@ export async function getTokenLogoURL(address: string, network:number, symbol: s
 
 export async function getTokenSocialInfofromCoingeckoAPI(address: string, network: number) {
   const networkId = network == constant.ETHEREUM_NETWORK ? "ethereum" : "binance-smart-chain";
-  const url = CG_ENDPOINT + "coins/" + networkId + "/contract/" + address;
+  const url = endpoint.CG_ENDPOINT + "coins/" + networkId + "/contract/" + address;
   const response = await fetch(url)
   if (response.ok) {
     const obj = await response.json();
@@ -288,6 +270,7 @@ export async function getTokenSocialInfofromCoingeckoAPI(address: string, networ
       if (facebook != "") {
         facebook = "https://www.facebook.com/" + facebook;
       }
+      console.log('social', website, twitter, facebook);
       return [website, twitter, facebook]
     }
     catch {
@@ -299,7 +282,7 @@ export async function getTokenSocialInfofromCoingeckoAPI(address: string, networ
 
 export async function getTokenPricefromCoingeckoAPI(addresses: string, network: number) {
   const networkId = network == constant.ETHEREUM_NETWORK ? "ethereum" : "binance-smart-chain";
-  const url = CG_ENDPOINT + "simple/token_price/" + networkId + "?contract_addresses=" + addresses + "&vs_currencies=USD";
+  const url = endpoint.CG_ENDPOINT + "simple/token_price/" + networkId + "?contract_addresses=" + addresses + "&vs_currencies=USD";
   const response = await fetch(url)
   if (response.ok) {
     const obj = await response.json();
@@ -476,7 +459,7 @@ export async function getLPTokenReserve(address: string, network: number) {
 export async function getTokenPricefromllama(address: string, network: number) {
   const networkId = network == constant.ETHEREUM_NETWORK ? "ethereum" : "bsc";
   const param = networkId + ":" + address;
-  const url = LLAMA_ENDPOINT + "prices/current/" + param;
+  const url = endpoint.LLAMA_ENDPOINT + "prices/current/" + param;
   const response = await fetch(url)
   try {
     const obj = await response.json();
@@ -498,7 +481,7 @@ export async function getMultiTokenPricefromllama(tokenList:ERC20Token[]){
     param += ",";
   })
 
-  const url = LLAMA_ENDPOINT + "prices/current/" + param;
+  const url = endpoint.LLAMA_ENDPOINT + "prices/current/" + param;
   try {
     const response = await fetch(url)
     const obj = await response.json();

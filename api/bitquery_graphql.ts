@@ -1,8 +1,7 @@
 import { gql, request } from 'graphql-request'
-import { BLOCKS_CLIENT } from './index'
 import { Block } from '../utils/type'
-import { BITQUERY_ENDPOINT, BITQUERY_API_KEY } from './index'
 import * as constant from '../utils/constant'
+import * as endpoint from '../utils/endpoints'
 
 export const getRangeHistoryData = async (
   baseAddress: string, 
@@ -53,9 +52,9 @@ export const getRangeHistoryData = async (
   const raw = JSON.stringify({query,"variables": "{}"});
 
   try {
-    const response = await fetch(BITQUERY_ENDPOINT, {
+    const response = await fetch(endpoint.BITQUERY_ENDPOINT, {
       method: 'POST',
-      headers: {'X-API-KEY': BITQUERY_API_KEY,
+      headers: {'X-API-KEY': endpoint.BITQUERY_API_KEY,
                 "Content-Type":"application/json"},
       body:raw,
       redirect:'follow'
@@ -119,9 +118,9 @@ export const getLimitHistoryData = async (
   const raw = JSON.stringify({query,"variables": "{}"});
 
   try {
-    const response = await fetch(BITQUERY_ENDPOINT, {
+    const response = await fetch(endpoint.BITQUERY_ENDPOINT, {
       method: 'POST',
-      headers: {'X-API-KEY': BITQUERY_API_KEY,
+      headers: {'X-API-KEY': endpoint.BITQUERY_API_KEY,
                 "Content-Type":"application/json"},
       body:raw,
       redirect:'follow'
@@ -180,9 +179,9 @@ export const getLPPairs = async (
 
   const raw = JSON.stringify({query,"variables": "{}"});
 
-  const response = await fetch(BITQUERY_ENDPOINT, {
+  const response = await fetch(endpoint.BITQUERY_ENDPOINT, {
     method: 'POST',
-    headers: {'X-API-KEY': BITQUERY_API_KEY,
+    headers: {'X-API-KEY': endpoint.BITQUERY_API_KEY,
               "Content-Type":"application/json"},
     body:raw,
     redirect:'follow'
@@ -231,7 +230,7 @@ const blocksQueryConstructor = (subqueries: string[]) => {
   const fetchedData: any = await multiQuery(
     blocksQueryConstructor,
     getBlockSubqueries(timestamps),
-    BLOCKS_CLIENT,
+    endpoint.BLOCKS_CLIENT,
     skipCount,
   )
 

@@ -7,18 +7,15 @@ import {
   LanguageCode,
   IChartingLibraryWidget,
   ResolutionString,
-} from '../../../api/charting_library'
-import axios from 'axios'
-import { getUnixTime, startOfHour, Duration, sub } from 'date-fns'
-import fetchTokenPriceData from '../../../api/priceDataforChart'
-import { useLPTokenPrice, useLPTransaction } from '../../../hooks'
-import { getRangeHistoryData } from '../../../api/bitquery_graphql'
-import * as constant from '../../../utils/constant'
-import { LPTokenPair, TokenSide } from '../../../utils/type'
-import { makeTemplateDate } from '../../../utils'
-import { getLastTransactionsLogsByTopic } from '../../../api'
-import { useStableCoinPrice } from '../../../hooks/useStableCoinPrice'
-import { ConvertEventtoTransaction } from '../../TokenTransaction/module'
+} from '../../api/charting_library'
+import { useLPTokenPrice, useLPTransaction } from '../../hooks'
+import { getRangeHistoryData } from '../../api/bitquery_graphql'
+import * as constant from '../../utils/constant'
+import { TokenSide } from '../../utils/type'
+import { makeTemplateDate } from '../../utils'
+import { getLastTransactionsLogsByTopic } from '../../api'
+import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
+import { ConvertEventtoTransaction } from '../TokenTransaction/module'
 
 // eslint-disable-next-line import/extensions
 
