@@ -70,6 +70,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
   let tvWidget: IChartingLibraryWidget | null = null
   const {lpTokenPrice, lpTokenAddress} = useLPTokenPrice();
   const {coinPrice} = useStableCoinPrice();
+  const [showOrder, setShowOrder] = React.useState<boolean>(false);
   const {transactionData, setTransactionData} = useLPTransaction();
   const checksumAddress = lpTokenAddress.contractAddress;
   let preReserve0 = 0;
@@ -425,14 +426,16 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
 			tvWidget!.headerReady().then(() => {
 				const button = tvWidget!.createButton();
 				button.setAttribute('title', 'Click to show positions');
+        button.setAttribute('style', "height:90%;display:flex;align-items:center;background:transparent");
 				button.classList.add('apply-common-tooltip');
-				button.addEventListener('click', () => tvWidget!.showNoticeDialog({
-						title: 'Notification',
-						body: 'Show Trade positions',
-						callback: () => {
-							console.log('Noticed!');
-						},
-					}));
+				button.addEventListener('click', () => {
+          const currentStatus = button.getAttribute('style');
+          if (currentStatus.includes("background:#2a2e39")) {
+            button.setAttribute('style', "height:90%;display:flex;align-items:center;background:transparent");
+          } else {
+            button.setAttribute('style', "height:90%;display:flex;align-items:center;background:#2a2e39");
+          }
+        });
 				button.innerHTML = 'Trade Show';
 			});
 		});
