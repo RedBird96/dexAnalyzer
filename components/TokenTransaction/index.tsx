@@ -59,7 +59,6 @@ export default function TokenTransaction() {
       const tempTransaction = await appendPastTransactions(transactionData, lpTokenAddress, false);
       let transaction = transactionData;
       transaction = transaction.concat(tempTransaction);
-      console.log('bottom', transaction.length);
       setTransactionData(transaction);
       setBottomHandle(false);
     }

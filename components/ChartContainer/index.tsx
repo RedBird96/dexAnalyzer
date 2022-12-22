@@ -39,6 +39,7 @@ export interface ChartContainerProps {
   studiesOverrides: ChartingLibraryWidgetOptions['studies_overrides']
   containerId: ChartingLibraryWidgetOptions['container_id']
   height: number
+  resize: boolean
 }
 
 const ChartContainerProps = {
@@ -420,7 +421,6 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
     }
 
     tvWidget = new widget(widgetOptions)
-
 		tvWidget.onChartReady(() => {
 			tvWidget!.headerReady().then(() => {
 				const button = tvWidget!.createButton();
@@ -441,25 +441,24 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
   React.useEffect(() => {
     lastBarsCache = undefined;
     const saveResolution = getCookie("chartInterval");
-    console.log('load chartInfo', saveResolution);
     getWidget(saveResolution)
     return(() => {
-      tvWidget?.save((saveObject) => {
-        return setCookie("chartInterval", currentResolutions)
-      })
+        return setCookie("chartInterval", currentResolutions);
     })
   }, [lpTokenAddress.contractAddress])
 
   React.useEffect(() => {
     lastBarsCache = undefined;
     const saveResolution = getCookie("chartInterval");
-    console.log('load chartInfo', saveResolution);
     getWidget(saveResolution)
+    return(() => {
+        return setCookie("chartInterval", currentResolutions);
+    })
   }, [colorMode])
 
   return (
-    <div style={{width: "100%", height: "100%"}}>
-      <div id={ChartContainerProps.containerId} style={{ height: '100%'}} />
+    <div style={{height:props.height, pointerEvents:props.resize ? "none" : "inherit"}}>
+      <div id={ChartContainerProps.containerId} style={{ height: "100%"}} />
     </div>
   )
 }

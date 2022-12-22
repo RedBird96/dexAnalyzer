@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react'
-import { Box, GridItem, calc } from "@chakra-ui/react"
+import React, { useEffect, useRef, useState } from 'react'
+import { Box, GridItem, calc, useColorModeValue } from "@chakra-ui/react"
 import { ResizableBox } from 'react-resizable'
 import dynamic from 'next/dynamic'
 import TokenList from "../TokenList"
@@ -11,13 +11,32 @@ import style from './TokenBody.module.css'
 import {ResizerDark, ResizerLight} from '../../assests/icon'
 
 const ChartContainer = dynamic(() => import("../ChartContainer"), { ssr: false })
-// const ResizePanel = dynamic(() => import('react-resize-panel'), { ssr: false });
+const ResizePanel = dynamic(() => import('react-resize-panel'), { ssr: false });
+
 
 export default function TokenBody() {
   
   const sidebarRef = useRef(null);
+  const transactionRef = useRef(null);
   const [isResizing, setIsResizing] = useState(false);
   const [height, setHeight] = useState(400);
+  const [chartheight, setChartHeight] = useState(600);
+  const resizeBgColor = useColorModeValue("#FFFFFF", "#1C1C1C");
+  const hasWindow = typeof window !== 'undefined';
+  const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
+  
+  function getWindowDimensions() {
+    const width = hasWindow ? window.innerWidth : null;
+    const height = hasWindow ? window.innerHeight : null;
+    return {
+      width,
+      height,
+    };
+  }
+
+  useEffect(() => {
+    setChartHeight(sidebarRef.current.clientHeight - 400);
+  }, [])
 
   const startResizing = React.useCallback((_mouseDownEvent: any) => {
     setIsResizing(true);
@@ -29,16 +48,16 @@ export default function TokenBody() {
 
 
   const resize = React.useCallback(
-    (mouseMoveEvent: { clientY: number }) => {
-      if (isResizing && sidebarRef != null) {
-        const main = document.getElementById("tradeMain");
-        const rect = main?.getBoundingClientRect();
-        const dragHeight = rect?.bottom! - mouseMoveEvent.clientY;
-        console.log(mouseMoveEvent.clientY, rect?.bottom!, dragHeight);
-        if (dragHeight < 400)
-          setHeight(400);  
-        else
-          setHeight(dragHeight);
+    (mouseMoveEvent:MouseEventInit ) => {
+      if (isResizing) {
+        let resizeHeight = windowDimensions.height - mouseMoveEvent.clientY;
+        if (resizeHeight < 400) {
+          resizeHeight = 400;
+        } else if (resizeHeight > 800){
+          resizeHeight = 800;
+        }
+        setHeight(resizeHeight);
+        setChartHeight(sidebarRef.current.clientHeight - resizeHeight);
       }
     },
     [isResizing]
@@ -54,7 +73,9 @@ export default function TokenBody() {
   }, [resize, stopResizing]);
   
   return (
-    <main className={style.tokenBody}>
+    <main 
+    className={style.tokenBody} 
+    >
       <Box style={{
         display: "flex", 
         flexDirection: "row", 
@@ -76,43 +97,44 @@ export default function TokenBody() {
           
         <Box 
         id="tradeMain"
-        ref = {sidebarRef}
         style={{
           display:"flex",
           flexDirection:"column",
           height:"100%"
         }}
-        // onMouseDown={(e) => e.preventDefault()}
+        ref = {sidebarRef}
         >
           <Box
           position={"relative"}
           width={"100%"}
           height={"100%"}
           >
-            <ChartContainer/>
+            <ChartContainer height = {chartheight - 10} resize = {isResizing}/>
           </Box>
-          <nav>
-            <hr aria-orientation='vertical' style={{width:"1px", color:"#313131"}}></hr>
-          </nav>
           <Box 
             position="relative"
             display="flex"
             height={height}
-            maxHeight={"40rem"}
+            maxHeight={"50rem"}
             minHeight={"25rem"}
             flexShrink={"0"}
             width={"100%"}
+            ref = {transactionRef}
           >
             <TokenTransaction/>
             <Box
               position="absolute"
               height={"15px"}
-              top={"0"}
+              top={"-12px"}
               left={"0px"}
               cursor={"row-resize"}
               width={"100%"}
-              // onMouseDown={startResizing}
+              backgroundColor={resizeBgColor}
+              onMouseDown={startResizing}
             >
+              <nav>
+                <hr aria-orientation='vertical' style={{width:"1px", color:"#313131"}}></hr>
+              </nav>
               <Box
                 display="flex"
                 width={"100%"}
