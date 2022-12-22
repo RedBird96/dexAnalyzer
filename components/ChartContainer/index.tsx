@@ -8,14 +8,19 @@ import {
   IChartingLibraryWidget,
   ResolutionString,
 } from '../../api/charting_library'
+import {
+  setCookie,
+  getCookie,
+  deleteCookie
+} from '../../utils'
 import { useLPTokenPrice, useLPTransaction } from '../../hooks'
 import { getRangeHistoryData } from '../../api/bitquery_graphql'
-import * as constant from '../../utils/constant'
 import { TokenSide } from '../../utils/type'
 import { makeTemplateDate } from '../../utils'
 import { getLastTransactionsLogsByTopic } from '../../api'
 import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
 import { ConvertEventtoTransaction } from '../TokenTransaction/module'
+import * as constant from '../../utils/constant'
 
 // eslint-disable-next-line import/extensions
 
@@ -38,7 +43,7 @@ export interface ChartContainerProps {
 
 const ChartContainerProps = {
   symbol: 'AAPL',
-  interval: 'H' as ResolutionString,
+  interval: '60' as ResolutionString,
   containerId: 'dexAnalyzer_chart_container',
   datafeedUrl: 'https://demo_feed.tradingview.com',
   libraryPath: '/charting_library/',
@@ -384,8 +389,11 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
   }
   // const tvWidget = null;
   //   React.useEffect(()=>{
-  const getWidget = async () => {
+  const getWidget = async (interval:any) => {
     
+    let initInterval = '60' as ResolutionString;
+    if (interval != undefined)
+      initInterval = interval as ResolutionString;
     const widgetOptions: ChartingLibraryWidgetOptions = {
       // symbol: this.props.symbol as string,
       symbol: tokendetails.pair,
@@ -393,13 +401,15 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       // tslint:disable-next-line:no-any
       //   datafeed: new (window as any).Datafeeds.UDFCompatibleDatafeed(props.datafeedUrl),
       datafeed: feed,
-      interval: ChartContainerProps.interval as ChartingLibraryWidgetOptions['interval'],
+      interval: initInterval as ChartingLibraryWidgetOptions['interval'],
       container_id: ChartContainerProps.containerId as ChartingLibraryWidgetOptions['container_id'],
       library_path: ChartContainerProps.libraryPath as string,
       container: 'dexAnalyzer_chart_container',
       locale: getLanguageFromURL() || 'en',
       theme: colorMode == "dark" ? 'Dark' : 'Light',
-      disabled_features: ['use_localstorage_for_settings'],
+      disabled_features: [
+        'compare_symbol'
+      ],
       charts_storage_url: ChartContainerProps.chartsStorageUrl,
       //   charts_storage_api_version: ChartContainerProps.chartsStorageApiVersion,
       client_id: ChartContainerProps.clientId,
@@ -414,15 +424,15 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
 		tvWidget.onChartReady(() => {
 			tvWidget!.headerReady().then(() => {
 				const button = tvWidget!.createButton();
-				button.setAttribute('title', 'Click to show a position');
+				button.setAttribute('title', 'Click to show positions');
 				button.classList.add('apply-common-tooltip');
-				// button.addEventListener('click', () => tvWidget!.showNoticeDialog({
-				// 		title: 'Notification',
-				// 		body: 'Show Trade positions',
-				// 		callback: () => {
-				// 			console.log('Noticed!');
-				// 		},
-				// 	}));
+				button.addEventListener('click', () => tvWidget!.showNoticeDialog({
+						title: 'Notification',
+						body: 'Show Trade positions',
+						callback: () => {
+							console.log('Noticed!');
+						},
+					}));
 				button.innerHTML = 'Trade Show';
 			});
 		});
@@ -430,12 +440,21 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
   
   React.useEffect(() => {
     lastBarsCache = undefined;
-    getWidget()
+    const saveResolution = getCookie("chartInterval");
+    console.log('load chartInfo', saveResolution);
+    getWidget(saveResolution)
+    return(() => {
+      tvWidget?.save((saveObject) => {
+        return setCookie("chartInterval", currentResolutions)
+      })
+    })
   }, [lpTokenAddress.contractAddress])
 
   React.useEffect(() => {
     lastBarsCache = undefined;
-    getWidget()
+    const saveResolution = getCookie("chartInterval");
+    console.log('load chartInfo', saveResolution);
+    getWidget(saveResolution)
   }, [colorMode])
 
   return (

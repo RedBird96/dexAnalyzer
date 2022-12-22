@@ -22,6 +22,7 @@ import {
 import {ERC20Token} from '../../utils/type'
 import { 
   convertBalanceCurrency,
+  deleteCookie,
   makeShortTokenName,
   numberWithCommasTwoDecimals
 } from '../../utils'
@@ -145,6 +146,7 @@ export default function WalletInfo() {
     setWalletTokens([]);
   }
   const getTokensFromWallet = async() => {
+    deleteCookie("dexChartInfo");
     initAllInfos();
     if (network[0].data.chain?.id == 1) {
       const res = await getContractInfoFromWalletAddress(address!, constant.ETHEREUM_NETWORK);
