@@ -71,7 +71,6 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
     let addressurl_index = 0;
     if (res == constant.NOT_FOUND_TOKEN)
       return tokenList;
-    console.log('res', res);
     for(let ind = 0; ind < res.length; ind ++) {
 
       if(res[ind].currency.tokenType == "ERC20") {
@@ -102,9 +101,8 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
         address_str += "%2C";
       }
     }
-    let jsonObject:any = undefined;
+    let jsonObject:any = {};
     for (let ind = 0; ind < addressurl_array.length; ind ++) {
-      console.log('url', addressurl_array[ind]);
       const price = await getTokenPricefromCoingeckoAPI(addressurl_array[ind], constant.BINANCE_NETOWRK);
       console.log('price', price);
       if (price != undefined && price != null) {
@@ -112,18 +110,15 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
       }
     }
     console.log('jsonObject', jsonObject);
-    // const tokenPrices = await getTokenPricefromCoingeckoAPI(address_str, constant.BINANCE_NETOWRK);
-    if (jsonObject != undefined) {
-      tokenList.forEach((value, _index) => {
-        const add = value.contractAddress;
-        if (jsonObject.hasOwnProperty(add)) {
-          const bal = jsonObject[value.contractAddress].usd * value.balance;
-          value.usdBalance = bal;
-        } else {
-          value.usdBalance = 0;
-        }
-      })
-    }
+    tokenList.forEach((value, _index) => {
+      const add = value.contractAddress;
+      if (jsonObject.hasOwnProperty(add)) {
+        const bal = jsonObject[value.contractAddress].usd * value.balance;
+        value.usdBalance = bal;
+      } else {
+        value.usdBalance = 0;
+      }
+    })
 
     tokenList.push(bnbToken);
     tokenList = tokenList.sort((value1, value2) => value2.usdBalance - value1.usdBalance);
