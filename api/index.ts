@@ -67,8 +67,12 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
     const eth = new EtherscanClient(BSC_MAINNET_CONNECTION);
     const res = await getHoldTokenList(address, network);
     let address_str = "";
+    let addressurl_array:any[] = [];
+    let addressurl_index = 0;
+    console.log('res', res);
     if (res == constant.NOT_FOUND_TOKEN)
       return tokenList;
+    console.log('res', res);
     for(let ind = 0; ind < res.length; ind ++) {
 
       if(res[ind].currency.tokenType == "ERC20") {
@@ -89,17 +93,29 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
           pinSetting: false,
           contractPage: BSCLINK + res[ind].currency.address
         } as ERC20Token);
+        if (ind % 150 == 0 || ind == res.length - 1) {
+          address_str = address_str.slice(0, -3);
+          addressurl_array[addressurl_index] = address_str;
+          addressurl_index ++;
+          address_str = "";
+        }
         address_str += res[ind].currency.address;
         address_str += "%2C";
       }
     }
-    address_str = address_str.slice(0, -3);
-    const tokenPrices = await getTokenPricefromCoingeckoAPI(address_str, constant.BINANCE_NETOWRK);
-    if (tokenPrices != undefined) {
+    let jsonObject:any = undefined;
+    for (let ind = 0; ind < addressurl_array.length; ind ++) {
+      const price = await getTokenPricefromCoingeckoAPI(addressurl_array[ind], constant.BINANCE_NETOWRK);
+      if (price != undefined) {
+        Object.assign(jsonObject, price);
+      }
+    }
+    // const tokenPrices = await getTokenPricefromCoingeckoAPI(address_str, constant.BINANCE_NETOWRK);
+    if (jsonObject != undefined) {
       tokenList.forEach((value, _index) => {
         const add = value.contractAddress;
-        if (tokenPrices.hasOwnProperty(add)) {
-          const bal = tokenPrices[value.contractAddress].usd * value.balance;
+        if (jsonObject.hasOwnProperty(add)) {
+          const bal = jsonObject[value.contractAddress].usd * value.balance;
           value.usdBalance = bal;
         } else {
           value.usdBalance = 0;
