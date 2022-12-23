@@ -3,11 +3,11 @@ import { Block } from '../utils/type'
 import * as constant from '../utils/constant'
 import * as endpoint from '../utils/endpoints'
 
-export const getRangeHistoryData = async (
+export const getLimitTimeHistoryData = async (
   baseAddress: string, 
   quoteAddress: string, 
   network: number,
-  after: string,
+  limit: number,
   before: string,
   count: number
 ) => {
@@ -15,11 +15,11 @@ export const getRangeHistoryData = async (
   {
     ethereum(network: ${network == constant.ETHEREUM_NETWORK ? "ethereum" : "bsc"}) {
       dexTrades(
-        options: {desc: "timeInterval.second"}
+        options: {desc: "timeInterval.second" limit:${limit}}
         exchangeName: {in: ["Pancake v2", "Uniswap"]}
         baseCurrency: {is: "${baseAddress}"}
         quoteCurrency: {is: "${quoteAddress}"}
-        time: {after: "${after}", before: "${before}"}
+        time: { before: "${before}"}
     ) {
         timeInterval {
           second(count: ${count})

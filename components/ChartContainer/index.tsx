@@ -14,13 +14,14 @@ import {
   deleteCookie
 } from '../../utils'
 import { useLPTokenPrice, useLPTransaction } from '../../hooks'
-import { getRangeHistoryData } from '../../api/bitquery_graphql'
+import { getLimitTimeHistoryData } from '../../api/bitquery_graphql'
 import { TokenSide } from '../../utils/type'
 import { makeTemplateDate } from '../../utils'
 import { getLastTransactionsLogsByTopic } from '../../api'
 import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
 import { ConvertEventtoTransaction } from '../TokenTransaction/module'
 import * as constant from '../../utils/constant'
+import { slice } from 'lodash'
 
 // eslint-disable-next-line import/extensions
 
@@ -127,7 +128,11 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
     ) => {
       try {
         let bars: any = []
+        let bar_data:any[] = [];
+        const CANDLE_FETCH_COUNT = 400;
         const { from, to, firstDataRequest } = periodParams
+        const after = new Date(from * 1000).toISOString();
+        const before = new Date(to * 1000).toISOString();
         
         if (lpTokenAddress.ownerToken == undefined || lpTokenAddress.ownerToken == "") {
           onHistoryCallback([], {
@@ -149,102 +154,178 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
         // }
 
         // console.log('from to', new Date(from * 1000).toISOString(), new Date(to * 1000).toISOString(), resolution);
-        let bar_data:any[];
-        const after = new Date(from * 1000).toISOString();
-        const before = new Date(to * 1000).toISOString();
         
-        let price = 1;
-        const coin = coinPrice.find((coinToken:any) => coinToken.contractAddress.toLowerCase() + coinToken.network ==
-                      lpTokenAddress.quoteCurrency_contractAddress! + lpTokenAddress.network);
-        // console.log('after before ', after, before);
+        
+        if (firstDataRequest) {
 
-        let beforeIndex = -1;
-        let afterIndex = -1;
-        if (priceData!=undefined) {
-          const searchbefore = (before.replace('T', ' ')).slice(0, 19);
-          const searchafter = (after.replace('T', ' ')).slice(0, 19);
-          // console.log('search', searchafter, searchbefore);
-          beforeIndex = priceData.findIndex(function(number) {
-            return number.timeInterval.second < searchbefore
-          });
-          afterIndex = priceData.findIndex(function(number) {
-            return number.timeInterval.second < searchafter
-          });
-          // console.log('after before index', beforeIndex, afterIndex);
-        }
-        if (beforeIndex != -1) {
-          bar_data = priceData.slice(afterIndex == -1 ? 0 : beforeIndex, afterIndex);
-          // console.log('bar_data', bar_data);
-        } else {
-          priceData.splice(afterIndex, priceData.length - 1);
-          bar_data = await getRangeHistoryData(
+          const current = new Date();
+          const calcTime = new Date();
+          calcTime.setMinutes(current.getMinutes() - CANDLE_FETCH_COUNT * resolution);
+          const end = new Date(current.toUTCString()).toISOString().slice(0, 19);
+          const start = new Date(calcTime.toUTCString()).toISOString().slice(0, 19);
+          bar_data = await getLimitTimeHistoryData(
             lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token1_contractAddress : lpTokenAddress.token0_contractAddress, 
             lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token0_contractAddress : lpTokenAddress.token1_contractAddress, 
             lpTokenAddress.network,
-            after,
-            before,
-            1
-          );
-
-          priceData = priceData.concat(bar_data);
-        }
-
-        // console.log('firstDataRequest bar_data.length', firstDataRequest, bar_data.length);
-        if (firstDataRequest && bar_data.length > 0) {
-          const res = await getLastTransactionsLogsByTopic(
-            lpTokenAddress.contractAddress, 
-            lpTokenAddress.network
-          );
-          if (res != constant.NOT_FOUND_TOKEN) {
-            let currentBaseReserve = lpTokenAddress.token0_reserve;
-            let currentQuoteReserve = lpTokenAddress.token1_reserve;
-            const utcTime = new Date();
-            const currentTime = new Date(bar_data[0].timeInterval.second);
-            utcTime.setUTCFullYear(currentTime.getFullYear(), currentTime.getMonth(), currentTime.getDate());
-            utcTime.setUTCHours(currentTime.getHours(), currentTime.getMinutes(), currentTime.getSeconds());
-            
-            // console.log("reserve", currentBaseReserve, currentQuoteReserve);
-            for (let index = 0; index < res.length; index++){
-              const value = res[index];
-              const timeStamp = parseInt(value.timeStamp, 16) * 1000;
-              const time = new Date(timeStamp).toISOString().replace("T", " ").slice(0, 19);
-              // console.log("bar_data[0], new data time", timeStamp, utcTime.getTime(), );
-              if (timeStamp <= utcTime.getTime())
-                continue;
-              let itemPrice = 0;
-              if (lpTokenAddress.tokenside == TokenSide.token0) {
-                itemPrice = currentQuoteReserve / currentBaseReserve;
-              } else {
-                itemPrice = currentBaseReserve / currentQuoteReserve;
+            CANDLE_FETCH_COUNT,
+            end,
+            resolution * 60
+          );     
+          console.log('first time bar_data1:', bar_data);
+          bar_data = bar_data.reverse();
+          priceData = bar_data;
+        } else {
+          console.log('second time');
+          console.log('second time: after before', from, to);
+          let subData:any[] = [];
+          let exist:boolean = false;
+          const lastEle = priceData.at(0);
+          const lastTime = new Date(lastEle.timeInterval.second + " UTC");
+          console.log('second time: lastTime', lastTime.getTime() / 1000);
+          if (to >= lastTime.getTime() / 1000) {
+            let fromIndex = 0;
+            const toIndex = priceData.findIndex((value, index) => {
+              const compareval = new Date(value.timeInterval.second + " UTC").getTime();
+              if (compareval > to) {
+                return index;
               }
-              const item = ConvertEventtoTransaction(value, lpTokenAddress);
-              const new_item = {
-                timeInterval:{
-                  second: time
-                },
-                isBarClosed:true,
-                isLastBar:false,
-                quoteAmount:item.quoteToken_amount,
-                open:itemPrice,
-                high:itemPrice,
-                low:itemPrice,
-                close:itemPrice
-              }
-              bar_data.unshift(new_item);
-              if (item.buy_sell == "Buy") {
-                currentBaseReserve += item.baseToken_amount;
-                currentQuoteReserve -= item.quoteToken_amount;
-              } else {
-                currentBaseReserve -= item.baseToken_amount;
-                currentQuoteReserve += item.quoteToken_amount;
-              }
-              // console.log('new_item', new_item);
+            });
+            if (from >= lastTime.getTime() / 1000) {
+              exist = true;
+              fromIndex = priceData.findIndex((value, index) => {
+                const compareval = new Date(value.timeInterval.second + " UTC").getTime();
+                if (compareval > from) {
+                  return index;
+                }
+              });
+              if (fromIndex > 1)
+                fromIndex = fromIndex - 1;
+            }
+            console.log('second time: from-to Index', fromIndex, toIndex);
+            if (toIndex > 1) {
+              subData = priceData.slice(fromIndex, toIndex - 1)
+              subData = subData.reverse();
             }
           }
+          console.log('second time: exist', exist);
+          if (!exist) {
+            bar_data = await getLimitTimeHistoryData(
+              lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token1_contractAddress : lpTokenAddress.token0_contractAddress, 
+              lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token0_contractAddress : lpTokenAddress.token1_contractAddress, 
+              lpTokenAddress.network,
+              CANDLE_FETCH_COUNT / 2,
+              lastTime.toISOString().slice(0, 19),
+              resolution * 60
+            );     
+            console.log('second time: bar_data', bar_data);
+            if (bar_data.length == 0) {
+              onHistoryCallback([], {
+                noData: true,
+              })             
+              return; 
+            }
+            bar_data = bar_data.concat(subData);  
+            bar_data = bar_data.reverse();
+            priceData = bar_data.concat(priceData);
+          } else {
+            bar_data = subData;
+            bar_data = bar_data.reverse();
+          }
+          console.log('second time: bar_data', bar_data);
         }
-        // console.log('priceData', priceData);
-        // console.log('bar_data', bar_data);
-        bar_data = bar_data.reverse()
+        console.log('priceData:', priceData);
+        let price = 1;
+        const coin = coinPrice.find((coinToken:any) => coinToken.contractAddress.toLowerCase() + coinToken.network ==
+                      lpTokenAddress.quoteCurrency_contractAddress! + lpTokenAddress.network);
+        // // console.log('after before ', after, before);
+
+        // let beforeIndex = -1;
+        // let afterIndex = -1;
+        // if (priceData!=undefined) {
+        //   const searchbefore = (before.replace('T', ' ')).slice(0, 19);
+        //   const searchafter = (after.replace('T', ' ')).slice(0, 19);
+        //   // console.log('search', searchafter, searchbefore);
+        //   beforeIndex = priceData.findIndex(function(number) {
+        //     return number.timeInterval.second < searchbefore
+        //   });
+        //   afterIndex = priceData.findIndex(function(number) {
+        //     return number.timeInterval.second < searchafter
+        //   });
+        //   // console.log('after before index', beforeIndex, afterIndex);
+        // }
+        // if (beforeIndex != -1) {
+        //   bar_data = priceData.slice(afterIndex == -1 ? 0 : beforeIndex, afterIndex);
+        //   // console.log('bar_data', bar_data);
+        // } else {
+        //   priceData.splice(afterIndex, priceData.length - 1);
+        //   bar_data = await getRangeHistoryData(
+        //     lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token1_contractAddress : lpTokenAddress.token0_contractAddress, 
+        //     lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token0_contractAddress : lpTokenAddress.token1_contractAddress, 
+        //     lpTokenAddress.network,
+        //     after,
+        //     before,
+        //     1
+        //   );
+
+        //   priceData = priceData.concat(bar_data);
+        // }
+
+        // // console.log('firstDataRequest bar_data.length', firstDataRequest, bar_data.length);
+        // if (firstDataRequest && bar_data.length > 0) {
+        //   const res = await getLastTransactionsLogsByTopic(
+        //     lpTokenAddress.contractAddress, 
+        //     lpTokenAddress.network
+        //   );
+        //   if (res != constant.NOT_FOUND_TOKEN) {
+        //     let currentBaseReserve = lpTokenAddress.token0_reserve;
+        //     let currentQuoteReserve = lpTokenAddress.token1_reserve;
+        //     const utcTime = new Date();
+        //     const currentTime = new Date(bar_data[0].timeInterval.second);
+        //     utcTime.setUTCFullYear(currentTime.getFullYear(), currentTime.getMonth(), currentTime.getDate());
+        //     utcTime.setUTCHours(currentTime.getHours(), currentTime.getMinutes(), currentTime.getSeconds());
+            
+        //     // console.log("reserve", currentBaseReserve, currentQuoteReserve);
+        //     for (let index = 0; index < res.length; index++){
+        //       const value = res[index];
+        //       const timeStamp = parseInt(value.timeStamp, 16) * 1000;
+        //       const time = new Date(timeStamp).toISOString().replace("T", " ").slice(0, 19);
+        //       // console.log("bar_data[0], new data time", timeStamp, utcTime.getTime(), );
+        //       if (timeStamp <= utcTime.getTime())
+        //         continue;
+        //       let itemPrice = 0;
+        //       if (lpTokenAddress.tokenside == TokenSide.token0) {
+        //         itemPrice = currentQuoteReserve / currentBaseReserve;
+        //       } else {
+        //         itemPrice = currentBaseReserve / currentQuoteReserve;
+        //       }
+        //       const item = ConvertEventtoTransaction(value, lpTokenAddress);
+        //       const new_item = {
+        //         timeInterval:{
+        //           second: time
+        //         },
+        //         isBarClosed:true,
+        //         isLastBar:false,
+        //         quoteAmount:item.quoteToken_amount,
+        //         open:itemPrice,
+        //         high:itemPrice,
+        //         low:itemPrice,
+        //         close:itemPrice
+        //       }
+        //       bar_data.unshift(new_item);
+        //       if (item.buy_sell == "Buy") {
+        //         currentBaseReserve += item.baseToken_amount;
+        //         currentQuoteReserve -= item.quoteToken_amount;
+        //       } else {
+        //         currentBaseReserve -= item.baseToken_amount;
+        //         currentQuoteReserve += item.quoteToken_amount;
+        //       }
+        //       // console.log('new_item', new_item);
+        //     }
+        //   }
+        // }
+        // // console.log('priceData', priceData);
+        // // console.log('bar_data', bar_data);
+        
 
         if (coin != undefined)
           price = coin.price;
@@ -254,21 +335,18 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
         //       noData: true,
         //     })          
         // } else {
-        bar_data?.forEach((value:any)  => {
-          const utcTime = new Date();
-          const currentTime = new Date(value.timeInterval.second);
-          utcTime.setUTCFullYear(currentTime.getFullYear(), currentTime.getMonth(), currentTime.getDate());
-          utcTime.setUTCHours(currentTime.getHours(), currentTime.getMinutes(), currentTime.getSeconds());
+        bar_data?.forEach((value:any, index:number)  => {
+          const currentTime = new Date(value.timeInterval.second + " UTC");
           // console.log('currentTime', currentTime, utcTime);
-          const cuTime = makeTemplateDate(utcTime, resolution);
+          // const cuTime = makeTemplateDate(utcTime, resolution);
           const pre = bars.at(-1);
-          if (pre == undefined || cuTime.getTime() != pre.time) {
+          if (pre == undefined || currentTime.getTime() != pre.time) {
             let open_price = 0.0;
             if(pre != undefined) {
               open_price = bars[bars.length -1].close;
             }
             const obj = {
-              time: cuTime.getTime(),
+              time: currentTime.getTime(),
               low: value.low * price,
               high: value.high * price,
               open: open_price == 0? (parseFloat(value.open) * price) : open_price,
@@ -297,6 +375,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
           preReserve1 = lpTokenAddress.token1_reserve;
         }
 
+        console.log('bars', bars);
         onHistoryCallback(bars, {
           noData: false,
         })
@@ -313,6 +392,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       subscribeUID: any,
       onResetCacheNeededCallback: any,
     ) => {
+      return;
       currentResolutions = resolution
       myInterval = setInterval(async function () {
         const currentReserve0 = lpTokenAddress.token0_reserve;
@@ -423,6 +503,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
 
     tvWidget = new widget(widgetOptions)
 		tvWidget.onChartReady(() => {
+      
 			tvWidget!.headerReady().then(() => {
 				const button = tvWidget!.createButton();
 				button.setAttribute('title', 'Click to show positions');
