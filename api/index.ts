@@ -105,11 +105,14 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
     }
     let jsonObject:any = undefined;
     for (let ind = 0; ind < addressurl_array.length; ind ++) {
+      console.log('url', addressurl_array[ind]);
       const price = await getTokenPricefromCoingeckoAPI(addressurl_array[ind], constant.BINANCE_NETOWRK);
-      if (price != undefined) {
+      console.log('price', price);
+      if (price != undefined && price != null) {
         Object.assign(jsonObject, price);
       }
     }
+    console.log('jsonObject', jsonObject);
     // const tokenPrices = await getTokenPricefromCoingeckoAPI(address_str, constant.BINANCE_NETOWRK);
     if (jsonObject != undefined) {
       tokenList.forEach((value, _index) => {
