@@ -150,13 +150,12 @@ export default function WalletInfo() {
   }
   const getTokensFromWallet = async() => {
     initAllInfos();
-    const adTemp = "0x1Db330ac2aAd0007e650D0c92a981Ce7CC72Cf04";
     if (network[0].data.chain?.id == 1) {
-      const res = await getContractInfoFromWalletAddress(adTemp!, constant.ETHEREUM_NETWORK);
+      const res = await getContractInfoFromWalletAddress(address!, constant.ETHEREUM_NETWORK);
       setETHTokensBalance(res);
     } else {
       let usdBalance = 0;
-      const res = await getContractInfoFromWalletAddress(adTemp!, constant.BINANCE_NETOWRK);
+      const res = await getContractInfoFromWalletAddress(address!, constant.BINANCE_NETOWRK);
       if (res != constant.NOT_FOUND_TOKEN){
         res.forEach((value: ERC20Token) => {
           usdBalance += value.usdBalance;
