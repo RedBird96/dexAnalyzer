@@ -302,7 +302,7 @@ export default function WalletInfo() {
                               <a className={style.tokenName}
                                  style={{color:tokenColor}}
                                  href={token.contractPage}
-                                 target="_blank">
+                                 target="_blank" rel="noreferrer noopener">
                                 {makeShortTokenName(token.symbol, 13)}
                               </a>
                             </Box>

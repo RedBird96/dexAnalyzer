@@ -132,6 +132,7 @@ export default function LpTokenInfo({
             color={whiteBlackMode}
             href={lpToken.pairContractURL}
             target="_blank"
+            rel="noreferrer noopener"
           >
             {numberWithCommasTwoDecimals(reserve, 2)} 
           </a>

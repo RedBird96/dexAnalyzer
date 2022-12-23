@@ -128,7 +128,7 @@ export default function TokenTransaction() {
                      _hover={{"textDecoration":"underline"}}
                      cursor="pointer"
                     >
-                      <a href={linkAddr} target="_blank">
+                      <a href={linkAddr} target="_blank" rel="noreferrer noopener">
                         {makeShortTxHash(txHash)}
                       </a>
                     </Box>

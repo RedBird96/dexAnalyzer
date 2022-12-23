@@ -312,6 +312,7 @@ export default function TokenInfo() {
                   style={{color:textColor}}
                   href = {tokenData.contractCodeURL}
                   target="_blank"
+                  rel="noreferrer noopener"
                 >
                   {tokenData.contractAddress}
                 </a>
@@ -331,13 +332,31 @@ export default function TokenInfo() {
             flexDirection={"row"}
             alignItems={"center"}
           >
-            <a className={style.socialUrl} href={tokenData.website} style={{marginRight:"0.5rem"}} target="_blank">
+            <a 
+              className={style.socialUrl} 
+              href={tokenData.website} 
+              style={{marginRight:"0.5rem"}} 
+              target="_blank"
+              rel="noreferrer noopener"
+            >
               <WebSite/>
             </a>            
-            <a className={style.socialUrl} href={tokenData.facebook} style={{marginRight:"0.5rem"}} target="_blank">
+            <a 
+              className={style.socialUrl} 
+              href={tokenData.facebook} 
+              style={{marginRight:"0.5rem"}} 
+              target="_blank"
+              rel="noreferrer noopener"
+            >
               <FaceBook className={style.socialUrl}/>
             </a>
-            <a className={style.socialUrl} href={tokenData.twitter} style={{marginRight:"0.7rem"}} target="_blank">
+            <a 
+              className={style.socialUrl} 
+              href={tokenData.twitter} 
+              style={{marginRight:"0.7rem"}} 
+              target="_blank"
+              rel="noreferrer noopener"
+            >
               <Twitter className={style.socialUrl}/>
             </a>
           </Box>
@@ -437,6 +456,7 @@ export default function TokenInfo() {
                   color={whiteBlackMode} 
                   href={tokenData.contractBalanceWalletURL} 
                   target="_blank"
+                  rel="noreferrer noopener"
                 >
                   {numberWithCommasTwoDecimals(balance)}
                 </a>
@@ -455,6 +475,7 @@ export default function TokenInfo() {
                   color={whiteBlackMode} 
                   href={tokenData.contractBalanceURL} 
                   target="_blank"
+                  rel="noreferrer noopener"
                 >
                   {holdersCount}
                 </a>
@@ -468,6 +489,7 @@ export default function TokenInfo() {
                   color={whiteBlackMode} 
                   href={tokenData.contractPage} 
                   target="_blank"
+                  rel="noreferrer noopener"
                 >
                   {transactionCount}
                 </a>
