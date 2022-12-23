@@ -84,6 +84,7 @@ export default function WalletInfo() {
     const ethBalance = text.ETH.balance;
     const ethPrice = text.ETH.price.rate;
     const usdETHBalance = ethBalance * ethPrice;
+    const ETHLINK = "https://etherscan.io/address/";
     let usdBalance = 0;
     tempTokens.push({
       name:network[0].data.chain?.id == 1 ? "ETH" : "BNB",
@@ -97,7 +98,8 @@ export default function WalletInfo() {
       network: constant.ETHEREUM_NETWORK,
       owner: address,
       totalSupply: 0,
-      marketCap: ""
+      marketCap: "",
+      contractPage: ETHLINK + address
     } as ERC20Token)
 
     usdBalance += usdETHBalance;
@@ -129,7 +131,8 @@ export default function WalletInfo() {
           image: value.tokenInfo.image,
           owner: value.tokenInfo.owner,
           totalSupply: value.tokenInfo.totalSupply,
-          marketCap: value.tokenInfo.totalSupply
+          marketCap: value.tokenInfo.totalSupply,
+          contractPage: ETHLINK + value.tokenInfo.address
         } as ERC20Token)
       });
     }
@@ -146,7 +149,6 @@ export default function WalletInfo() {
     setWalletTokens([]);
   }
   const getTokensFromWallet = async() => {
-    deleteCookie("dexChartInfo");
     initAllInfos();
     if (network[0].data.chain?.id == 1) {
       const res = await getContractInfoFromWalletAddress(address!, constant.ETHEREUM_NETWORK);
