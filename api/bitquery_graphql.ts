@@ -244,3 +244,48 @@ export const getHoldTransferCount = async (
 
 }
 
+
+export const getHoldTokenList = async (
+  address: string, 
+  network: number
+) => {
+
+  const query = `
+  {
+    ethereum(network: ${network == constant.ETHEREUM_NETWORK ? "ethereum" : "bsc"}) {
+      address(address: {is: "${address}"}) {
+        balances {
+          currency {
+            symbol
+            address
+            decimals
+            tokenType
+          }
+          value
+        }
+      }
+    }
+  }
+  `;
+
+  const raw = JSON.stringify({query,"variables": "{}"});
+
+  const response = await fetch(endpoint.BITQUERY_ENDPOINT, {
+    method: 'POST',
+    headers: {'X-API-KEY': endpoint.BITQUERY_API_KEY,
+              "Content-Type":"application/json"},
+    body:raw,
+    redirect:'follow'
+  });  
+  if (response.status != 200) {
+    return constant.NOT_FOUND_TOKEN;
+  }
+  try {
+    const text = await response.json();
+    return text["data"].ethereum.address[0].balances;
+  } catch (err:any) {
+    return constant.NOT_FOUND_TOKEN;
+  }
+
+}
+

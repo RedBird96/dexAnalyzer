@@ -212,7 +212,14 @@ export default function TokenList() {
         network:obj["network"],
         price:obj["price"],
         totalSupply:obj["totalSupply"],
-        pinSetting:obj["pinSetting"]
+        pinSetting:obj["pinSetting"],
+        website:obj["website"],
+        twitter:obj["twitter"],
+        facebook:obj["facebook"],
+        contractCodeURL:obj["contractCodeURL"],
+        contractBalanceWalletURL:obj["contractBalanceWalletURL"],
+        contractBalanceURL:obj["contractBalanceURL"],
+        contractPage:obj["contractPage"]
       } as ERC20Token;
       if (token.pinSetting == false)
         return;

@@ -55,7 +55,6 @@ export default function TokenTransaction() {
     lpTokenAddress.quoteCurrency_contractAddress! + lpTokenAddress.network);
     if (coin != undefined)
       setquotePrice(coin.price);
-    console.log('updated data', transactionData);
     setTXTransaction(transactionData);
   }, [transactionData])
   useEffect(() => {
@@ -129,7 +128,7 @@ export default function TokenTransaction() {
                      _hover={{"textDecoration":"underline"}}
                      cursor="pointer"
                     >
-                      <a href={linkAddr}>
+                      <a href={linkAddr} target="_blank">
                         {makeShortTxHash(txHash)}
                       </a>
                     </Box>

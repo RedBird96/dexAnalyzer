@@ -311,6 +311,7 @@ export default function TokenInfo() {
                 <a className={style.tokenAddress} 
                   style={{color:textColor}}
                   href = {tokenData.contractCodeURL}
+                  target="_blank"
                 >
                   {tokenData.contractAddress}
                 </a>
@@ -330,13 +331,13 @@ export default function TokenInfo() {
             flexDirection={"row"}
             alignItems={"center"}
           >
-            <a className={style.socialUrl} href={tokenData.website} style={{marginRight:"0.5rem"}}>
+            <a className={style.socialUrl} href={tokenData.website} style={{marginRight:"0.5rem"}} target="_blank">
               <WebSite/>
             </a>            
-            <a className={style.socialUrl} href={tokenData.facebook} style={{marginRight:"0.5rem"}}>
+            <a className={style.socialUrl} href={tokenData.facebook} style={{marginRight:"0.5rem"}} target="_blank">
               <FaceBook className={style.socialUrl}/>
             </a>
-            <a className={style.socialUrl} href={tokenData.twitter} style={{marginRight:"0.7rem"}}>
+            <a className={style.socialUrl} href={tokenData.twitter} style={{marginRight:"0.7rem"}} target="_blank">
               <Twitter className={style.socialUrl}/>
             </a>
           </Box>
@@ -429,10 +430,16 @@ export default function TokenInfo() {
           }}/>
           <Box display={"flex"} flexDirection={"column"} width={"39%"}>
               <p className={style.marketCap} style={{color:textColor}}>Balance</p>
-              <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
-                <Box _hover={{"textDecoration":"underline"}} cursor="pointer" >
-                  <a className={style.tokenMarketCap} style={{marginRight:"1rem"}} color={whiteBlackMode} href={tokenData.contractBalanceWalletURL}>{numberWithCommasTwoDecimals(balance)}</a>
-                </Box>
+              <Box display={"flex"} flexDirection={"row"} alignItems={"center"}  _hover={{"textDecoration":"underline"}} cursor="pointer">
+                <a 
+                  className={style.tokenMarketCap} 
+                  style={{marginRight:"1rem"}} 
+                  color={whiteBlackMode} 
+                  href={tokenData.contractBalanceWalletURL} 
+                  target="_blank"
+                >
+                  {numberWithCommasTwoDecimals(balance)}
+                </a>
                 <p className={style.tokenMarketCap}  style={{color:priceColor}} >({convertBalanceCurrency(balanceUSD, 2)})</p>
               </Box>
           </Box>          
@@ -443,13 +450,27 @@ export default function TokenInfo() {
             <Box display={"flex"} flexDirection={"column"} width={"50%"}>
               <p className={style.holder} style={{color:textColor}}>Holders</p>
               <Box _hover={{"textDecoration":"underline"}} cursor="pointer" >
-                <a className={style.itemvalue} color={whiteBlackMode} href={tokenData.contractBalanceURL}>{holdersCount}</a>
+                <a 
+                  className={style.itemvalue} 
+                  color={whiteBlackMode} 
+                  href={tokenData.contractBalanceURL} 
+                  target="_blank"
+                >
+                  {holdersCount}
+                </a>
               </Box>
             </Box>
             <Box>
               <p className={style.holder} style={{color:textColor}}>Transactions</p>
               <Box _hover={{"textDecoration":"underline"}} cursor="pointer" >
-                <a className={style.itemvalue} color={whiteBlackMode} href={tokenData.contractPage}>{transactionCount}</a>
+                <a 
+                  className={style.itemvalue} 
+                  color={whiteBlackMode} 
+                  href={tokenData.contractPage} 
+                  target="_blank"
+                >
+                  {transactionCount}
+                </a>
               </Box>
             </Box>              
           </Box>        

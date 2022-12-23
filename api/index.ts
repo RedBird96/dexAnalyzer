@@ -8,7 +8,7 @@ import EtherscanClient, {Action} from './ethers/etherscan-client';
 import {ERC20Token, LPTokenPair, TokenSide} from '../utils/type'
 import UniswapV2Pair from '../config/IUniswapV2Pair.json';
 import PancakeswapV2Pair from '../config/IPancakeswapV2Pair.json';
-import { getHoldTransferCount, getLPPairs } from "./bitquery_graphql";
+import { getHoldTokenList, getHoldTransferCount, getLPPairs } from "./bitquery_graphql";
 import * as constant from '../utils/constant'
 import * as endpoint from '../utils/endpoints'
 
@@ -42,6 +42,7 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
     return JSON.parse(text);
   } else {
     const web3_bsc = new Web3(constant.BSCRPC_URL);
+    const BSCLINK = " https://bscscan.com/address/";
     const bnbBalance = parseInt(await web3_bsc.eth.getBalance(address))/ Math.pow(10, 18);
     const bnbPrice = await getTokenPricefromllama(constant.WHITELIST_TOKENS.BSC.BNB, constant.BINANCE_NETOWRK);
     const usdBalance = bnbPrice * bnbBalance;
@@ -59,52 +60,37 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
       owner: "",
       totalSupply: 0,
       marketCap: "",
-      pinSetting: false      
+      pinSetting: false,
+      contractPage: BSCLINK + constant.WHITELIST_TOKENS.BSC.BNB 
     }               
     let tokenList:ERC20Token[] = [];
     const eth = new EtherscanClient(BSC_MAINNET_CONNECTION);
-    const res = await eth.call(Action.account_tokentx, {address});
+    const res = await getHoldTokenList(address, network);
     let address_str = "";
-    for(let ind = 0; ind < res.result.length; ind ++) {
-      if (res.result[ind].hasOwnProperty('tokenDecimal')) {
-        const add = res.result[ind].contractAddress;
-        const decimal = res.result[ind].tokenDecimal;
-        const value  = res.result[ind].value;
-        const symbol = res.result[ind].tokenSymbol;
-        const name = res.result[ind].tokenName;
-        const from = res.result[ind].from;
-        const to = res.result[ind].to;
-        const balance = parseInt(value) / Math.pow(10, decimal);
-        if (to.toLowerCase() == address.toLowerCase()) {
-          const index = tokenList.findIndex((value) => value.contractAddress.toLowerCase() == add)
-          if (index == -1) {
-            tokenList.push({
-              name: name,
-              decimals: decimal,
-              symbol: symbol,
-              contractAddress: add,
-              balance: balance,
-              usdBalance: 0,
-              network: network,
-              price: 0,
-              holdersCount: 0,
-              image: "",
-              owner: "",
-              totalSupply: 0,
-              marketCap: "",
-              pinSetting: false
-            });
-            address_str += add;
-            address_str += "%2C";
-          } else {
-            tokenList[index].balance += balance;
-          }
-        } else {
-          const index = tokenList.findIndex((value) => value.contractAddress.toLowerCase() == add)
-          if (index != -1) {
-            tokenList[index].balance -= balance;
-          }
-        }
+    if (res == constant.NOT_FOUND_TOKEN)
+      return tokenList;
+    for(let ind = 0; ind < res.length; ind ++) {
+
+      if(res[ind].currency.tokenType == "ERC20") {
+        tokenList.push({
+          name: res[ind].currency.name,
+          decimals: res[ind].currency.decimals,
+          symbol: res[ind].currency.symbol,
+          contractAddress: res[ind].currency.address,
+          balance: res[ind].value,
+          usdBalance: 0,
+          network: network,
+          price: 0,
+          holdersCount: 0,
+          image: "",
+          owner: "",
+          totalSupply: 0,
+          marketCap: "",
+          pinSetting: false,
+          contractPage: BSCLINK + res[ind].currency.address
+        } as ERC20Token);
+        address_str += res[ind].currency.address;
+        address_str += "%2C";
       }
     }
     address_str = address_str.slice(0, -3);

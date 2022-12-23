@@ -123,20 +123,18 @@ export default function LpTokenInfo({
         onClick={()=> {setLPTokenHandler(lpToken)}}
       >
         <p className={style.marketCap} style={{color:textColor}}>{lpToken.symbol}&nbsp;(LP)</p>
-        <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
-          <Box
+        <Box display={"flex"} flexDirection={"row"} alignItems={"center"}
             _hover={{"textDecoration":"underline"}} 
-            cursor="pointer"
+            cursor="pointer">
+          <a 
+            className={style.tokenMarketCap} 
+            style={{marginRight:"0.2rem"}}  
+            color={whiteBlackMode}
+            href={lpToken.pairContractURL}
+            target="_blank"
           >
-            <a 
-              className={style.tokenMarketCap} 
-              style={{marginRight:"0.2rem"}}  
-              color={whiteBlackMode}
-              href={lpToken.pairContractURL}
-            >
-              {numberWithCommasTwoDecimals(reserve, 2)} 
-            </a>
-          </Box>
+            {numberWithCommasTwoDecimals(reserve, 2)} 
+          </a>
           <p
             className={style.tokenMarketCap} 
             style={{marginRight:"0.5rem"}}  

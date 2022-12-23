@@ -291,11 +291,19 @@ export default function WalletInfo() {
                     if (Number.isNaN(token.decimals))
                       return ;
                     return (
-                      <Tr key={token.name + index}>
+                      <Tr key={token.contractAddress + index}>
                           <Th style={{padding:"0.3rem 0.5rem 0.3rem 0rem"}}>
-                            <p className={style.tokenName} style={{color:tokenColor}}>
-                              {makeShortTokenName(token.symbol, 13)}
-                            </p>
+                            <Box
+                            _hover={{"textDecoration":"underline"}}
+                            cursor="pointer"
+                            >
+                              <a className={style.tokenName}
+                                 style={{color:tokenColor}}
+                                 href={token.contractPage}
+                                 target="_blank">
+                                {makeShortTokenName(token.symbol, 13)}
+                              </a>
+                            </Box>
                           </Th>
                           <Th style={{padding:"0.3rem 0rem 0.3rem 0rem"}}>
                             <div className={style.tokenBalance}>
