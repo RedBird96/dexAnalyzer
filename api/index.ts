@@ -69,7 +69,6 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
     let address_str = "";
     let addressurl_array:any[] = [];
     let addressurl_index = 0;
-    console.log('res', res);
     if (res == constant.NOT_FOUND_TOKEN)
       return tokenList;
     console.log('res', res);
@@ -93,7 +92,7 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
           pinSetting: false,
           contractPage: BSCLINK + res[ind].currency.address
         } as ERC20Token);
-        if (ind % 150 == 0 || ind == res.length - 1) {
+        if (ind != 0 && (ind % 150 == 0 || ind == res.length - 1)) {
           address_str = address_str.slice(0, -3);
           addressurl_array[addressurl_index] = address_str;
           addressurl_index ++;
