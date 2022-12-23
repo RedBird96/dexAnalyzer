@@ -112,7 +112,7 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
     console.log('jsonObject', jsonObject);
     tokenList.forEach((value, _index) => {
       const add = value.contractAddress;
-      if (jsonObject.hasOwnProperty(add)) {
+      if (jsonObject.hasOwnProperty(add) && value.balance > 0) {
         const bal = jsonObject[value.contractAddress].usd * value.balance;
         value.usdBalance = bal;
       } else {
