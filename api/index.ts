@@ -47,9 +47,9 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
     const bnbPrice = await getTokenPricefromllama(constant.WHITELIST_TOKENS.BSC.BNB, constant.BINANCE_NETOWRK);
     const usdBalance = bnbPrice * bnbBalance;
     let bnbToken:ERC20Token = {
-      name: "WBNB",
+      name: "BNB",
       decimals: 18,
-      symbol: "WBNB",
+      symbol: "BNB",
       contractAddress: constant.WHITELIST_TOKENS.BSC.BNB,
       balance: bnbBalance,
       usdBalance: usdBalance,
@@ -104,12 +104,10 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
     let jsonObject:any = {};
     for (let ind = 0; ind < addressurl_array.length; ind ++) {
       const price = await getTokenPricefromCoingeckoAPI(addressurl_array[ind], constant.BINANCE_NETOWRK);
-      console.log('price', price);
       if (price != undefined && price != null) {
         Object.assign(jsonObject, price);
       }
     }
-    console.log('jsonObject', jsonObject);
     tokenList.forEach((value, _index) => {
       const add = value.contractAddress;
       if (jsonObject.hasOwnProperty(add) && value.balance > 0) {

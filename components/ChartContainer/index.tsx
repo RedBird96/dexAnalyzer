@@ -392,7 +392,6 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       subscribeUID: any,
       onResetCacheNeededCallback: any,
     ) => {
-      return;
       currentResolutions = resolution
       myInterval = setInterval(async function () {
         const currentReserve0 = lpTokenAddress.token0_reserve;
@@ -489,9 +488,6 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       container: 'dexAnalyzer_chart_container',
       locale: getLanguageFromURL() || 'en',
       theme: colorMode == "dark" ? 'Dark' : 'Light',
-      disabled_features: [
-        'compare_symbol'
-      ],
       charts_storage_url: ChartContainerProps.chartsStorageUrl,
       //   charts_storage_api_version: ChartContainerProps.chartsStorageApiVersion,
       client_id: ChartContainerProps.clientId,
