@@ -73,7 +73,7 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
       return tokenList;
     for(let ind = 0; ind < res.length; ind ++) {
 
-      if(res[ind].currency.tokenType == "ERC20") {
+      if(res[ind].currency.tokenType == "ERC20" && res[ind].value > 0) {
         tokenList.push({
           name: res[ind].currency.name,
           decimals: res[ind].currency.decimals,
@@ -155,7 +155,7 @@ export async function getCurrentBlockNumber(network: number) {
 
 export async function getLastTransactionsLogsByTopic(address:string, network: number) {
   
-  const backTime = 3600;
+  const backTime = 1800;
   const topic = "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822";
   let client, response;
   if (network == constant.ETHEREUM_NETWORK) {

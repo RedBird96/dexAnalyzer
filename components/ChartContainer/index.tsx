@@ -69,7 +69,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
 
   const { colorMode } = useColorMode();
   let tvWidget: IChartingLibraryWidget | null = null
-  const {lpTokenPrice, lpTokenAddress} = useLPTokenPrice();
+  const {lpTokenAddress} = useLPTokenPrice();
   const {coinPrice} = useStableCoinPrice();
   const [showOrder, setShowOrder] = React.useState<boolean>(false);
   const {transactionData, setTransactionData} = useLPTransaction();
@@ -89,6 +89,59 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
   const configurationData = {
     supported_resolutions: ['1', '5', '10', '30', '1H', '6H', '12H', '1D']
   }
+
+
+  const AddRecentData = async (data: any[]) => {
+    
+    const res = await getLastTransactionsLogsByTopic(
+      lpTokenAddress.contractAddress, 
+      lpTokenAddress.network
+    );
+    if (res != constant.NOT_FOUND_TOKEN) {
+      let currentBaseReserve = lpTokenAddress.token0_reserve;
+      let currentQuoteReserve = lpTokenAddress.token1_reserve;
+      const currentTime = new Date(data[0].timeInterval.second + " UTC");
+      
+      // console.log("reserve", currentBaseReserve, currentQuoteReserve);
+      for (let index = 0; index < res.length; index++){
+        const value = res[index];
+        const timeStamp = parseInt(value.timeStamp, 16) * 1000;
+        if (timeStamp <= currentTime.getTime())
+          continue;
+
+        const time = new Date(timeStamp).toISOString().replace("T", " ").slice(0, 19);
+        let itemPrice = 0;
+        if (lpTokenAddress.tokenside == TokenSide.token0) {
+          itemPrice = currentQuoteReserve / currentBaseReserve;
+        } else {
+          itemPrice = currentBaseReserve / currentQuoteReserve;
+        }
+        const item = ConvertEventtoTransaction(value, lpTokenAddress);
+        const new_item = {
+          timeInterval:{
+            second: time
+          },
+          isBarClosed:true,
+          isLastBar:false,
+          quoteAmount:item.quoteToken_amount,
+          open:itemPrice,
+          high:itemPrice,
+          low:itemPrice,
+          close:itemPrice
+        }
+        data.unshift(new_item);
+        if (item.buy_sell == "Buy") {
+          currentBaseReserve += item.baseToken_amount;
+          currentQuoteReserve -= item.quoteToken_amount;
+        } else {
+          currentBaseReserve -= item.baseToken_amount;
+          currentQuoteReserve += item.quoteToken_amount;
+        }
+      }
+    }
+  
+  }
+
 
   const feed = {
     onReady: (callback: any) => {
@@ -155,7 +208,8 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
 
         // console.log('from to', new Date(from * 1000).toISOString(), new Date(to * 1000).toISOString(), resolution);
         
-        
+        console.log('lp info', lpTokenAddress.token0_reserve, lpTokenAddress.token1_reserve);
+
         if (firstDataRequest) {
 
           const current = new Date();
@@ -171,17 +225,14 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
             end,
             resolution * 60
           );     
-          console.log('first time bar_data1:', bar_data);
+          await AddRecentData(bar_data);
           bar_data = bar_data.reverse();
           priceData = bar_data;
         } else {
-          console.log('second time');
-          console.log('second time: after before', from, to);
           let subData:any[] = [];
           let exist:boolean = false;
           const lastEle = priceData.at(0);
           const lastTime = new Date(lastEle.timeInterval.second + " UTC");
-          console.log('second time: lastTime', lastTime.getTime() / 1000);
           if (to >= lastTime.getTime() / 1000) {
             let fromIndex = 0;
             const toIndex = priceData.findIndex((value, index) => {
@@ -201,13 +252,11 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
               if (fromIndex > 1)
                 fromIndex = fromIndex - 1;
             }
-            console.log('second time: from-to Index', fromIndex, toIndex);
             if (toIndex > 1) {
               subData = priceData.slice(fromIndex, toIndex - 1)
               subData = subData.reverse();
             }
           }
-          console.log('second time: exist', exist);
           if (!exist) {
             bar_data = await getLimitTimeHistoryData(
               lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token1_contractAddress : lpTokenAddress.token0_contractAddress, 
@@ -217,7 +266,6 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
               lastTime.toISOString().slice(0, 19),
               resolution * 60
             );     
-            console.log('second time: bar_data', bar_data);
             if (bar_data.length == 0) {
               onHistoryCallback([], {
                 noData: true,
@@ -231,114 +279,17 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
             bar_data = subData;
             bar_data = bar_data.reverse();
           }
-          console.log('second time: bar_data', bar_data);
         }
-        console.log('priceData:', priceData);
         let price = 1;
         const coin = coinPrice.find((coinToken:any) => coinToken.contractAddress.toLowerCase() + coinToken.network ==
                       lpTokenAddress.quoteCurrency_contractAddress! + lpTokenAddress.network);
         // // console.log('after before ', after, before);
 
-        // let beforeIndex = -1;
-        // let afterIndex = -1;
-        // if (priceData!=undefined) {
-        //   const searchbefore = (before.replace('T', ' ')).slice(0, 19);
-        //   const searchafter = (after.replace('T', ' ')).slice(0, 19);
-        //   // console.log('search', searchafter, searchbefore);
-        //   beforeIndex = priceData.findIndex(function(number) {
-        //     return number.timeInterval.second < searchbefore
-        //   });
-        //   afterIndex = priceData.findIndex(function(number) {
-        //     return number.timeInterval.second < searchafter
-        //   });
-        //   // console.log('after before index', beforeIndex, afterIndex);
-        // }
-        // if (beforeIndex != -1) {
-        //   bar_data = priceData.slice(afterIndex == -1 ? 0 : beforeIndex, afterIndex);
-        //   // console.log('bar_data', bar_data);
-        // } else {
-        //   priceData.splice(afterIndex, priceData.length - 1);
-        //   bar_data = await getRangeHistoryData(
-        //     lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token1_contractAddress : lpTokenAddress.token0_contractAddress, 
-        //     lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token0_contractAddress : lpTokenAddress.token1_contractAddress, 
-        //     lpTokenAddress.network,
-        //     after,
-        //     before,
-        //     1
-        //   );
-
-        //   priceData = priceData.concat(bar_data);
-        // }
-
-        // // console.log('firstDataRequest bar_data.length', firstDataRequest, bar_data.length);
-        // if (firstDataRequest && bar_data.length > 0) {
-        //   const res = await getLastTransactionsLogsByTopic(
-        //     lpTokenAddress.contractAddress, 
-        //     lpTokenAddress.network
-        //   );
-        //   if (res != constant.NOT_FOUND_TOKEN) {
-        //     let currentBaseReserve = lpTokenAddress.token0_reserve;
-        //     let currentQuoteReserve = lpTokenAddress.token1_reserve;
-        //     const utcTime = new Date();
-        //     const currentTime = new Date(bar_data[0].timeInterval.second);
-        //     utcTime.setUTCFullYear(currentTime.getFullYear(), currentTime.getMonth(), currentTime.getDate());
-        //     utcTime.setUTCHours(currentTime.getHours(), currentTime.getMinutes(), currentTime.getSeconds());
-            
-        //     // console.log("reserve", currentBaseReserve, currentQuoteReserve);
-        //     for (let index = 0; index < res.length; index++){
-        //       const value = res[index];
-        //       const timeStamp = parseInt(value.timeStamp, 16) * 1000;
-        //       const time = new Date(timeStamp).toISOString().replace("T", " ").slice(0, 19);
-        //       // console.log("bar_data[0], new data time", timeStamp, utcTime.getTime(), );
-        //       if (timeStamp <= utcTime.getTime())
-        //         continue;
-        //       let itemPrice = 0;
-        //       if (lpTokenAddress.tokenside == TokenSide.token0) {
-        //         itemPrice = currentQuoteReserve / currentBaseReserve;
-        //       } else {
-        //         itemPrice = currentBaseReserve / currentQuoteReserve;
-        //       }
-        //       const item = ConvertEventtoTransaction(value, lpTokenAddress);
-        //       const new_item = {
-        //         timeInterval:{
-        //           second: time
-        //         },
-        //         isBarClosed:true,
-        //         isLastBar:false,
-        //         quoteAmount:item.quoteToken_amount,
-        //         open:itemPrice,
-        //         high:itemPrice,
-        //         low:itemPrice,
-        //         close:itemPrice
-        //       }
-        //       bar_data.unshift(new_item);
-        //       if (item.buy_sell == "Buy") {
-        //         currentBaseReserve += item.baseToken_amount;
-        //         currentQuoteReserve -= item.quoteToken_amount;
-        //       } else {
-        //         currentBaseReserve -= item.baseToken_amount;
-        //         currentQuoteReserve += item.quoteToken_amount;
-        //       }
-        //       // console.log('new_item', new_item);
-        //     }
-        //   }
-        // }
-        // // console.log('priceData', priceData);
-        // // console.log('bar_data', bar_data);
-        
-
         if (coin != undefined)
           price = coin.price;
 
-        // if (bar_data.length == 0) {
-        //     onHistoryCallback([], {
-        //       noData: true,
-        //     })          
-        // } else {
-        bar_data?.forEach((value:any, index:number)  => {
+        bar_data?.forEach((value:any)  => {
           const currentTime = new Date(value.timeInterval.second + " UTC");
-          // console.log('currentTime', currentTime, utcTime);
-          // const cuTime = makeTemplateDate(utcTime, resolution);
           const pre = bars.at(-1);
           if (pre == undefined || currentTime.getTime() != pre.time) {
             let open_price = 0.0;
@@ -356,11 +307,6 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
               volume: value.quoteAmount * price,
             }
             bars = [...bars, obj]
-            // console.log('bars', bars);
-            // if (i === bar_data.length - 1) {
-            //   obj.isLastBar = true
-            //   obj.isBarClosed = false
-            // }
           } else {
             const lastIndex = bars.length - 1;
             bars[lastIndex].close = parseFloat(value.close) * price;
@@ -370,9 +316,10 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
           }
         });
         if(bars.length>0) {
-          lastBarsCache = bars[0];
+          lastBarsCache = bars[bars.length - 1];
           preReserve0 = lpTokenAddress.token0_reserve;
           preReserve1 = lpTokenAddress.token1_reserve;
+          
         }
 
         console.log('bars', bars);

@@ -149,6 +149,9 @@ export default function WalletInfo() {
     setWalletTokens([]);
   }
   const getTokensFromWallet = async() => {
+    if (address == null || address == "")
+      return;
+      
     initAllInfos();
     if (network[0].data.chain?.id == 1) {
       const res = await getContractInfoFromWalletAddress(address!, constant.ETHEREUM_NETWORK);
