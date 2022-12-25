@@ -35,6 +35,7 @@ import * as constant from '../../utils/constant'
 import LpTokenInfo from './LpTokenInfo'
 import { LPTokenPair, TokenSide } from '../../utils/type'
 import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
+import { isNumber } from 'lodash'
 
 
 export default function TokenInfo() {
@@ -174,7 +175,8 @@ export default function TokenInfo() {
     const res = await getTokenHolderandTransactionCount(tokenData.contractAddress, tokenData.network);
     setHoldersCount(res[0]);
     setTransactionCount(res[1]);
-    setBurnAmount(burn_res);
+    if (!isNaN(burn_res))
+      setBurnAmount(burn_res);
   }
 
   const setLpTokenItem = (clickLp: LPTokenPair) => {

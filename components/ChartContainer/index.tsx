@@ -93,29 +93,32 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
 
   const AddRecentData = async (data: any[]) => {
     
+    let recentArray:any[] = [];
     const res = await getLastTransactionsLogsByTopic(
       lpTokenAddress.contractAddress, 
       lpTokenAddress.network
     );
     if (res != constant.NOT_FOUND_TOKEN) {
-      let currentBaseReserve = lpTokenAddress.token0_reserve;
-      let currentQuoteReserve = lpTokenAddress.token1_reserve;
+      let currentBaseReserve = 0;lpTokenAddress.token0_reserve;
+      let currentQuoteReserve = 0;lpTokenAddress.token1_reserve;
+      if (lpTokenAddress.tokenside == TokenSide.token0) {
+        currentBaseReserve = lpTokenAddress.token0_reserve;
+        currentQuoteReserve = lpTokenAddress.token1_reserve;
+      } else {
+        currentBaseReserve = lpTokenAddress.token1_reserve;
+        currentQuoteReserve = lpTokenAddress.token0_reserve;
+      }
       const currentTime = new Date(data[0].timeInterval.second + " UTC");
       
       // console.log("reserve", currentBaseReserve, currentQuoteReserve);
-      for (let index = 0; index < res.length; index++){
+      for (let index = res.length - 1; index > 0; index--){
         const value = res[index];
         const timeStamp = parseInt(value.timeStamp, 16) * 1000;
         if (timeStamp <= currentTime.getTime())
-          continue;
+          break;
 
         const time = new Date(timeStamp).toISOString().replace("T", " ").slice(0, 19);
-        let itemPrice = 0;
-        if (lpTokenAddress.tokenside == TokenSide.token0) {
-          itemPrice = currentQuoteReserve / currentBaseReserve;
-        } else {
-          itemPrice = currentBaseReserve / currentQuoteReserve;
-        }
+        let itemPrice = currentQuoteReserve / currentBaseReserve;
         const item = ConvertEventtoTransaction(value, lpTokenAddress);
         const new_item = {
           timeInterval:{
@@ -129,7 +132,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
           low:itemPrice,
           close:itemPrice
         }
-        data.unshift(new_item);
+        recentArray.push(new_item);
         if (item.buy_sell == "Buy") {
           currentBaseReserve += item.baseToken_amount;
           currentQuoteReserve -= item.quoteToken_amount;
@@ -138,6 +141,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
           currentQuoteReserve += item.quoteToken_amount;
         }
       }
+      data.unshift(...recentArray);
     }
   
   }
@@ -197,20 +201,20 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
         }
 
         // console.log('getBars firstDataRequest', new Date(from * 1000).toISOString(), new Date(to * 1000).toISOString(),  firstDataRequest);
-        // if (checksumAddress) {
-        //   // setLoader(true);
-        //   if (!firstDataRequest) {
-        //     // "noData" should be set if there is no data in the requested period.
-        //     onHistoryCallback([], {
-        //       noData: true,
-        //     })
-        //     return
-        //   }
-        // }
+        if (checksumAddress) {
+          // setLoader(true);
+          if (!firstDataRequest) {
+            // "noData" should be set if there is no data in the requested period.
+            onHistoryCallback([], {
+              noData: true,
+            })
+            return
+          }
+        }
 
         // console.log('from to', new Date(from * 1000).toISOString(), new Date(to * 1000).toISOString(), resolution);
         
-        console.log('lp info', lpTokenAddress.token0_reserve, lpTokenAddress.token1_reserve);
+        // console.log('lp info', lpTokenAddress.token0_reserve, lpTokenAddress.token1_reserve);
 
         if (firstDataRequest) {
 
@@ -317,14 +321,14 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
             bars[lastIndex].volume += (value.quoteAmount * price);
           }
         });
-        if(bars.length>0) {
+        if(bars.length>0 && firstDataRequest) {
           lastBarsCache = bars[bars.length - 1];
           preReserve0 = lpTokenAddress.token0_reserve;
           preReserve1 = lpTokenAddress.token1_reserve;
           
         }
 
-        console.log('bars', bars);
+        // console.log('bars', bars);
         onHistoryCallback(bars, {
           noData: false,
         })
@@ -346,7 +350,6 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
         const currentReserve0 = lpTokenAddress.token0_reserve;
         const currentReserve1 = lpTokenAddress.token1_reserve;
         if (preReserve0 != currentReserve0 || preReserve1 != currentReserve1) {
-          console.log('bar should be updated');
           const resolutionMapping: any = {
             '1': 60000,
             '5': 300000,
@@ -359,11 +362,10 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
             '1W': 7 * 24 * 3600000,
             '1M': 30 * 24 * 3600000,
           }
-
           if (lastBarsCache === undefined) return
           const time = new Date();
-          const isNew = new Date().getTime() - lastBarsCache.time >= resolutionMapping[currentResolutions]
-          const cuTime = makeTemplateDate(time, resolution);
+          const cuTime = makeTemplateDate(time, currentResolutions);
+          const isNew = cuTime.getTime() - lastBarsCache.time >= resolutionMapping[currentResolutions]
           
           let price = 1;
           const coin = coinPrice.find((coinToken:any) => coinToken.contractAddress.toLowerCase() + coinToken.network ==
@@ -382,6 +384,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
             currentPrice = currentReserve0 / currentReserve1 * price;
             volume += (Math.abs(currentReserve0 - preReserve0)) * price
           }
+          // console.log('bar should be updated', time.toUTCString(), cuTime, currentPrice, temp);
           if (isNew) {
             lastBarsCache.time = cuTime.getTime()
             lastBarsCache.open = temp.close
@@ -399,6 +402,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
             if (lastBarsCache.high < currentPrice) {
               lastBarsCache.high = currentPrice
             }
+            lastBarsCache.close = currentPrice;
             lastBarsCache.volume += volume;
             lastBarsCache.isLastBar = true;
             lastBarsCache.isBarClosed = false;
@@ -406,9 +410,11 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
           onRealtimeCallback(lastBarsCache)
           preReserve0 = currentReserve0;
           preReserve1 = currentReserve1;
+          console.log('lastBarsCache', lastBarsCache);
         }
+
       }, 1000 * 1)
-        
+       
     },
     unsubscribeBars: (subscriberUID: any) => {
       // console.log('[unsubscribeBars]: Method call with subscriberUID:', subscriberUID)

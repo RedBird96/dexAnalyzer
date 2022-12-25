@@ -102,44 +102,32 @@ export function makeTemplateDate(originDate : Date, resolution: number): Date{
   let day = originDate.getDate();
   let hour = originDate.getHours();
   let minute = originDate.getMinutes();
-  switch(resolution) {
-    case 1:
-      res = originDate;
-      break;
-    case 5:
-      const re5Min = Math.round(minute / 10) * 10;
-      if ((minute % 10 / 5).toFixed(0) == '1') {
-        minute = re5Min + 5;
-      }
-      res = new Date(year, month, day, hour, minute,0);
-      break;
-    case 10:
-      minute = Math.round(minute / 10) * 10;
-      res = new Date(year, month, day, hour, minute,0);
-      break;
-    case 30:
-      res = new Date(year, month, day, hour, minute < 30 ? 0 : 30,0);
-      break;
-    case 60:
-      res = new Date(year, month, day, hour,0,0);
-      break;
-    case 360:
-      if (hour < 6)
-        hour = 0;
-      else if (hour < 12)
-        hour = 6;
-      else if (hour < 18)
-        hour = 12;
-      else 
-        hour = 18;
-      break;
-    case 720:
-      res = new Date(year, month, day, hour, 0 , 0);
-      break;
-    case 1440:
-      res = new Date(year, month, day, 0,0,0);
-      break;
+  if (resolution == 5) {
+    const re5Min = Math.round(minute / 10) * 10;
+    if ((minute % 10 / 5).toFixed(0) == '1') {
+      minute = re5Min + 5;
+    }    
+  } else if (resolution == 10) {
+    minute = Math.round(minute / 10) * 10;
+  } else if (resolution == 30) {
+    minute = minute < 30 ? 0 : 30;
+  } else if (resolution == 60) {
+    minute = 0;
+  } else if (resolution == 360) {
+    if (hour < 6) hour = 0;
+    else if (hour < 12) hour = 6;
+    else if (hour < 18) hour = 12;
+    else hour = 18;
+    minute = 0;
+  } else if (resolution == 720) {
+    if (hour < 12) hour = 0;
+    else if (hour < 24) hour = 12;
+    minute = 0;
+  } else if (resolution == 1440) {
+    hour = 0;
+    minute = 0;
   }
 
+  res = new Date(year, month, day, hour, minute,0);
   return res;
 }
