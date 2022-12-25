@@ -390,6 +390,8 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
             lastBarsCache.close = currentPrice
             lastBarsCache.volume = volume;
             priceData = priceData.concat(lastBarsCache);
+            lastBarsCache.isLastBar = false;
+            lastBarsCache.isBarClosed = true;
           } else {
             if (lastBarsCache.low > currentPrice) {
               lastBarsCache.low = currentPrice
@@ -397,17 +399,15 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
             if (lastBarsCache.high < currentPrice) {
               lastBarsCache.high = currentPrice
             }
-            lastBarsCache.volume = volume;
-            lastBarsCache.isLastBar = false;
-            lastBarsCache.isBarClosed = true;
+            lastBarsCache.volume += volume;
+            lastBarsCache.isLastBar = true;
+            lastBarsCache.isBarClosed = false;
           }
-          lastBarsCache.isLastBar = true;
-          lastBarsCache.isBarClosed = false;
           onRealtimeCallback(lastBarsCache)
+          preReserve0 = currentReserve0;
+          preReserve1 = currentReserve1;
         }
-        preReserve0 = currentReserve0;
-        preReserve1 = currentReserve1;
-      }, 1000 * 3)
+      }, 1000 * 1)
         
     },
     unsubscribeBars: (subscriberUID: any) => {
@@ -440,6 +440,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       charts_storage_url: ChartContainerProps.chartsStorageUrl,
       //   charts_storage_api_version: ChartContainerProps.chartsStorageApiVersion,
       client_id: ChartContainerProps.clientId,
+      disabled_features: ['header_compare'],
       user_id: ChartContainerProps.userId,
       fullscreen: ChartContainerProps.fullscreen,
       autosize: ChartContainerProps.autosize,
