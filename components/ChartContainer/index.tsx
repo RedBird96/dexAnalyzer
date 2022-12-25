@@ -157,6 +157,8 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       const symbolInfo = {
         ticker: lpTokenAddress.name,
         name: lpTokenAddress.name,
+        type: 'crypto',
+        session: '24x7',        
         description: lpTokenAddress.symbol,
         locale: getLanguageFromURL() || 'en',
         exchange: lpTokenAddress.tokenside == TokenSide.token0 ? lpTokenAddress.token0_name : lpTokenAddress.token1_name,
@@ -164,7 +166,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
         pricescale: 1000000,
         has_intraday: true,
         has_no_volume: false,
-        has_weekly_and_monthly: false,
+        has_weekly_and_monthly: true,
         supported_resolutions: configurationData.supported_resolutions,
         volume_precision: 3,
       }
