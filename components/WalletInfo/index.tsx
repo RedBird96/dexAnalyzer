@@ -262,8 +262,32 @@ export default function WalletInfo() {
           value={searchContext}
           height='2.5rem'
         />  
-        <Box style={{width:"78%", maxHeight:"30rem"}}>
-          <TableContainer overflowY={"auto"} overflowX={"auto"} height={"100%"} css={{
+        <Box 
+          className={tableHeadBorder} 
+          style = {{width:"100%", marginTop:"1rem"}}
+          display = {"flex"}
+          flexDirection = {"column"}
+          alignItems = {"center"}
+        >
+          <Box 
+            style={{width:"78%", maxHeight:"30rem", marginBottom:"0.5rem"}} 
+            display={"flex"} 
+            flexDirection={"row"}
+            alignContent={"center"}
+            color={"#7C7C7C"}
+          >
+            <p style={{width:"30%"}}>Token</p>
+            <p>Balance</p>
+          </Box>  
+          <Box style={{
+              width:"100%", 
+              maxHeight:"25rem", 
+              alignItems:"center"
+            }}
+            display={"flex"}
+            flexDirection={"column"}
+            overflow={"auto"}
+            css={{
               '&::-webkit-scrollbar': {
                 width: '10px',
                 height: '4px',
@@ -276,57 +300,54 @@ export default function WalletInfo() {
                 backgroundColor: "grey",
                 borderRadius: '24px',
               },
-            }}>
-            <Table style={{height:"5rem"}} >
-              <Thead
-               className={tableHeadBorder} 
-               position="sticky" 
-               top={0} 
-               zIndex="docked"
-               backgroundColor={headerColor}
-              >
-                <Tr>
-                  <Th style={{width:"40%", paddingBottom:"0rem", paddingLeft:"0rem"}} textTransform={"initial"} color={"#7C7C7C"}>Token</Th>
-                  <Th style={{paddingBottom:"0rem", paddingLeft:"0rem"}} textTransform={"initial"} color={"#7C7C7C"}>Balance</Th>
-                </Tr>
-              </Thead>
-              <Tbody className={tableBodyBorder}>
-                {
-                  tokensInfo?.map((token, index) => {
-                    if (Number.isNaN(token.decimals))
-                      return ;
-                    return (
-                      <Tr key={token.contractAddress + index}>
-                          <Th style={{padding:"0.3rem 0.5rem 0.3rem 0rem"}}>
-                            <Box
-                            _hover={{"textDecoration":"underline"}}
-                            cursor="pointer"
-                            >
-                              <a className={style.tokenName}
-                                 style={{color:tokenColor}}
-                                 href={token.contractPage}
-                                 target="_blank" rel="noreferrer noopener">
-                                {makeShortTokenName(token.symbol, 13)}
-                              </a>
-                            </Box>
-                          </Th>
-                          <Th style={{padding:"0.3rem 0rem 0.3rem 0rem"}}>
-                            <div className={style.tokenBalance}>
-                              <p style={{marginRight:"5px", color:tokenColor}}>
-                                {numberWithCommasTwoDecimals(token.balance)}
-                              </p>
-                              <p style={{color:priceColor}}>
-                                {convertBalanceCurrency(token.usdBalance)}
-                              </p>
-                            </div>
-                          </Th>
-                      </Tr>
-                    )
-                  })
-                }
-              </Tbody>
-            </Table>
-          </TableContainer>
+            }}
+          >
+          {
+            tokensInfo?.map((token, index) => {
+              if (Number.isNaN(token.decimals))
+                return ;              
+              return (
+                <Box 
+                  style={{
+                    width:"100%",
+                    justifyContent:"center"
+                  }} 
+                  display={"flex"} 
+                  alignItems={"center"}
+                  _hover={{
+                    backgroundColor:"#000000"
+                  }}
+                >
+                  <Box
+                    style={{width:"78%"}} 
+                    display={"flex"} 
+                    alignItems={"center"}
+                    flexDirection={"row"}
+                  >
+                    <Box
+                      style={{color:tokenColor, width:"30%"}}
+                      _hover={{"textDecoration":"underline"}}
+                      cursor="pointer"
+                    >
+                      <a className={style.tokenName}
+                        href={token.contractPage}
+                        target="_blank" rel="noreferrer noopener"
+                      >
+                        {makeShortTokenName(token.symbol, 8)}
+                      </a>
+                    </Box>
+                    <p className={style.tokenBalance} style={{width:"35%",marginRight:"5px", color:tokenColor}}>
+                      {makeShortTokenName(numberWithCommasTwoDecimals(token.balance), 14)}
+                    </p>
+                    <p className={style.tokenBalance} style={{width:"35%", color:priceColor}}>
+                      ({makeShortTokenName(convertBalanceCurrency(token.usdBalance), 15)})
+                    </p>
+                  </Box>
+                </Box>
+              )
+            })
+          }
+          </Box>
         </Box>
       </Box>
     </Box>

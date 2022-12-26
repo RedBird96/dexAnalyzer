@@ -69,6 +69,7 @@ export default function TokenTransaction() {
           height: '4px',
         },
         '&::-webkit-scrollbar-track': {
+          marginTop: '30px',
           width: '6px',
           height: '4px',
         },
@@ -89,7 +90,7 @@ export default function TokenTransaction() {
             <Th color={"#7C7C7C"} width={"16%"} textTransform={"initial"} paddingLeft={"0rem"}>Txn</Th>
           </Tr>
         </Thead>
-        <Tbody className={style.tbody}>
+        <Tbody className={style.tbody} style={{overflow:"auto"}}>
           {
             txTransaction.map((data, index) => {
               if (data != null) {
