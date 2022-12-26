@@ -196,6 +196,7 @@ export default function TokenList() {
   useEffect(() => {
     // const cookieString = getCookie("PinnedToken");
     const cookieString = localStorage.getItem("PinnedToken");
+    console.log('getcookie', cookieString);
     const tokenString = cookieString?.split("&");
     let cookieToken:ERC20Token[] = [];
     tokenString?.forEach((jsonToken)=>{
@@ -247,6 +248,7 @@ export default function TokenList() {
       newCookieString += "&";
     });
     localStorage.setItem("PinnedToken", newCookieString);
+    console.log('setcookie', newCookieString);
     // setCookie("PinnedToken", newCookieString);
   }
 
@@ -294,7 +296,7 @@ export default function TokenList() {
           }}
           css={{
             '&::-webkit-scrollbar': {
-              width: '10px',
+              width: '7px',
               height: '4px',
             },
             '&::-webkit-scrollbar-track': {
