@@ -123,32 +123,36 @@ export default function LpTokenInfo({
         onClick={()=> {setLPTokenHandler(lpToken)}}
       >
         <p className={style.marketCap} style={{color:textColor}}>{lpToken.symbol}&nbsp;(LP)</p>
-        <Box display={"flex"} flexDirection={"row"} alignItems={"center"}
-            _hover={{"textDecoration":"underline"}} 
-            cursor="pointer">
-          <a 
-            className={style.tokenMarketCap} 
-            style={{marginRight:"0.2rem"}}  
-            color={whiteBlackMode}
-            href={lpToken.pairContractURL}
-            target="_blank"
-            rel="noreferrer noopener"
+        <Box _hover={{"textDecoration":"underline"}} 
+              cursor="pointer"
+        >
+          <a style={{display:"flex", flexDirection:"row", alignItems:"center"}}
+              
+              href={lpToken.pairContractURL}
+              target="_blank"
+              rel="noreferrer noopener"
           >
-            {numberWithCommasTwoDecimals(reserve, 2)} 
+            <p
+              className={style.tokenMarketCap} 
+              style={{marginRight:"0.2rem"}}  
+              color={whiteBlackMode}
+            >
+              {numberWithCommasTwoDecimals(reserve, 2)} 
+            </p>
+            <p
+              className={style.tokenMarketCap} 
+              style={{marginRight:"0.5rem"}}  
+              color={whiteBlackMode}
+            >
+              {reserveCurrency}
+            </p>
+            <p
+              className={style.tokenMarketCap} 
+              style={{color:"#00B112"}}
+            >
+              ({convertBalanceCurrency(reserveUSD, 0)})
+            </p>
           </a>
-          <p
-            className={style.tokenMarketCap} 
-            style={{marginRight:"0.5rem"}}  
-            color={whiteBlackMode}
-          >
-            {reserveCurrency}
-          </p>
-          <p
-            className={style.tokenMarketCap} 
-            style={{color:"#00B112"}}
-          >
-            ({convertBalanceCurrency(reserveUSD, 0)})
-          </p>
         </Box>
       </Box>
       {
