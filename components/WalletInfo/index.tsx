@@ -308,6 +308,7 @@ export default function WalletInfo() {
                 return ;              
               return (
                 <Box 
+                  key = {index}
                   style={{
                     width:"100%",
                     justifyContent:"center"
