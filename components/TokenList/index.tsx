@@ -196,36 +196,40 @@ export default function TokenList() {
   useEffect(() => {
     // const cookieString = getCookie("PinnedToken");
     const cookieString = localStorage.getItem("PinnedToken");
-    console.log('getcookie', cookieString);
-    const tokenString = cookieString?.split("&");
+    const tokenString = cookieString?.split(";");
     let cookieToken:ERC20Token[] = [];
-    tokenString?.forEach((jsonToken)=>{
+    tokenString?.forEach((jsonToken, index)=>{
       if (jsonToken.length < 2)
         return;
-      const obj = JSON.parse(jsonToken);
-      const token = {
-        name:obj["name"],
-        symbol:obj["symbol"],
-        balance:obj["balance"],
-        contractAddress:obj["contractAddress"],
-        holdersCount:obj["holdersCount"],
-        image:obj["image"],
-        marketCap:obj["marketCap"],
-        network:obj["network"],
-        price:obj["price"],
-        totalSupply:obj["totalSupply"],
-        pinSetting:obj["pinSetting"],
-        website:obj["website"],
-        twitter:obj["twitter"],
-        facebook:obj["facebook"],
-        contractCodeURL:obj["contractCodeURL"],
-        contractBalanceWalletURL:obj["contractBalanceWalletURL"],
-        contractBalanceURL:obj["contractBalanceURL"],
-        contractPage:obj["contractPage"]
-      } as ERC20Token;
-      if (token.pinSetting == false)
-        return;
-      cookieToken.push(token);
+      console.log(index);
+      try{
+        const obj = JSON.parse(jsonToken);
+        const token = {
+          name:obj["name"],
+          symbol:obj["symbol"],
+          balance:obj["balance"],
+          contractAddress:obj["contractAddress"],
+          holdersCount:obj["holdersCount"],
+          image:obj["image"],
+          marketCap:obj["marketCap"],
+          network:obj["network"],
+          price:obj["price"],
+          totalSupply:obj["totalSupply"],
+          pinSetting:obj["pinSetting"],
+          website:obj["website"],
+          twitter:obj["twitter"],
+          facebook:obj["facebook"],
+          contractCodeURL:obj["contractCodeURL"],
+          contractBalanceWalletURL:obj["contractBalanceWalletURL"],
+          contractBalanceURL:obj["contractBalanceURL"],
+          contractPage:obj["contractPage"]
+        } as ERC20Token;
+        if (token.pinSetting == false)
+          return;
+        cookieToken.push(token);
+      } catch(e){
+
+      }
     });
     setListTokens(cookieToken); 
   }, []);
@@ -244,11 +248,12 @@ export default function TokenList() {
     let newCookieString = "";
     filterTokens.forEach((token) => {
       const obj = JSON.stringify(token);
-      newCookieString += obj;
-      newCookieString += "&";
+      if (obj.indexOf(";") == -1) {
+        newCookieString += obj;
+        newCookieString += ";";
+      }
     });
     localStorage.setItem("PinnedToken", newCookieString);
-    console.log('setcookie', newCookieString);
     // setCookie("PinnedToken", newCookieString);
   }
 
