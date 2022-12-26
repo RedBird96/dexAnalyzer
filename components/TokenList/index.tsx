@@ -194,7 +194,9 @@ export default function TokenList() {
   }, [debouncedQuery]);
 
   useEffect(() => {
-    const cookieString = getCookie("PinedToken");
+    // const cookieString = getCookie("PinedToken");
+    const cookieString = localStorage.getItem("PinedToken");
+    console.log('getCookie', cookieString);
     const tokenString = cookieString?.split("&");
     let cookieToken:ERC20Token[] = [];
     tokenString?.forEach((jsonToken)=>{
@@ -245,7 +247,9 @@ export default function TokenList() {
       newCookieString += obj;
       newCookieString += "&";
     });
-    setCookie("PinedToken", newCookieString);
+    localStorage.setItem("PinedToken", newCookieString);
+    // setCookie("PinedToken", newCookieString);
+    console.log('new Cookie', newCookieString);
   }
 
   const setActiveTokenHandler = (token:ERC20Token) => {

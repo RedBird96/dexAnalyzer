@@ -218,11 +218,13 @@ export default function TokenInfo() {
       newCookieString += obj;
       newCookieString += "&";
     });
-    setCookie("PinedLPToken", newCookieString);
+    // setCookie("PinedLPToken", newCookieString);
+    localStorage.setItem("PinedLPToken", newCookieString);
   }
 
   const getLastLpTokenList = () => {
-    const cookieString = getCookie("PinedLPToken");
+    // const cookieString = getCookie("PinedLPToken");
+    const cookieString = localStorage.getItem("PinedLPToken");
     const tokenString = cookieString?.split("&");
     let cookieLPToken:LPTokenPair[] = [];
     tokenString?.forEach((jsonToken)=>{
