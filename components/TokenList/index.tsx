@@ -196,7 +196,6 @@ export default function TokenList() {
   useEffect(() => {
     // const cookieString = getCookie("PinedToken");
     const cookieString = localStorage.getItem("PinedToken");
-    console.log('getCookie', cookieString);
     const tokenString = cookieString?.split("&");
     let cookieToken:ERC20Token[] = [];
     tokenString?.forEach((jsonToken)=>{
@@ -249,7 +248,6 @@ export default function TokenList() {
     });
     localStorage.setItem("PinedToken", newCookieString);
     // setCookie("PinedToken", newCookieString);
-    console.log('new Cookie', newCookieString);
   }
 
   const setActiveTokenHandler = (token:ERC20Token) => {
@@ -286,7 +284,30 @@ export default function TokenList() {
           value={searchQuery}
         />
       </Box>
-      <Box style={{display:"flex", flexDirection:"column", width:"100%"}}>
+      <Box 
+        style={{
+          display:"flex", 
+          flexDirection:"column", 
+          width:"100%", 
+          overflow:"auto", 
+          maxHeight:"71rem"
+          }}
+          css={{
+            '&::-webkit-scrollbar': {
+              width: '10px',
+              height: '4px',
+            },
+            '&::-webkit-scrollbar-track': {
+              width: '6px',
+              height: '4px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: "grey",
+              borderRadius: '24px',
+            },
+          }}
+
+        >
           {
             searchStatus == SearchStatus.searching &&
             <Box width = "100%" style={{display:"flex", justifyContent:"center"}}>

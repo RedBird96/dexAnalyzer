@@ -1,6 +1,6 @@
 .tokenListInfo {
   display: flex;
-  height: 5rem;
+  min-height: 5rem;
   flex-direction: row;
   align-items: center;
   width: 100%;

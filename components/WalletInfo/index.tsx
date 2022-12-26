@@ -316,7 +316,8 @@ export default function WalletInfo() {
                   display={"flex"} 
                   alignItems={"center"}
                   _hover={{
-                    backgroundColor:"#000000"
+                    backgroundColor:"#000000",
+                    color: "#FFFFFF"
                   }}
                 >
                   <Box
@@ -326,8 +327,10 @@ export default function WalletInfo() {
                     flexDirection={"row"}
                   >
                     <Box
-                      style={{color:tokenColor, width:"30%"}}
-                      _hover={{"textDecoration":"underline"}}
+                      style={{width:"30%"}}
+                      _hover={{
+                        "textDecoration":"underline",
+                      }}
                       cursor="pointer"
                     >
                       <a className={style.tokenName}
@@ -337,7 +340,7 @@ export default function WalletInfo() {
                         {makeShortTokenName(token.symbol, 8)}
                       </a>
                     </Box>
-                    <p className={style.tokenBalance} style={{width:"35%",marginRight:"5px", color:tokenColor}}>
+                    <p className={style.tokenBalance} style={{width:"35%",marginRight:"5px"}}>
                       {makeShortTokenName(numberWithCommasTwoDecimals(token.balance), 14)}
                     </p>
                     <p className={style.tokenBalance} style={{width:"35%", color:priceColor}}>
