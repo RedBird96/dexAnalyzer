@@ -175,9 +175,10 @@ export default function TokenBody() {
             width: "56.5%",
             height:"100%",
             justifyContent:"center",
-            alignItems:"center"
+            alignItems:"center",
+            backgroundColor: "#262626"
           }}>
-              Please search or select one token
+              Please search or select a token
           </Box>
       }
       
