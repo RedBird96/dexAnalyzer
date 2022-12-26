@@ -201,20 +201,20 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
         }
 
         // console.log('getBars firstDataRequest', new Date(from * 1000).toISOString(), new Date(to * 1000).toISOString(),  firstDataRequest);
-        if (checksumAddress) {
-          // setLoader(true);
-          if (!firstDataRequest) {
-            // "noData" should be set if there is no data in the requested period.
-            onHistoryCallback([], {
-              noData: true,
-            })
-            return
-          }
-        }
+        // if (checksumAddress) {
+        //   // setLoader(true);
+        //   if (!firstDataRequest) {
+        //     // "noData" should be set if there is no data in the requested period.
+        //     onHistoryCallback([], {
+        //       noData: true,
+        //     })
+        //     return
+        //   }
+        // }
 
         // console.log('from to', new Date(from * 1000).toISOString(), new Date(to * 1000).toISOString(), resolution);
         
-        // console.log('lp info', lpTokenAddress.token0_reserve, lpTokenAddress.token1_reserve);
+        console.log('lp info', lpTokenAddress.token0_reserve, lpTokenAddress.token1_reserve);
 
         if (firstDataRequest) {
 
@@ -328,7 +328,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
           
         }
 
-        // console.log('bars', bars);
+        console.log('bars', bars);
         onHistoryCallback(bars, {
           noData: false,
         })
@@ -362,6 +362,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
             '1W': 7 * 24 * 3600000,
             '1M': 30 * 24 * 3600000,
           }
+          console.log('current resolution', currentResolutions);
           if (lastBarsCache === undefined) return
           const time = new Date();
           const cuTime = makeTemplateDate(time, currentResolutions);
@@ -384,7 +385,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
             currentPrice = currentReserve0 / currentReserve1 * price;
             volume += (Math.abs(currentReserve0 - preReserve0)) * price
           }
-          // console.log('bar should be updated', time.toUTCString(), cuTime, currentPrice, temp);
+          console.log('bar should be updated', time.toUTCString(), cuTime, currentPrice, temp);
           if (isNew) {
             lastBarsCache.time = cuTime.getTime()
             lastBarsCache.open = temp.close
@@ -455,7 +456,6 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
 
     tvWidget = new widget(widgetOptions)
 		tvWidget.onChartReady(() => {
-      
 			tvWidget!.headerReady().then(() => {
 				const button = tvWidget!.createButton();
 				button.setAttribute('title', 'Click to show positions');
@@ -464,8 +464,10 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
 				button.addEventListener('click', () => {
           const currentStatus = button.getAttribute('style');
           if (currentStatus.includes("background:#2a2e39")) {
+            tvWidget.activeChart().removeAllShapes();
             button.setAttribute('style', "height:90%;display:flex;align-items:center;background:transparent");
           } else {
+            tvWidget.activeChart().createShape(lastBarsCache.time, {shape:"long_position"})
             button.setAttribute('style', "height:90%;display:flex;align-items:center;background:#2a2e39");
           }
         });
