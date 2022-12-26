@@ -218,13 +218,13 @@ export default function TokenInfo() {
       newCookieString += obj;
       newCookieString += "&";
     });
-    // setCookie("PinedLPToken", newCookieString);
-    localStorage.setItem("PinedLPToken", newCookieString);
+    // setCookie("PinnedLPToken", newCookieString);
+    localStorage.setItem("PinnedLPToken", newCookieString);
   }
 
   const getLastLpTokenList = () => {
-    // const cookieString = getCookie("PinedLPToken");
-    const cookieString = localStorage.getItem("PinedLPToken");
+    // const cookieString = getCookie("PinnedLPToken");
+    const cookieString = localStorage.getItem("PinnedLPToken");
     const tokenString = cookieString?.split("&");
     let cookieLPToken:LPTokenPair[] = [];
     tokenString?.forEach((jsonToken)=>{
