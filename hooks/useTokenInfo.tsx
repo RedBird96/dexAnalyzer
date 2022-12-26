@@ -14,9 +14,9 @@ export function TokenInfoProvider({children}:any) {
   let temp:ERC20Token;
   const usdtAddress = "";
     temp = {
-      name:"USDT",
-      symbol:"USDT",
-      contractAddress:usdtAddress,
+      name:"",
+      symbol:"",
+      contractAddress:"",
       price: 1,
       marketCap: "0",
       totalSupply: 0,

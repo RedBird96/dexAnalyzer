@@ -9,6 +9,7 @@ import TokenTransaction from "../TokenTransaction"
 import WalletInfo from "../WalletInfo"
 import style from './TokenBody.module.css'
 import {ResizerDark, ResizerLight} from '../../assests/icon'
+import { useTokenInfo } from '../../hooks'
 
 const ChartContainer = dynamic(() => import("../ChartContainer"), { ssr: false })
 const ResizePanel = dynamic(() => import('react-resize-panel'), { ssr: false });
@@ -19,8 +20,9 @@ export default function TokenBody() {
   const sidebarRef = useRef(null);
   const transactionRef = useRef(null);
   const [isResizing, setIsResizing] = useState(false);
-  const [height, setHeight] = useState(400);
-  const [chartheight, setChartHeight] = useState(600);
+  const {tokenData} = useTokenInfo();
+  const [height, setHeight] = useState(320);
+  const [chartheight, setChartHeight] = useState(750);
   const resizeBgColor = useColorModeValue("#FFFFFF", "#1C1C1C");
   const hasWindow = typeof window !== 'undefined';
   const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
@@ -46,7 +48,8 @@ export default function TokenBody() {
   }, []);
 
   useEffect(() => {
-    setChartHeight(sidebarRef.current.clientHeight - 400);
+    if (tokenData.contractAddress != "")
+      setChartHeight(sidebarRef.current.clientHeight - 320);
   }, [windowDimensions])
 
   const startResizing = React.useCallback((_mouseDownEvent: any) => {
@@ -62,8 +65,8 @@ export default function TokenBody() {
     (mouseMoveEvent:MouseEventInit ) => {
       if (isResizing) {
         let resizeHeight = windowDimensions.height - mouseMoveEvent.clientY;
-        if (resizeHeight < 400) {
-          resizeHeight = 400;
+        if (resizeHeight < 320) {
+          resizeHeight = 320;
         } else if (resizeHeight > 800){
           resizeHeight = 800;
         }
@@ -85,7 +88,7 @@ export default function TokenBody() {
   
   return (
     <main 
-    className={style.tokenBody} 
+      className={style.tokenBody} 
     >
       <Box style={{
         display: "flex", 
@@ -98,73 +101,86 @@ export default function TokenBody() {
       <nav>
         <hr aria-orientation='vertical' style={{width:"1px", color:"#313131"}}></hr>
       </nav>
-      <Box style={{
-        display: "flex", 
-        flexDirection: "column", 
-        width: "56.5%",
-        height:"100%"
-      }}>
-        <TokenInfo/>  
-          
-        <Box 
-        id="tradeMain"
-        style={{
-          display:"flex",
-          flexDirection:"column",
+      {
+        tokenData.contractAddress != "" ? 
+        <Box style={{
+          display: "flex", 
+          flexDirection: "column", 
+          width: "56.5%",
           height:"100%"
-        }}
-        ref = {sidebarRef}
-        >
-          <Box
-          position={"relative"}
-          width={"100%"}
-          height={"100%"}
-          >
-            <ChartContainer height = {chartheight - 10} resize = {isResizing}/>
-          </Box>
+        }}>
+          <TokenInfo/>  
           <Box 
-            position="relative"
-            display="flex"
-            height={height}
-            maxHeight={"50rem"}
-            minHeight={"25rem"}
-            flexShrink={"0"}
-            width={"100%"}
-            ref = {transactionRef}
+          id="tradeMain"
+          style={{
+            display:"flex",
+            flexDirection:"column",
+            height:"100%"
+          }}
+          ref = {sidebarRef}
           >
-            <TokenTransaction/>
             <Box
-              position="absolute"
-              height={"15px"}
-              top={"-12px"}
-              left={"0px"}
-              cursor={"row-resize"}
-              width={"100%"}
-              backgroundColor={resizeBgColor}
-              onMouseDown={startResizing}
+            position={"relative"}
+            width={"100%"}
+            height={"100%"}
             >
-              <nav>
-                <hr aria-orientation='vertical' style={{width:"1px", color:"#313131"}}></hr>
-              </nav>
+              <ChartContainer height = {chartheight} resize = {isResizing}/>
+            </Box>
+            <Box 
+              position="relative"
+              display="flex"
+              height={height}
+              maxHeight={"50rem"}
+              minHeight={"20rem"}
+              flexShrink={"0"}
+              width={"100%"}
+              ref = {transactionRef}
+            >
+              <TokenTransaction/>
               <Box
-                display="flex"
+                position="absolute"
+                height={"15px"}
+                top={"-12px"}
+                left={"0px"}
+                cursor={"row-resize"}
                 width={"100%"}
-                height={"100%"}
-                position={"relative"}
-                textAlign={"center"}
-                justifyContent={"center"}
-                alignItems={"center"}
-                style={{
-                  zIndex:99
-                }}
+                backgroundColor={resizeBgColor}
+                onMouseDown={startResizing}
               >
-                <ResizerLight/>
+                <nav>
+                  <hr aria-orientation='vertical' style={{width:"1px", color:"#313131"}}></hr>
+                </nav>
+                <Box
+                  display="flex"
+                  width={"100%"}
+                  height={"100%"}
+                  position={"relative"}
+                  textAlign={"center"}
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                  style={{
+                    zIndex:99
+                  }}
+                >
+                  <ResizerLight/>
+                </Box>
               </Box>
             </Box>
           </Box>
-        </Box>
-        
-      </Box>
+          
+        </Box>:
+          <Box style={{
+            display: "flex", 
+            flexDirection: "column", 
+            width: "56.5%",
+            height:"100%",
+            justifyContent:"center",
+            alignItems:"center"
+          }}>
+              Please search or select one token
+          </Box>
+      }
+      
       <nav>
         <hr aria-orientation='vertical' style={{width:"1px", color:"#313131"}}></hr>
       </nav>
