@@ -176,7 +176,8 @@ export default function TokenBody() {
             height:"100%",
             justifyContent:"center",
             alignItems:"center",
-            backgroundColor: "#262626"
+            backgroundColor: "#1C1C1C",
+            color:"#FFFFFF"
           }}>
               Please search or select a token
           </Box>
