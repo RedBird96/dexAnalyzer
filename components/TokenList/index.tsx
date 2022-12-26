@@ -117,7 +117,7 @@ export default function TokenList() {
             twitter: social![1],
             facebook: social![2],
             contractCodeURL: ETHLINK + "address/" + debouncedQuery +"#code",
-            contractBalanceWalletURL: ETHLINK + "token/" + debouncedQuery + "?a=" + walletAddress,
+            contractBalanceWalletURL: ETHLINK + "token/" + debouncedQuery + "?a=",
             contractBalanceURL: ETHLINK + "token/" + debouncedQuery + "#balances",
             contractPage:ETHLINK + "token/" + debouncedQuery
           } as ERC20Token;
@@ -148,7 +148,7 @@ export default function TokenList() {
               twitter: social![1],
               facebook: social![2],
               contractCodeURL: BSCLINK + "address/" + debouncedQuery +"#code",
-              contractBalanceWalletURL: BSCLINK + "token/" + debouncedQuery + "?a=" + walletAddress,
+              contractBalanceWalletURL: BSCLINK + "token/" + debouncedQuery + "?a=",
               contractBalanceURL: BSCLINK + "token/" + debouncedQuery + "#balances",
               contractPage:BSCLINK + "token/" + debouncedQuery
             } as ERC20Token;

@@ -36,6 +36,7 @@ import LpTokenInfo from './LpTokenInfo'
 import { LPTokenPair, TokenSide } from '../../utils/type'
 import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
 import { isNumber } from 'lodash'
+import { useAddress } from '@thirdweb-dev/react'
 
 
 export default function TokenInfo() {
@@ -63,6 +64,7 @@ export default function TokenInfo() {
     style.tokenInfo + " " + style.tokenInfoDark
   );
 
+  const address = useAddress();
   const textColor = useColorModeValue("#5E5E5E","#A7A7A7");
   const infoborderColorMode = useColorModeValue("#E2E8F0","#2B2A2A");
   const whiteBlackMode = useColorModeValue('#FFFFFF', '#000000');
@@ -451,18 +453,21 @@ export default function TokenInfo() {
           }}/>
           <Box display={"flex"} flexDirection={"column"} width={"39%"}>
               <p className={style.marketCap} style={{color:textColor}}>Balance</p>
-              <Box display={"flex"} flexDirection={"row"} alignItems={"center"}  _hover={{"textDecoration":"underline"}} cursor="pointer">
-                <a 
+              <Box _hover={{"textDecoration":"underline"}} cursor="pointer">
+              <a style = {{display:"flex", flexDirection:"row", alignItems:"center"}}
+                  href={tokenData.contractBalanceWalletURL + address}
+                  target="_blank"
+                  rel="noreferrer noopener" >
+              
+                <p
                   className={style.tokenMarketCap} 
                   style={{marginRight:"1rem"}} 
                   color={whiteBlackMode} 
-                  href={tokenData.contractBalanceWalletURL} 
-                  target="_blank"
-                  rel="noreferrer noopener"
                 >
                   {numberWithCommasTwoDecimals(balance)}
-                </a>
+                </p>
                 <p className={style.tokenMarketCap}  style={{color:priceColor}} >({convertBalanceCurrency(balanceUSD, 2)})</p>
+              </a>
               </Box>
           </Box>          
         </Box>
