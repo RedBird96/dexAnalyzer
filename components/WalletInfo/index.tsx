@@ -179,7 +179,7 @@ export default function WalletInfo() {
 
   useEffect(() => {
     initAllInfos();
-    if (address != undefined) {
+    if (address != undefined && tokenData != undefined) {
       getTokensFromWallet();
     }
   }, [address, network[0].data.chain?.id]);
@@ -340,10 +340,10 @@ export default function WalletInfo() {
                         {makeShortTokenName(token.symbol, 8)}
                       </a>
                     </Box>
-                    <p className={style.tokenBalance} style={{width:"35%",marginRight:"5px"}}>
+                    <p className={style.tokenBalance} style={{width:"35%",marginRight:"5px", alignItems:"flex-start"}}>
                       {makeShortTokenName(numberWithCommasTwoDecimals(token.balance), 14)}
                     </p>
-                    <p className={style.tokenBalance} style={{width:"35%", color:priceColor}}>
+                    <p className={style.tokenBalance} style={{width:"35%", color:priceColor, alignItems:"flex-end"}}>
                       ({makeShortTokenName(convertBalanceCurrency(token.usdBalance), 15)})
                     </p>
                   </Box>

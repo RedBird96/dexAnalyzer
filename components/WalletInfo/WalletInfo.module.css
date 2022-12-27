@@ -83,7 +83,6 @@
 .tokenBalance {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
   font-family: 'Inter';
   font-style: normal;
   font-weight: 400;

@@ -206,7 +206,6 @@ export default function TokenList() {
     tokenString?.forEach((jsonToken, index)=>{
       if (jsonToken.length < 2)
         return;
-      console.log(index);
       try{
         const obj = JSON.parse(jsonToken);
         const token = {

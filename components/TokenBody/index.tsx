@@ -48,7 +48,7 @@ export default function TokenBody() {
   }, []);
 
   useEffect(() => {
-    if (tokenData.contractAddress != "")
+    if (tokenData !=undefined && tokenData.contractAddress != "")
       setChartHeight(sidebarRef.current.clientHeight - 320);
   }, [windowDimensions])
 
@@ -85,7 +85,7 @@ export default function TokenBody() {
       window.removeEventListener("mouseup", stopResizing);
     };
   }, [resize, stopResizing]);
-  
+
   return (
     <main 
       className={style.tokenBody} 

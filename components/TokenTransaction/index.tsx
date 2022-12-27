@@ -84,7 +84,7 @@ export default function TokenTransaction() {
         <Thead position="sticky" top={0} zIndex="docked" backgroundColor={headerColor}>
           <Tr>
             <Th color={"#7C7C7C"} width={"8%"} textTransform={"initial"} paddingLeft={"1.5rem"}>Activity</Th>
-            <Th color={"#7C7C7C"} width={"10%"} textTransform={"initial"} paddingLeft={"0.7rem"}>Tokens</Th>
+            <Th color={"#7C7C7C"} width={"15%"} textTransform={"initial"} paddingLeft={"0.7rem"}>Tokens</Th>
             <Th color={"#7C7C7C"} width={"42%"} textTransform={"initial"} paddingLeft={"10rem"}>Amount</Th>
             <Th color={"#7C7C7C"} width={"24%"} textTransform={"initial"} paddingLeft={"3rem"}>Date</Th>
             <Th color={"#7C7C7C"} width={"16%"} textTransform={"initial"} paddingLeft={"0rem"}>Txn</Th>
@@ -98,12 +98,11 @@ export default function TokenTransaction() {
                 const color = buy_sell == "Buy" ? priceColor: "#FF002E";               
                 const usdVal = quotePrice * data.quoteToken_amount;
                 const txHash = data.transaction_hash;
-                const currentTime = new Date(data.transaction_utc_time);
                 const linkAddr = tokenData.network == constant.BINANCE_NETOWRK ? LINK_BSCNETWORK + txHash: LINK_ETHNETWORK + txHash;
                 return (
                 <Tr key={index} color={color} className={style.txData}>
                   <Td width={"8%"} paddingLeft={"1.5rem"}>{buy_sell}</Td>
-                  <Td width={"10%"} paddingLeft={"0.7rem"}>{numberWithCommasNoDecimals(data.baseToken_amount)}</Td>
+                  <Td width={"15%"} paddingLeft={"0.7rem"}>{numberWithCommasNoDecimals(data.baseToken_amount)}</Td>
                   <Td width={"42%"} paddingLeft={"2rem"} style={{
                     paddingLeft:"0rem"
                   }}>
