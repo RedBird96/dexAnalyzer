@@ -267,8 +267,9 @@ export default function WalletInfo() {
               paddingTop = '7px'
               paddingLeft= '5px'
               pointerEvents='none'
-              children={<SearchIcon/>}
-          />
+          >
+            <SearchIcon/>
+          </InputLeftElement>
           <Input 
             placeholder='Search token symbol' 
             _placeholder={{fontsize:'1rem', fontcolor:"#E34B62"}}
@@ -286,8 +287,9 @@ export default function WalletInfo() {
               cursor='pointer'
               paddingTop = '7px'
               paddingRight= '5px'
-              children={<SearchCross/>}
-            />
+            >
+              <SearchCross/>
+            </InputRightElement>
           }
         </InputGroup>
         <Box 

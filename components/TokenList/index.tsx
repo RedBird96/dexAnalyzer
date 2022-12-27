@@ -308,8 +308,9 @@ export default function TokenList() {
             paddingTop = '7px'
             paddingLeft= '5px'
             pointerEvents='none'
-            children={<SearchIcon/>}
-          />
+          >
+            <SearchIcon/>
+          </InputLeftElement>
           <Input 
             id='SearchId'
             placeholder='Search token address'
@@ -328,8 +329,9 @@ export default function TokenList() {
               cursor='pointer'
               paddingTop = '7px'
               paddingRight= '5px'
-              children={<SearchCross/>}
-            />
+            >
+              <SearchCross/>
+            </InputRightElement>
           }
         </InputGroup>
       </Box>
