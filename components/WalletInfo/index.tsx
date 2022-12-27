@@ -270,7 +270,7 @@ export default function WalletInfo() {
               children={<SearchIcon/>}
           />
           <Input 
-            placeholder='Search token address' 
+            placeholder='Search token symbol' 
             _placeholder={{fontsize:'1rem', fontcolor:"#E34B62"}}
             onChange={handleSearchChange}
             borderRadius ={"2rem"}
