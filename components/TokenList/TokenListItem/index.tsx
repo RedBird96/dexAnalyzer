@@ -47,7 +47,6 @@ const TokenListItem = ({
   }
   const setActiveToken = () => {
     activeTokenHandler(tokenData);
-    pinTokenHandler(tokenData, true);
   }
   return(
     <Box className= {style.tokenListInfo} 

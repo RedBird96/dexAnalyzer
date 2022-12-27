@@ -197,7 +197,6 @@ export default function TokenList() {
   useEffect(() => {
     // const cookieString = getCookie("PinnedToken");
     const cookieString = localStorage.getItem("PinnedToken");
-    console.log('newCookieString', cookieString)
     const tokenString = cookieString?.split(";");
     let cookieToken:ERC20Token[] = [];
     tokenString?.forEach((jsonToken, index)=>{
@@ -234,7 +233,6 @@ export default function TokenList() {
   }, []);
 
   const TokenActionHandler = (token:ERC20Token, add:boolean) => {
-    console.log('select token', token);
     let filterTokens = listTokens;
     filterTokens = filterTokens.filter(item => (item.contractAddress + item.network) != (token.contractAddress + token.network));
     
@@ -259,7 +257,6 @@ export default function TokenList() {
       else
         filterTokens.push(token);
     }
-    console.log('filterTokens', filterTokens);
     setListTokens(filterTokens);
     let newCookieString = "";
     filterTokens.forEach((token) => {
@@ -269,7 +266,6 @@ export default function TokenList() {
         newCookieString += ";";
       }
     });
-    console.log('newCookieString', newCookieString)
     localStorage.setItem("PinnedToken", newCookieString);
     // setCookie("PinnedToken", newCookieString);
   }
@@ -288,6 +284,15 @@ export default function TokenList() {
       else
         filterTokens.push(token);
 
+      let newCookieString = "";
+      filterTokens.forEach((token) => {
+        const obj = JSON.stringify(token);
+        if (obj.indexOf(";") == -1) {
+          newCookieString += obj;
+          newCookieString += ";";
+        }
+      });
+      localStorage.setItem("PinnedToken", newCookieString);
       setListTokens(filterTokens); 
     }
     //  else if (token.pinSetting == true && listTokens.length >= 2){
