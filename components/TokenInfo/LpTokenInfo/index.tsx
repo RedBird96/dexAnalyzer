@@ -13,7 +13,7 @@ import {
   numberWithCommasTwoDecimals
 } from '../../../utils'
 import { LPTokenPair, TokenSide } from '../../../utils/type'
-import style from './LpTokenInfo.module.css'
+import style from '../TokenInfo.module.css'
 import { getTokenPricefromllama } from '../../../api'
 import { NOT_FOUND_TOKEN } from '../../../utils/constant'
 import { useStableCoinPrice } from '../../../hooks/useStableCoinPrice'
@@ -24,12 +24,14 @@ export default function LpTokenInfo({
   showArrow,
   setLPTokenHandler,
   isLast,
+  lpTokenList
 }:{
   lpToken: LPTokenPair,
   dropListHandler: (x?: any) => void,
   showArrow: boolean,
   setLPTokenHandler: (x?: any) => void
   isLast: boolean
+  lpTokenList: LPTokenPair[]
 }) {
 
   const {coinPrice} = useStableCoinPrice();
@@ -133,21 +135,21 @@ export default function LpTokenInfo({
               rel="noreferrer noopener"
           >
             <p
-              className={style.tokenMarketCap} 
+              className={style.itemvalue} 
               style={{marginRight:"0.2rem"}}  
               color={whiteBlackMode}
             >
               {numberWithCommasTwoDecimals(reserve, 2)} 
             </p>
             <p
-              className={style.tokenMarketCap} 
+              className={style.itemvalue} 
               style={{marginRight:"0.5rem"}}  
               color={whiteBlackMode}
             >
               {reserveCurrency}
             </p>
             <p
-              className={style.tokenMarketCap} 
+              className={style.itemvalue} 
               style={{color:"#00B112"}}
             >
               ({convertBalanceCurrency(reserveUSD, 0)})
@@ -156,7 +158,7 @@ export default function LpTokenInfo({
         </Box>
       </Box>
       {
-        showArrow ?
+        showArrow && lpTokenList.length === 1 ?
         <Box
           cursor={"pointer"} 
           style={{transform:`rotate(${clickDex * 180}deg)`, width:"1rem"}} 
@@ -167,12 +169,13 @@ export default function LpTokenInfo({
             <DownArrowLight/> 
           }
         </Box>
-        :   
+        : lpTokenList.length > 1 ?
         <div style={{
           width:"90%",
           borderWidth:isLast?"0":"thin",
           borderColor:infoborderColorMode,
-        }}/>
+        }}/> :
+        <></>
       }
     </Box>
     )

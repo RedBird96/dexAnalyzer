@@ -301,6 +301,7 @@ export default function WalletInfo() {
             flexDirection={"row"}
             alignContent={"center"}
             color={"#7C7C7C"}
+            paddingRight={"10px"}
           >
             <p style={{width:"30%"}}>Token</p>
             <p>Balance</p>
@@ -337,7 +338,6 @@ export default function WalletInfo() {
                   key = {index}
                   style={{
                     width:"100%",
-                    justifyContent:"center"
                   }} 
                   display={"flex"} 
                   alignItems={"center"}
@@ -347,9 +347,8 @@ export default function WalletInfo() {
                   }}
                 >
                   <Box
-                    style={{width:"78%"}} 
+                    style={{width:"100%"}} 
                     display={"flex"} 
-                    alignItems={"center"}
                     flexDirection={"row"}
                   >
                     <Box
@@ -369,7 +368,7 @@ export default function WalletInfo() {
                     <p className={style.tokenBalance} style={{width:"35%",marginRight:"5px", alignItems:"flex-start"}}>
                       {makeShortTokenName(numberWithCommasTwoDecimals(token.balance), 14)}
                     </p>
-                    <p className={style.tokenBalance} style={{width:"35%", color:priceColor, alignItems:"flex-end"}}>
+                    <p className={style.tokenBalance} style={{width:"35%", color:priceColor, alignItems:"flex-end", paddingRight:"10px"}} >
                       ({makeShortTokenName(convertBalanceCurrency(token.usdBalance), 15)})
                     </p>
                   </Box>

@@ -61,6 +61,12 @@ export default function TokenTransaction() {
     setTXTransaction([]);
     setquotePrice(1);
   }, [lpTokenAddress.contractAddress])
+
+  let intlDateObj = new Intl.DateTimeFormat('en-US', {
+    timeZone: "America/New_York"
+  });
+  
+
   return (
     <Box className={transactionClass}>
       <TableContainer overflowY={"auto"} overflowX={"auto"} height={"100%"} css={{
@@ -84,7 +90,7 @@ export default function TokenTransaction() {
         <Thead position="sticky" top={0} zIndex="docked" backgroundColor={headerColor}>
           <Tr>
             <Th color={"#7C7C7C"} width={"8%"} textTransform={"initial"} paddingLeft={"1.5rem"}>Activity</Th>
-            <Th color={"#7C7C7C"} width={"15%"} textTransform={"initial"} paddingLeft={"0.7rem"}>Tokens</Th>
+            <Th color={"#7C7C7C"} width={"18%"} textTransform={"initial"} paddingLeft={"0.7rem"}>Tokens</Th>
             <Th color={"#7C7C7C"} width={"42%"} textTransform={"initial"} paddingLeft={"10rem"}>Amount</Th>
             <Th color={"#7C7C7C"} width={"24%"} textTransform={"initial"} paddingLeft={"3rem"}>Date</Th>
             <Th color={"#7C7C7C"} width={"16%"} textTransform={"initial"} paddingLeft={"0rem"}>Txn</Th>
@@ -99,10 +105,11 @@ export default function TokenTransaction() {
                 const usdVal = quotePrice * data.quoteToken_amount;
                 const txHash = data.transaction_hash;
                 const linkAddr = tokenData.network == constant.BINANCE_NETOWRK ? LINK_BSCNETWORK + txHash: LINK_ETHNETWORK + txHash;
+                const date = new Date(data.transaction_local_time + " UTC");
                 return (
                 <Tr key={index} color={color} className={style.txData}>
                   <Td width={"8%"} paddingLeft={"1.5rem"}>{buy_sell}</Td>
-                  <Td width={"15%"} paddingLeft={"0.7rem"}>{numberWithCommasNoDecimals(data.baseToken_amount)}</Td>
+                  <Td width={"18%"} paddingLeft={"0.7rem"}>{numberWithCommasNoDecimals(data.baseToken_amount)}</Td>
                   <Td width={"42%"} paddingLeft={"2rem"} style={{
                     paddingLeft:"0rem"
                   }}>
@@ -122,7 +129,7 @@ export default function TokenTransaction() {
                     }}>{numberWithCommasTwoDecimals(data.quoteToken_amount) + " " + lpTokenAddress.quoteCurrency_name}</p>
                     </Box>
                   </Td>
-                  <Td width={"24%"} paddingLeft={"3rem"}>{data.transaction_local_time}</Td>
+                  <Td width={"24%"} paddingLeft={"3rem"}>{date.toString().slice(4, 34)}</Td>
                   <Td width={"16%"} paddingLeft={"0rem"}>
                     <Box
                      _hover={{"textDecoration":"underline"}}

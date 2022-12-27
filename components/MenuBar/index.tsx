@@ -2,10 +2,11 @@ import React from 'react'
 import { Box, useColorModeValue } from "@chakra-ui/react"
 import style from './MenuBar.module.css'
 import {GameMenuBar, TopMenuBar} from '../../assests/icon'
-import {ChartMenuBar} from '../../assests/icon'
 import {TradeMenuBar} from '../../assests/icon'
+import { usePlayMode } from '../../hooks/usePlayMode'
 
 export default function MenuBar() {
+  const {showMode, setShowMode} = usePlayMode();
   const menuClass = useColorModeValue(
     style.menuBar + " " + style.menuBarLight,
     style.menuBar + " " + style.menuBarDark
@@ -25,20 +26,23 @@ export default function MenuBar() {
       }}>
         <TopMenuBar className={"text-1x"}/>
       </Box>
-      <div style={{
+      <Box style={{
         display: "flex", 
         justifyContent:"center", 
         height:"5rem", 
         alignContent:"center",
         cursor: "pointer",
-        backgroundColor:chartSelectColor,
         flexDirection: "column",
         width:"100%",
         alignItems:"center"
-      }}>
+        }}
+        onClick = {() => setShowMode("Trade")}
+        _hover={{bg:chartSelectColor}}
+        background = {showMode === "Trade" ? chartSelectColor : "transparent"}
+      >
         <TradeMenuBar/>
-      </div>
-      <div style={{
+      </Box>
+      <Box style={{
         display: "flex", 
         justifyContent:"center", 
         height:"5rem", 
@@ -47,9 +51,13 @@ export default function MenuBar() {
         flexDirection: "column",
         width:"100%",
         alignItems:"center"
-      }}>
+        }}
+        _hover={{bg:chartSelectColor}}
+        onClick = {() => setShowMode("Games")}
+        background = {showMode === "Games" ? chartSelectColor : "transparent"}
+      >
         <GameMenuBar/>
-      </div>      
+      </Box>      
       
     </Box>
   );

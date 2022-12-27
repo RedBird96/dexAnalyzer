@@ -8,8 +8,9 @@ import MenuBar from "../MenuBar"
 import TokenTransaction from "../TokenTransaction"
 import WalletInfo from "../WalletInfo"
 import style from './TokenBody.module.css'
-import {ResizerDark, ResizerLight} from '../../assests/icon'
+import {ResizerDark, ResizerLight, PlayChess} from '../../assests/icon'
 import { useTokenInfo } from '../../hooks'
+import { usePlayMode } from '../../hooks/usePlayMode'
 
 const ChartContainer = dynamic(() => import("../ChartContainer"), { ssr: false })
 const ResizePanel = dynamic(() => import('react-resize-panel'), { ssr: false });
@@ -26,6 +27,7 @@ export default function TokenBody() {
   const resizeBgColor = useColorModeValue("#FFFFFF", "#1C1C1C");
   const hasWindow = typeof window !== 'undefined';
   const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
+  const {showMode} = usePlayMode();
   
   function getWindowDimensions() {
     const width = hasWindow ? window.innerWidth : null;
@@ -90,108 +92,133 @@ export default function TokenBody() {
     <main 
       className={style.tokenBody} 
     >
-      <Box style={{
-        display: "flex", 
-        flexDirection: "row", 
-        width: "21.7%"
-      }}>
-        <MenuBar/>
-        <TokenList/>
-      </Box>
-      <nav>
-        <hr aria-orientation='vertical' style={{width:"1px", color:"#313131"}}></hr>
-      </nav>
-      {
-        tokenData != undefined && tokenData.contractAddress != "" ? 
+    {
+      showMode === "Trade" ? 
+      <>
         <Box style={{
           display: "flex", 
-          flexDirection: "column", 
-          width: "56.5%",
-          height:"100%"
-        }}>
-          <TokenInfo/>  
-          <Box 
-          id="tradeMain"
-          style={{
-            display:"flex",
-            flexDirection:"column",
-            height:"100%"
-          }}
-          ref = {sidebarRef}
-          >
-            <Box
-            position={"relative"}
-            width={"100%"}
-            height={"100%"}
-            >
-              <ChartContainer height = {chartheight} resize = {isResizing}/>
-            </Box>
-            <Box 
-              position="relative"
-              display="flex"
-              height={height}
-              maxHeight={"50rem"}
-              minHeight={"20rem"}
-              flexShrink={"0"}
-              width={"100%"}
-              ref = {transactionRef}
-            >
-              <TokenTransaction/>
-              <Box
-                position="absolute"
-                height={"15px"}
-                top={"-12px"}
-                left={"0px"}
-                cursor={"row-resize"}
-                width={"100%"}
-                backgroundColor={resizeBgColor}
-                onMouseDown={startResizing}
-              >
-                <nav>
-                  <hr aria-orientation='vertical' style={{width:"1px", color:"#313131"}}></hr>
-                </nav>
-                <Box
-                  display="flex"
-                  width={"100%"}
-                  height={"100%"}
-                  position={"relative"}
-                  textAlign={"center"}
-                  justifyContent={"center"}
-                  alignItems={"center"}
-                  style={{
-                    zIndex:99
-                  }}
-                >
-                  <ResizerLight/>
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-          
-        </Box>:
+          flexDirection: "row", 
+          width: "21.7%"
+          }}>
+          <MenuBar/>
+          <TokenList/>
+        </Box>
+        <nav>
+          <hr aria-orientation='vertical' style={{width:"1px", color:"#313131"}}></hr>
+        </nav>
+        {
+          tokenData != undefined && tokenData.contractAddress != "" ? 
           <Box style={{
             display: "flex", 
             flexDirection: "column", 
             width: "56.5%",
-            height:"100%",
-            justifyContent:"center",
-            alignItems:"center",
-            backgroundColor: "#1C1C1C",
-            color:"#FFFFFF"
+            height:"100%"
           }}>
-              Please search or select a token
-          </Box>
-      }
-      
-      <nav>
-        <hr aria-orientation='vertical' style={{width:"1px", color:"#313131"}}></hr>
-      </nav>
+            <TokenInfo/>  
+            <Box 
+            id="tradeMain"
+            style={{
+              display:"flex",
+              flexDirection:"column",
+              height:"100%"
+            }}
+            ref = {sidebarRef}
+            >
+              <Box
+              position={"relative"}
+              width={"100%"}
+              height={"100%"}
+              >
+                <ChartContainer height = {chartheight} resize = {isResizing}/>
+              </Box>
+              <Box 
+                position="relative"
+                display="flex"
+                height={height}
+                maxHeight={"50rem"}
+                minHeight={"20rem"}
+                flexShrink={"0"}
+                width={"100%"}
+                ref = {transactionRef}
+              >
+                <TokenTransaction/>
+                <Box
+                  position="absolute"
+                  height={"15px"}
+                  top={"-12px"}
+                  left={"0px"}
+                  cursor={"row-resize"}
+                  width={"100%"}
+                  backgroundColor={resizeBgColor}
+                  onMouseDown={startResizing}
+                >
+                  <nav>
+                    <hr aria-orientation='vertical' style={{width:"1px", color:"#313131"}}></hr>
+                  </nav>
+                  <Box
+                    display="flex"
+                    width={"100%"}
+                    height={"100%"}
+                    position={"relative"}
+                    textAlign={"center"}
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                    style={{
+                      zIndex:99
+                    }}
+                  >
+                    <ResizerLight/>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+            
+          </Box>:
+            <Box style={{
+              display: "flex", 
+              flexDirection: "column", 
+              width: "56.5%",
+              height:"100%",
+              justifyContent:"center",
+              alignItems:"center",
+              backgroundColor: "#1C1C1C",
+              color:"#FFFFFF"
+            }}>
+                Please search or select a token
+            </Box>
+        }
+        
+        <nav>
+          <hr aria-orientation='vertical' style={{width:"1px", color:"#313131"}}></hr>
+        </nav>
+        <Box style={{
+          display: "flex", 
+          width: "21.8%"
+        }}>
+        <WalletInfo/>
+        </Box>            
+      </> :
       <Box style={{
         display: "flex", 
-        width: "21.8%"
-      }}>
-      <WalletInfo/>
-      </Box>      
+        flexDirection: "row",
+        width: "100%",
+        background: "#1C1C1C"
+        }}>
+        <Box style={{
+          display: "flex", 
+          flexDirection: "row",
+          width: "21.8%"
+          }}>
+          <MenuBar/>
+          <Box
+            margin={"3rem"}
+          >
+            <PlayChess/>
+          </Box>
+        </Box>
+      </Box>
+    }
+      
     </main>
   );
 }

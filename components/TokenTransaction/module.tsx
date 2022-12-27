@@ -82,7 +82,6 @@ export async function appendPastTransactions(
     beforeTime = element?.transaction_utc_time!;
     if (beforeTime.at(11) != "T")
       beforeTime = beforeTime.substring(0, 10) + "T" + beforeTime.substring(11);
-    console.log('beforeTime element', beforeTime, element);
   } else {
     const res = await getLastTransactionsLogsByTopic(
       lpTokenAddress.contractAddress, 
@@ -101,7 +100,6 @@ export async function appendPastTransactions(
       }
     }
   }
-
   if (tempTransaction.length > TRANSACTION_BLOCK_SHOW)
     return tempTransaction;
 
@@ -113,7 +111,6 @@ export async function appendPastTransactions(
     beforeTime,
     TRANSACTION_BLOCK_SHOW - tempTransaction.length
   );
-
   if (transactions != constant.NOT_FOUND_TOKEN){
 
     transactions?.forEach((value:any, index:number) => {
@@ -121,7 +118,6 @@ export async function appendPastTransactions(
       let buy_sell;
 
       buy_sell = value.buyCurrency.address == lpTokenAddress.quoteCurrency_contractAddress ? "Buy" : "Sell";
-
       const baseAmount = value.baseAmount;
       const quoteAmount = value.quoteAmount;
       const utcTime = value.timeInterval.second;

@@ -9,6 +9,7 @@ import { LpTokenPriceProvider } from '../hooks/useLPTokenPrice';
 import { WalletTokenBalanceProvider } from '../hooks/useWalletBalanceTokens';
 import { StableCoinPriceProvider } from '../hooks/useStableCoinPrice';
 import { LPTransactionProvider } from '../hooks/useLPTransaction';
+import { PlayModeProvider } from '../hooks/usePlayMode';
 
 export default function App({ Component, pageProps }: AppProps) {
 
@@ -18,6 +19,7 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <ChakraProvider theme={theme}>
       <ThirdwebProvider desiredChainId={desiredChainId} supportedChains={supportChain}>
+        <PlayModeProvider>
           <StableCoinPriceProvider>
             <TokenInfoProvider>
               <LpTokenPriceProvider>
@@ -31,6 +33,7 @@ export default function App({ Component, pageProps }: AppProps) {
               </LpTokenPriceProvider>
             </TokenInfoProvider>
           </StableCoinPriceProvider>
+          </PlayModeProvider>
       </ThirdwebProvider>
     </ChakraProvider>
     

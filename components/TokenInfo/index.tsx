@@ -413,6 +413,7 @@ export default function TokenInfo() {
               showArrow = {true}
               setLPTokenHandler = {setLpTokenItem}
               isLast = {false}
+              lpTokenList = {lpTokenList}
             />
             <Box 
               id="dexlist" 
@@ -441,6 +442,7 @@ export default function TokenInfo() {
                       showArrow = {false}
                       setLPTokenHandler = {setLpTokenItem}
                       isLast = {index == lpTokenList.length - 1 ? true : false}
+                      lpTokenList = {lpTokenList}
                     />
                   );
                 })
@@ -462,13 +464,13 @@ export default function TokenInfo() {
                   rel="noreferrer noopener" >
               
                 <p
-                  className={style.tokenMarketCap} 
+                  className={style.itemvalue} 
                   style={{marginRight:"1rem"}} 
                   color={whiteBlackMode} 
                 >
                   {numberWithCommasTwoDecimals(balance)}
                 </p>
-                <p className={style.tokenMarketCap}  style={{color:priceColor}} >({convertBalanceCurrency(balanceUSD, 2)})</p>
+                <p className={style.itemvalue}  style={{color:priceColor}} >({convertBalanceCurrency(balanceUSD, 2)})</p>
               </a>
               </Box>
           </Box>          
