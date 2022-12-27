@@ -27,7 +27,7 @@
 }
 
 .txData {
-  font-family: "Inter";
+  font-family: "Lato";
 }
 @media only screen and (max-height: 900px) {
   .tokenTransaction {

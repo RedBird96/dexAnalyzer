@@ -313,7 +313,7 @@ export default function WalletInfo() {
           >
             <p style={{width:"30%"}}>Token</p>
             <p style={{width:"35%"}}>Balance</p>
-            <p style={{width:"35%", alignItems:"flex-end", display:"flex", flexDirection:"column", paddingRight:"10px"}}>Value</p>
+            <p style={{width:"35%", alignItems:"flex-end", display:"flex", flexDirection:"column"}}>Value</p>
           </Box>  
           <Box style={{
               width:"100%", 
@@ -380,10 +380,10 @@ export default function WalletInfo() {
                       </a>
                     </Box>
                     <p className={style.tokenBalance} style={{width:"35%",marginRight:"5px", alignItems:"flex-start", paddingLeft:"2px"}}>
-                      {makeShortTokenName(numberWithCommasTwoDecimals(token.balance), 19)}
+                      {makeShortTokenName(numberWithCommasTwoDecimals(token.balance), 25)}
                     </p>
-                    <p className={style.tokenBalance} style={{width:"35%", color:priceColor, alignItems:"flex-end", paddingRight:"10px"}} >
-                      ({makeShortTokenName(convertBalanceCurrency(token.usdBalance, 2), 15)})
+                    <p className={style.tokenBalance} style={{width:"35%", color:priceColor, alignItems:"flex-end"}} >
+                      ({makeShortTokenName(convertBalanceCurrency(token.usdBalance, 2), 20)})
                     </p>
                   </Box>
                 </Box>

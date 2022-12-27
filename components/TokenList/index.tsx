@@ -263,12 +263,10 @@ export default function TokenList() {
     setListTokens(filterTokens);
     let newCookieString = "";
     filterTokens.forEach((token) => {
-      if (token.pinSetting) {
-        const obj = JSON.stringify(token);
-        if (obj.indexOf(";") == -1) {
-          newCookieString += obj;
-          newCookieString += ";";
-        }
+      const obj = JSON.stringify(token);
+      if (obj.indexOf(";") == -1) {
+        newCookieString += obj;
+        newCookieString += ";";
       }
     });
     localStorage.setItem("PinnedToken", newCookieString);
