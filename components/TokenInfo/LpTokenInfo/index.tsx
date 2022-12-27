@@ -158,7 +158,7 @@ export default function LpTokenInfo({
         </Box>
       </Box>
       {
-        showArrow && lpTokenList.length === 1 ?
+        showArrow && lpTokenList.length > 0 ?
         <Box
           cursor={"pointer"} 
           style={{transform:`rotate(${clickDex * 180}deg)`, width:"1rem"}} 
@@ -169,7 +169,7 @@ export default function LpTokenInfo({
             <DownArrowLight/> 
           }
         </Box>
-        : lpTokenList.length > 1 ?
+        : lpTokenList.length > 0 ?
         <div style={{
           width:"90%",
           borderWidth:isLast?"0":"thin",
