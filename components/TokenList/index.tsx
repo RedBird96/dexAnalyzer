@@ -41,6 +41,7 @@ export default function TokenList() {
 
   const [showListToken, setShowListToken] = useState<Boolean>();
   const [activeToken, setActiveToken] = useState<ERC20Token>();
+  const debouncedActiveToken = useDebounce<ERC20Token>(activeToken, 500);
   const [foundToken, setFoundToken] = useState<ERC20Token[]>([]);
   const [listTokens, setListTokens] = useState<ERC20Token[]>([]);
   const [searchStatus, setSearchStatus] = useState<SearchStatus>(SearchStatus.notsearch);
@@ -194,6 +195,10 @@ export default function TokenList() {
   }, [debouncedQuery]);
 
   useEffect(() => {
+    setTokenData(debouncedActiveToken);
+  }, [debouncedActiveToken])
+
+  useEffect(() => {
     // const cookieString = getCookie("PinnedToken");
     const cookieString = localStorage.getItem("PinnedToken");
     const tokenString = cookieString?.split(";");
@@ -259,7 +264,7 @@ export default function TokenList() {
 
   const setActiveTokenHandler = (token:ERC20Token) => {
     setActiveToken(token);
-    setTokenData(token);
+    // setTokenData(token);
     if (searchStatus == SearchStatus.founddata) {
       setSearchQuery("");
       setListTokens(
@@ -337,7 +342,7 @@ export default function TokenList() {
                       <TokenListItem
                         key={token.contractAddress + token.network}
                         tokenData = {token}
-                        activeToken = {activeToken!}
+                        activeToken = {debouncedActiveToken!}
                         activeTokenHandler = {setActiveTokenHandler}
                         pinTokenHandler = {addPinTokenHandler}
                       />
@@ -379,7 +384,7 @@ export default function TokenList() {
               <TokenListItem
                 key={token.name+token.network}
                 tokenData = {token}
-                activeToken = {activeToken!}
+                activeToken = {debouncedActiveToken!}
                 activeTokenHandler = {setActiveTokenHandler}
                 pinTokenHandler = {addPinTokenHandler}
               />);      

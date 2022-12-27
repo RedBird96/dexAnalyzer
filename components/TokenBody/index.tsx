@@ -102,7 +102,7 @@ export default function TokenBody() {
         <hr aria-orientation='vertical' style={{width:"1px", color:"#313131"}}></hr>
       </nav>
       {
-        tokenData.contractAddress != "" ? 
+        tokenData != undefined && tokenData.contractAddress != "" ? 
         <Box style={{
           display: "flex", 
           flexDirection: "column", 
