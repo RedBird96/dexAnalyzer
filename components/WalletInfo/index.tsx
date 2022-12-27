@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import { 
   Box, 
   Button, 
@@ -61,12 +61,14 @@ export default function WalletInfo() {
   const tokenColor = useColorModeValue("#1C1C1C","#FFFFFF");
   const refreshBtnBgColor = useColorModeValue("#FFFFFF","#1C1C1C");
   const refreshBtnBorderColor = useColorModeValue("#CFCFCF","#5c5c5c");
+  const hoverColor = useColorModeValue("#005CE5","#3A3A29");
   const headerColor = useColorModeValue("#FFFFFF", "#262626");
   const priceColor = useColorModeValue("#00B112","#00C514");
   const tableBodyBorder = useColorModeValue(style.walletTokenBodyBorderLight,style.walletTokenBodyBorderDark);
   const tableHeadBorder = useColorModeValue(style.walletTokenHeadBorderLight,style.walletTokenHeadBorderDark);
   const address = useAddress();
   const network = useNetwork();
+  const walletRef = useRef(null);
   
   const [searchContext, setSearchContext] = useState("");
   const [walletBalance, setWalletBalance] = useState(0);
@@ -188,9 +190,9 @@ export default function WalletInfo() {
       getTokensFromWallet();
     }
   }, [address, network[0].data.chain?.id]);
-
+  console.log('wallet', walletRef.current.clientWidth);
   return (
-    <Box className={walletClass}>
+    <Box className={walletClass} ref = {walletRef}>
       <Box className={titleClass}>
         <Box style={{
           display:"flex", 
@@ -214,7 +216,7 @@ export default function WalletInfo() {
           </Button>
         </Box>
       </Box>
-      <nav><hr aria-orientation='horizontal'></hr></nav>
+      <nav><hr aria-orientation='horizontal' style={{width:walletRef.current.clientWidth}}></hr></nav>
       <Box style={{
           display:"flex", 
           flexDirection:"row", 
@@ -260,7 +262,7 @@ export default function WalletInfo() {
         </Button>
       </Box>
       <Box className={style.walletData}>
-        <InputGroup className = {searchClass} >
+        <InputGroup className = {searchClass} width={"89%"}>
           <InputLeftElement
               paddingTop = '7px'
               paddingLeft= '5px'
@@ -296,7 +298,7 @@ export default function WalletInfo() {
           alignItems = {"center"}
         >
           <Box 
-            style={{width:"100%", maxHeight:"30rem", marginBottom:"0.5rem"}} 
+            style={{width:"89%", maxHeight:"30rem", marginBottom:"0.5rem"}} 
             display={"flex"} 
             flexDirection={"row"}
             alignContent={"center"}
@@ -304,11 +306,12 @@ export default function WalletInfo() {
             paddingRight={"10px"}
           >
             <p style={{width:"30%"}}>Token</p>
-            <p>Balance</p>
+            <p style={{width:"35%"}}>Balance</p>
+            <p style={{width:"35%", alignItems:"flex-end", display:"flex", flexDirection:"column", paddingRight:"10px"}}>Value</p>
           </Box>  
           <Box style={{
               width:"100%", 
-              maxHeight:"25rem", 
+              height:"25.5rem", 
               alignItems:"center"
             }}
             display={"flex"}
@@ -324,7 +327,7 @@ export default function WalletInfo() {
                 height: '4px',
               },
               '&::-webkit-scrollbar-thumb': {
-                backgroundColor: "grey",
+                backgroundColor: "#3D3D3D",
                 borderRadius: '24px',
               },
             }}
@@ -342,17 +345,22 @@ export default function WalletInfo() {
                   display={"flex"} 
                   alignItems={"center"}
                   _hover={{
-                    backgroundColor:"#000000",
+                    backgroundColor:hoverColor,
                     color: "#FFFFFF"
                   }}
+                  paddingTop={"5px"}
+                  paddingBottom={"5px"}
+                  justifyContent={"center"}
                 >
                   <Box
-                    style={{width:"100%"}} 
+                    style={{width:"89%"}} 
                     display={"flex"} 
                     flexDirection={"row"}
                   >
                     <Box
                       style={{width:"30%"}}
+                      display={"flex"}
+                      alignItems={"center"}
                       _hover={{
                         "textDecoration":"underline",
                       }}
@@ -362,14 +370,14 @@ export default function WalletInfo() {
                         href={token.contractPage}
                         target="_blank" rel="noreferrer noopener"
                       >
-                        {makeShortTokenName(token.symbol, 8)}
+                        {makeShortTokenName(token.symbol, 10)}
                       </a>
                     </Box>
-                    <p className={style.tokenBalance} style={{width:"35%",marginRight:"5px", alignItems:"flex-start"}}>
-                      {makeShortTokenName(numberWithCommasTwoDecimals(token.balance), 14)}
+                    <p className={style.tokenBalance} style={{width:"35%",marginRight:"5px", alignItems:"flex-start", paddingLeft:"2px"}}>
+                      {makeShortTokenName(numberWithCommasTwoDecimals(token.balance), 19)}
                     </p>
                     <p className={style.tokenBalance} style={{width:"35%", color:priceColor, alignItems:"flex-end", paddingRight:"10px"}} >
-                      ({makeShortTokenName(convertBalanceCurrency(token.usdBalance), 15)})
+                      ({makeShortTokenName(convertBalanceCurrency(token.usdBalance, 2), 15)})
                     </p>
                   </Box>
                 </Box>
@@ -378,6 +386,10 @@ export default function WalletInfo() {
           }
           </Box>
         </Box>
+      </Box>
+      <nav><hr aria-orientation='horizontal' style={{width:walletRef.current.clientWidth}}></hr></nav>
+      <Box width={"100%"} height={"100%"} background={"#1C1C1C"}>
+
       </Box>
     </Box>
   );

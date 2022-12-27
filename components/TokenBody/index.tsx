@@ -51,7 +51,7 @@ export default function TokenBody() {
 
   useEffect(() => {
     if (tokenData !=undefined && tokenData.contractAddress != "")
-      setChartHeight(sidebarRef.current.clientHeight - 320);
+      setChartHeight(sidebarRef.current.clientHeight - 320 < 750 ? 750 : sidebarRef.current.clientHeight - 320);
   }, [windowDimensions])
 
   const startResizing = React.useCallback((_mouseDownEvent: any) => {
@@ -129,7 +129,7 @@ export default function TokenBody() {
               width={"100%"}
               height={"100%"}
               >
-                <ChartContainer height = {chartheight} resize = {isResizing}/>
+                <ChartContainer height = {chartheight - 10} resize = {isResizing}/>
               </Box>
               <Box 
                 position="relative"
@@ -153,7 +153,7 @@ export default function TokenBody() {
                   onMouseDown={startResizing}
                 >
                   <nav>
-                    <hr aria-orientation='vertical' style={{width:"1px", color:"#313131"}}></hr>
+                    <hr aria-orientation='vertical' style={{width:"100%", height:"1px", color:"#313131"}}></hr>
                   </nav>
                   <Box
                     display="flex"

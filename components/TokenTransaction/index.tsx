@@ -18,6 +18,7 @@ import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
 import * as constant from '../../utils/constant'
 import { TokenSide, TransactionType } from '../../utils/type'
 import { appendPastTransactions } from './module'
+import { format } from 'path'
 
 export default function TokenTransaction() {
   const transactionClass = useColorModeValue(
@@ -62,10 +63,7 @@ export default function TokenTransaction() {
     setquotePrice(1);
   }, [lpTokenAddress.contractAddress])
 
-  let intlDateObj = new Intl.DateTimeFormat('en-US', {
-    timeZone: "America/New_York"
-  });
-  
+
 
   return (
     <Box className={transactionClass}>
@@ -80,7 +78,7 @@ export default function TokenTransaction() {
           height: '4px',
         },
         '&::-webkit-scrollbar-thumb': {
-          backgroundColor: "grey",
+          backgroundColor: "#3D3D3D",
           borderRadius: '24px',
         },
         }}
@@ -101,14 +99,30 @@ export default function TokenTransaction() {
             txTransaction.map((data, index) => {
               if (data != null) {
                 const buy_sell = data.buy_sell;
-                const color = buy_sell == "Buy" ? priceColor: "#FF002E";               
+                const color = buy_sell == "Buy" ? priceColor: "#DC3545";        
+                const boxColor = buy_sell == "Buy" ? "#01840E" : "#DC3545";
                 const usdVal = quotePrice * data.quoteToken_amount;
                 const txHash = data.transaction_hash;
                 const linkAddr = tokenData.network == constant.BINANCE_NETOWRK ? LINK_BSCNETWORK + txHash: LINK_ETHNETWORK + txHash;
                 const date = new Date(data.transaction_local_time + " UTC");
+
                 return (
                 <Tr key={index} color={color} className={style.txData}>
-                  <Td width={"8%"} paddingLeft={"1.5rem"}>{buy_sell}</Td>
+                  <Td width={"8%"} paddingLeft={"1.5rem"}>
+                    <Box
+                      paddingTop={"2px"}
+                      background={boxColor}
+                      width={"50px"}
+                      height={"24px"}
+                      display = {"flex"}
+                      borderRadius = {"5px"}
+                      color={"white"}
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                    >
+                      <p>{buy_sell}</p>
+                    </Box>
+                  </Td>
                   <Td width={"18%"} paddingLeft={"0.7rem"}>{numberWithCommasNoDecimals(data.baseToken_amount)}</Td>
                   <Td width={"42%"} paddingLeft={"2rem"} style={{
                     paddingLeft:"0rem"
@@ -129,7 +143,7 @@ export default function TokenTransaction() {
                     }}>{numberWithCommasTwoDecimals(data.quoteToken_amount) + " " + lpTokenAddress.quoteCurrency_name}</p>
                     </Box>
                   </Td>
-                  <Td width={"24%"} paddingLeft={"3rem"}>{date.toString().slice(4, 34)}</Td>
+                  <Td width={"24%"} paddingLeft={"3rem"}>{date.toLocaleString("en-US")}</Td>
                   <Td width={"16%"} paddingLeft={"0rem"}>
                     <Box
                      _hover={{"textDecoration":"underline"}}
