@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, KeyboardEvent } from 'react'
-import { Box, Input, useColorModeValue, useColorMode } from "@chakra-ui/react"
+import { Box, Input, useColorModeValue, useColorMode, InputGroup, InputLeftAddon, InputLeftElement, InputRightElement } from "@chakra-ui/react"
 import {
   useAddress,
   useNetwork,
@@ -14,14 +14,10 @@ import {
   useDebounce
 } from '../../hooks'
 import {ERC20Token, SearchStatus} from '../../utils/type'
-import {
-  setCookie,
-  getCookie,
-  deleteCookie
-} from '../../utils'
 import * as constant from '../../utils/constant'
 import TokenListItem from './TokenListItem'
 import style from './TokenList.module.css'
+import { SearchCross, SearchIcon } from '../../assests/icon'
 
 export default function TokenList() {
   const colorMode = useColorMode();
@@ -238,23 +234,41 @@ export default function TokenList() {
     setListTokens(cookieToken); 
   }, []);
 
-  const addPinTokenHandler = (token:ERC20Token) => {
-    const filterTokens = listTokens.filter(
-      item => (item.contractAddress+item.network) !== 
-      (token.contractAddress+token.network)
-    );
-    if (token.pinSetting) {
-      filterTokens.push(token);
-      setListTokens(filterTokens); 
-    } else {
-      setListTokens(filterTokens);
+  const TokenActionHandler = (token:ERC20Token, add:boolean) => {
+    let filterTokens = listTokens;
+    filterTokens = filterTokens.filter(item => (item.contractAddress + item.network) != (token.contractAddress + token.network));
+    
+
+    filterTokens = filterTokens.sort((value1, value2) => {
+      if (value1.pinSetting && !value2.pinSetting)
+        return -1;
+      else if (!value1.pinSetting && value2.pinSetting)
+        return 1;
+      else {
+        if (value1.name > value2.name)
+          return -1;
+        else if (value1.name < value2.name)
+          return 1;
+        return 0;
+      }
+    })
+    
+    if (add) {
+      if (token.pinSetting)
+        filterTokens.splice(0, 0, token);
+      else
+        filterTokens.push(token);
     }
+
+    setListTokens(filterTokens);
     let newCookieString = "";
     filterTokens.forEach((token) => {
-      const obj = JSON.stringify(token);
-      if (obj.indexOf(";") == -1) {
-        newCookieString += obj;
-        newCookieString += ";";
+      if (token.pinSetting) {
+        const obj = JSON.stringify(token);
+        if (obj.indexOf(";") == -1) {
+          newCookieString += obj;
+          newCookieString += ";";
+        }
       }
     });
     localStorage.setItem("PinnedToken", newCookieString);
@@ -266,34 +280,58 @@ export default function TokenList() {
     // setTokenData(token);
     if (searchStatus == SearchStatus.founddata) {
       setSearchQuery("");
-      setListTokens(
-        listTokens.filter(item => (item.contractAddress + item.network) != (token.contractAddress + token.network) && 
-        item.pinSetting == true)); 
-      setListTokens(tokens => [...tokens, token]);
-    } else if (token.pinSetting == true && listTokens.length >= 2){
-      const last = listTokens.at(-1);
-      if (last?.pinSetting == false)
-        setListTokens(listTokens.filter(
-          item => (item.contractAddress+item.network) != 
-          (last!.contractAddress + last!.network)
-      ));
-    }
-  }
+      let filterTokens = listTokens;
+      filterTokens = filterTokens.filter(item => (item.contractAddress + item.network) != (token.contractAddress + token.network)); 
+      const unPinIndex = filterTokens.findIndex((value:any) => value.pinSetting == false);
 
+      if (unPinIndex != -1)
+        filterTokens.splice(unPinIndex, 0, token);
+      else
+        filterTokens.push(token);
+
+      setListTokens(filterTokens); 
+    }
+    //  else if (token.pinSetting == true && listTokens.length >= 2){
+    //   const last = listTokens.at(-1);
+    //   if (last?.pinSetting == false)
+    //     setListTokens(listTokens.filter(
+    //       item => (item.contractAddress+item.network) != 
+    //       (last!.contractAddress + last!.network)
+    //   ));
+    // }
+  }
   return (
     <Box className={listClass}>
       <Box className = {style.tokenSearch}>
-        <Input 
-          id='SearchId'
-          placeholder='Search'
-          onChange={handleSearchChange} 
-          onKeyDown={handleEnter}
-          fontSize='0.8rem'
-          borderRadius={'2rem'}
-          height='2.5rem'
-          className={searchClass}
-          value={searchQuery}
-        />
+        <InputGroup>
+          <InputLeftElement
+            paddingTop = '7px'
+            paddingLeft= '5px'
+            pointerEvents='none'
+            children={<SearchIcon/>}
+          />
+          <Input 
+            id='SearchId'
+            placeholder='Search token address'
+            _placeholder={{fontsize:'1rem', fontcolor:"#E34B62"}}
+            onChange={handleSearchChange} 
+            onKeyDown={handleEnter}
+            borderRadius={'2rem'}
+            height='2.5rem'
+            className={searchClass}
+            value={searchQuery}
+          />
+          {
+            searchQuery.length > 0 && 
+            <InputRightElement
+              onClick={()=>{setSearchQuery("");}}
+              cursor='pointer'
+              paddingTop = '7px'
+              paddingRight= '5px'
+              children={<SearchCross/>}
+            />
+          }
+        </InputGroup>
       </Box>
       <Box 
         style={{
@@ -301,19 +339,19 @@ export default function TokenList() {
           flexDirection:"column", 
           width:"100%", 
           overflow:"auto", 
-          maxHeight:"71rem"
+          maxHeight:"71.9rem"
           }}
           css={{
             '&::-webkit-scrollbar': {
-              width: '7px',
+              width: '4px',
               height: '4px',
             },
             '&::-webkit-scrollbar-track': {
-              width: '6px',
+              width: '4px',
               height: '4px',
             },
             '&::-webkit-scrollbar-thumb': {
-              backgroundColor: "grey",
+              backgroundColor: "#3D3D3D",
               borderRadius: '24px',
             },
           }}
@@ -343,7 +381,7 @@ export default function TokenList() {
                         tokenData = {token}
                         activeToken = {debouncedActiveToken!}
                         activeTokenHandler = {setActiveTokenHandler}
-                        pinTokenHandler = {addPinTokenHandler}
+                        pinTokenHandler = {TokenActionHandler}
                       />
                     );
                   })
@@ -385,7 +423,7 @@ export default function TokenList() {
                 tokenData = {token}
                 activeToken = {debouncedActiveToken!}
                 activeTokenHandler = {setActiveTokenHandler}
-                pinTokenHandler = {addPinTokenHandler}
+                pinTokenHandler = {TokenActionHandler}
               />);      
             })
           }

@@ -1,8 +1,9 @@
 import React from 'react'
 import { Box, useColorModeValue } from "@chakra-ui/react"
 import style from './MenuBar.module.css'
-import {TopMenuBar} from '../../assests/icon'
+import {GameMenuBar, TopMenuBar} from '../../assests/icon'
 import {ChartMenuBar} from '../../assests/icon'
+import {TradeMenuBar} from '../../assests/icon'
 
 export default function MenuBar() {
   const menuClass = useColorModeValue(
@@ -35,8 +36,21 @@ export default function MenuBar() {
         width:"100%",
         alignItems:"center"
       }}>
-        <ChartMenuBar/>
+        <TradeMenuBar/>
       </div>
+      <div style={{
+        display: "flex", 
+        justifyContent:"center", 
+        height:"5rem", 
+        alignContent:"center",
+        cursor: "pointer",
+        flexDirection: "column",
+        width:"100%",
+        alignItems:"center"
+      }}>
+        <GameMenuBar/>
+      </div>      
+      
     </Box>
   );
 }

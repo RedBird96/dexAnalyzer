@@ -5,11 +5,9 @@ import {
   PinIcon,
   UnPinIcon,
   PinLightIcon,
-  UnPinLightIcon
+  UnPinLightIcon,
+  SearchCross
 } from '../../../assests/icon'
-import {
-  useTokenInfo
-} from '../../../hooks'
 import { Box, Input, Button, useColorModeValue, useColorMode } from "@chakra-ui/react"
 import style from './TokenListItem.module.css'
 import {makeShortAddress, makeShortTokenName} from '../../../utils'
@@ -25,7 +23,7 @@ const TokenListItem = ({
   tokenData: ERC20Token,
   activeToken: ERC20Token,
   activeTokenHandler: (x?: any) => void,
-  pinTokenHandler: (x?: any) => void,
+  pinTokenHandler: (x?: any, y?:boolean) => void,
 }) => {
 
   const colorMode = useColorMode();
@@ -38,12 +36,14 @@ const TokenListItem = ({
   const addressColorActive  = useColorModeValue("#a7a7a7","#6a6a6a");
   const [isHover, setIsHover] = useState<Boolean>(false);
   const [isActive, setIsActive] = useState<Boolean>(false);
+  const [showCrossIcon, setShowCrossIcon] = useState<Boolean>(false);
   useEffect(() => {
       setIsActive(activeToken == tokenData);
   }, [activeToken, tokenData]);
   const setPinIcon = () => {
     tokenData.pinSetting = !tokenData.pinSetting;
-    pinTokenHandler(tokenData);
+    setShowCrossIcon(false);
+    pinTokenHandler(tokenData, true);
   }
   const setActiveToken = () => {
     activeTokenHandler(tokenData);
@@ -53,12 +53,18 @@ const TokenListItem = ({
       _hover={{bg:hoverColor}}
       onMouseOver={() => {setIsHover(true)}}
       onMouseOut={() => {setIsHover(false)}}
-      onClick={setActiveToken}
       backgroundColor={isActive ? hoverColor:"#transparent"}
       color={isActive?"#FFFFFF":whiteColor}
+      onMouseMove={() => {
+        setShowCrossIcon(true)
+      }}
+      onMouseLeave={() => setShowCrossIcon(false)}      
     >
       <Box display={"flex"} flexDirection={"row"} alignItems={"center"} width={"90%"} justifyContent={"space-between"}>
-        <Box style={{display:"flex", flexDirection:"row", alignItems:"center"}}>
+        <Box 
+          style={{display:"flex", flexDirection:"row", alignItems:"center"}}
+          onClick={setActiveToken}
+        >
           <img src={tokenData?.image} width={"40rem"}/>
           <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
             <Box display={"flex"} flexDirection={"row"} >
@@ -68,7 +74,14 @@ const TokenListItem = ({
             <p className={style.tokenAddress} style ={{color:isActive || isHover ? addressColorActive : addressColor}}>{makeShortAddress(tokenData?.contractAddress!)}</p>
           </Box>
         </Box>
-        <Box style={{display:"flex", flexDirection:"row", alignItems:"center", width:"3rem", justifyContent:"space-between"}}>
+        <Box style={{
+          display:"flex", 
+          flexDirection:"row", 
+          alignItems:"center", 
+          justifyContent:"space-between",
+          }}
+          width = {showCrossIcon?"4.5rem":"3rem"}
+        >
           {
             tokenData?.network == constant.ETHEREUM_NETWORK ?
             <ETHIcon/> :
@@ -80,8 +93,14 @@ const TokenListItem = ({
             tokenData?.pinSetting == false ? <UnPinLightIcon/> : <PinLightIcon/> : 
             tokenData?.pinSetting == false ? <UnPinIcon/> : <PinIcon/>
           }    
-          </Box>        
-        </Box>
+          </Box>   
+          {
+            showCrossIcon == true && 
+            <Box onClick={()=>pinTokenHandler(tokenData, false)}>
+              <SearchCross/>
+            </Box>
+          }   
+        </Box>  
       </Box>
     </Box>
   );

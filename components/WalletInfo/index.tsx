@@ -10,7 +10,10 @@ import {
   Tbody,
   useColorModeValue,
   calc,
-  TableContainer
+  TableContainer,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement
 } from "@chakra-ui/react"
 import {
   useNetwork,
@@ -26,7 +29,7 @@ import {
   makeShortTokenName,
   numberWithCommasTwoDecimals
 } from '../../utils'
-import {Refresh} from '../../assests/icon'
+import {Refresh, SearchCross, SearchIcon} from '../../assests/icon'
 import style from './WalletInfo.module.css'
 import * as constant from '../../utils/constant'
 import { 
@@ -52,6 +55,8 @@ export default function WalletInfo() {
   const {setWalletTokens} = useWalletTokenBalance();
   const {tokenData, setTokenData} = useTokenInfo();
   const selectBtnColor ="#0067C6";// useColorModeValue("#0070D7","#494949");
+  const searchColor = useColorModeValue("#FFFFFF", "#323232");
+  const searchBorderColor = useColorModeValue("#CFCFCF", "#323232");
   const notSelectBtnColor = useColorModeValue("#E0E0E0","#1C1C1C");
   const tokenColor = useColorModeValue("#1C1C1C","#FFFFFF");
   const refreshBtnBgColor = useColorModeValue("#FFFFFF","#1C1C1C");
@@ -149,7 +154,7 @@ export default function WalletInfo() {
     setWalletTokens([]);
   }
   const getTokensFromWallet = async() => {
-    if (address == null || address == "")
+    if (address == null || address == "" || tokenData == undefined)
       return;
       
     initAllInfos();
@@ -189,7 +194,7 @@ export default function WalletInfo() {
       <Box className={titleClass}>
         <Box style={{
           display:"flex", 
-          width:"78%", 
+          width:"89%", 
           flexDirection:"row", 
           justifyContent:"space-between"
         }}>
@@ -214,7 +219,8 @@ export default function WalletInfo() {
           display:"flex", 
           flexDirection:"row", 
           alignItems:"center",
-          justifyContent:"center"
+          justifyContent:"center",
+          width:"89%"
         }}
       >
         <Button
@@ -227,7 +233,7 @@ export default function WalletInfo() {
           _hover={{
             backgroundColor:notSelectBtnColor
           }}
-          width={"39%"}
+          width={"50%"}
           borderRadius={"0.7rem 0rem 0rem 0.7rem"}
           height={"2.8rem"}
           backgroundColor={notSelectBtnColor}
@@ -244,7 +250,7 @@ export default function WalletInfo() {
           _hover={{
             backgroundColor:selectBtnColor
           }}
-          width={"39%"}
+          width={"50%"}
           height={"2.8rem"}
           borderRadius={"0rem 0.7rem 0.7rem 0rem"}
           backgroundColor={selectBtnColor}
@@ -254,14 +260,34 @@ export default function WalletInfo() {
         </Button>
       </Box>
       <Box className={style.walletData}>
-        <Input 
-          className = {searchClass} 
-          placeholder='Search' 
-          fontSize='0.8rem'
-          onChange={handleSearchChange}
-          value={searchContext}
-          height='2.5rem'
-        />  
+        <InputGroup className = {searchClass} >
+          <InputLeftElement
+              paddingTop = '7px'
+              paddingLeft= '5px'
+              pointerEvents='none'
+              children={<SearchIcon/>}
+          />
+          <Input 
+            placeholder='Search token address' 
+            _placeholder={{fontsize:'1rem', fontcolor:"#E34B62"}}
+            onChange={handleSearchChange}
+            borderRadius ={"2rem"}
+            value={searchContext}
+            height='2.5rem'
+            background={searchColor}
+            borderColor={searchBorderColor}
+          />  
+          {
+            searchContext.length > 0 && 
+            <InputRightElement
+              onClick={()=>{setSearchContext("");}}
+              cursor='pointer'
+              paddingTop = '7px'
+              paddingRight= '5px'
+              children={<SearchCross/>}
+            />
+          }
+        </InputGroup>
         <Box 
           className={tableHeadBorder} 
           style = {{width:"100%", marginTop:"1rem"}}
@@ -270,7 +296,7 @@ export default function WalletInfo() {
           alignItems = {"center"}
         >
           <Box 
-            style={{width:"78%", maxHeight:"30rem", marginBottom:"0.5rem"}} 
+            style={{width:"100%", maxHeight:"30rem", marginBottom:"0.5rem"}} 
             display={"flex"} 
             flexDirection={"row"}
             alignContent={"center"}

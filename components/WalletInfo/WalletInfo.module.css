@@ -5,6 +5,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 .walletInfoDark {
@@ -39,10 +40,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  width:89%;
 }
 
 .tokenSearch {
-  width: 78% !important;
   margin-top: 1.2rem;
   margin-bottom:0.4rem;
   border-radius: 2rem !important;
