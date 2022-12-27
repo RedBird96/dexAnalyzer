@@ -62,7 +62,7 @@ const TokenListItem = ({
     >
       <Box display={"flex"} flexDirection={"row"} alignItems={"center"} width={"90%"} justifyContent={"space-between"}>
         <Box 
-          style={{display:"flex", flexDirection:"row", alignItems:"center"}}
+          style={{display:"flex", flexDirection:"row", alignItems:"center", width:"80%"}}
           onClick={setActiveToken}
         >
           <img src={tokenData?.image} width={"40rem"}/>
