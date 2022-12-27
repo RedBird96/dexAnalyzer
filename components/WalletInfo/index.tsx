@@ -70,6 +70,7 @@ export default function WalletInfo() {
   const network = useNetwork();
   const walletRef = useRef(null);
   
+  const [borderWidth, setBorderWidth] = useState(0);
   const [searchContext, setSearchContext] = useState("");
   const [walletBalance, setWalletBalance] = useState(0);
   const [tokensInfo, setTokensInfo] = useState<ERC20Token[]>([]);
@@ -85,6 +86,10 @@ export default function WalletInfo() {
     );
     setTokensInfo(temp);
   };
+
+  useEffect(() => {
+    setBorderWidth(walletRef.current.clientWidth);
+  }, [])
 
   const setETHTokensBalance = (text:any) => {
     let tempTokens: ERC20Token[] = [];
@@ -190,7 +195,6 @@ export default function WalletInfo() {
       getTokensFromWallet();
     }
   }, [address, network[0].data.chain?.id]);
-  console.log('wallet', walletRef.current.clientWidth);
   return (
     <Box className={walletClass} ref = {walletRef}>
       <Box className={titleClass}>
@@ -216,7 +220,7 @@ export default function WalletInfo() {
           </Button>
         </Box>
       </Box>
-      <nav><hr aria-orientation='horizontal' style={{width:walletRef.current.clientWidth}}></hr></nav>
+      <nav><hr aria-orientation='horizontal' style={{width:borderWidth}}></hr></nav>
       <Box style={{
           display:"flex", 
           flexDirection:"row", 
@@ -389,7 +393,7 @@ export default function WalletInfo() {
           </Box>
         </Box>
       </Box>
-      <nav><hr aria-orientation='horizontal' style={{width:walletRef.current.clientWidth}}></hr></nav>
+      <nav><hr aria-orientation='horizontal' style={{width:borderWidth}}></hr></nav>
       <Box width={"100%"} height={"100%"} background={"#1C1C1C"}>
 
       </Box>
