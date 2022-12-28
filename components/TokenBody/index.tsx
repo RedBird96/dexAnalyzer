@@ -182,8 +182,7 @@ export default function TokenBody() {
               height:"100%",
               justifyContent:"center",
               alignItems:"center",
-              backgroundColor: "#1C1C1C",
-              color:"#FFFFFF"
+              backgroundColor: resizeBgColor
             }}>
                 Please search or select a token
             </Box>
@@ -203,7 +202,7 @@ export default function TokenBody() {
         display: "flex", 
         flexDirection: "row",
         width: "100%",
-        background: "#1C1C1C"
+        background: resizeBgColor
         }}>
         <Box style={{
           display: "flex", 

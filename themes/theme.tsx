@@ -5,7 +5,7 @@ const dark = "#232323";
 const light = "#ffffff";
 
 export const theme = extendTheme({
-  initialColorMode: 'light',
+  initialColorMode: 'dark',
   useSystemColorMode: true,
   styles: {
     global: (props: Record<string, any> | StyleFunctionProps) => ({

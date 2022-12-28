@@ -394,7 +394,7 @@ export default function WalletInfo() {
         </Box>
       </Box>
       <nav><hr aria-orientation='horizontal' style={{width:borderWidth}}></hr></nav>
-      <Box width={"100%"} height={"100%"} background={"#1C1C1C"}>
+      <Box width={"100%"} height={"100%"} background={refreshBtnBgColor}>
 
       </Box>
     </Box>
