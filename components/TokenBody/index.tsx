@@ -23,7 +23,7 @@ export default function TokenBody() {
   const [isResizing, setIsResizing] = useState(false);
   const {tokenData} = useTokenInfo();
   const [height, setHeight] = useState(320);
-  const [chartheight, setChartHeight] = useState(750);
+  const [chartheight, setChartHeight] = useState(0);
   const resizeBgColor = useColorModeValue("#FFFFFF", "#1C1C1C");
   const hasWindow = typeof window !== 'undefined';
   const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
@@ -50,9 +50,10 @@ export default function TokenBody() {
   }, []);
 
   useEffect(() => {
-    if (tokenData !=undefined && tokenData.contractAddress != "")
+    if (tokenData !=undefined && tokenData.contractAddress != ""){
       setChartHeight(sidebarRef.current.clientHeight - 320 < 750 ? 750 : sidebarRef.current.clientHeight - 320);
-  }, [windowDimensions])
+    }
+  }, [windowDimensions, tokenData])
 
   const startResizing = React.useCallback((_mouseDownEvent: any) => {
     setIsResizing(true);
