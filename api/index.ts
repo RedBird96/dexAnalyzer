@@ -8,9 +8,15 @@ import EtherscanClient, {Action} from './ethers/etherscan-client';
 import {ERC20Token, LPTokenPair, TokenSide} from '../utils/type'
 import UniswapV2Pair from '../config/IUniswapV2Pair.json';
 import PancakeswapV2Pair from '../config/IPancakeswapV2Pair.json';
-import { getHoldTokenList, getHoldTransferCount, getLPPairs } from "./bitquery_graphql";
+import {
+  getHoldTokenList, 
+  getHoldTransferCount, 
+  getLPPairs, 
+  getBuySellTransactions 
+} from "./bitquery_graphql";
 import * as constant from '../utils/constant'
 import * as endpoint from '../utils/endpoints'
+import { makeTemplateDate } from "../utils";
 
 const ETH_MAINNET_CONNECTION = {
   apiKey: endpoint.ETHERSCAN_API_KEY,
@@ -131,7 +137,7 @@ export async function getTokenBurnAmount(address:string, network: number) {
     client =  new EtherscanClient(BSC_MAINNET_CONNECTION);
   else
     client =  new EtherscanClient(ETH_MAINNET_CONNECTION);
-  const deadAddress = "0x000000000000000000000000000000000000dEaD";
+  const deadAddress = "0x000000000000000000000000000000000000dead";
   const res = await client.call(Action.account_tokentx, {
     contractaddress:address,
     address:deadAddress
@@ -193,8 +199,8 @@ export async function getTokenHolderandTransactionCount(address:string, network:
   return [0, 0];
 }
 
-export async function getTokenInfoFromTokenName(_name: string) {
-  const url = "https://sandbox-api.coinmarketcap.com/v1/cryptocurrency/listings/latest";
+export async function getTokenInfoFromTokenName() {
+  const url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/info?id=1";
   const response = await fetch(url, {
     method: 'POST',
     headers: {'X-CMC_PRO_API_KEY': endpoint.COINMARKETCAP_API_KEY}
@@ -269,12 +275,19 @@ export async function getTokenSocialInfofromCoingeckoAPI(address: string, networ
   const response = await fetch(url)
   if (response.ok) {
     const obj = await response.json();
-    let website = "", facebook = "", twitter = "";
+    console.log('social response', obj);
+    let website = "", facebook = "", twitter = "", discord="", github = "", telegram = "", instagram = "", medium = "", reddit = "";
+
     try{
       if (obj["links"].hasOwnProperty('homepage')) {
         website = obj["links"].homepage[0];
         twitter= obj["links"].twitter_screen_name;
         facebook = obj["links"].facebook_username;
+        discord = obj["links"].official_forum_url[0];
+        github = obj["links"].repos_url.github[0];
+        telegram = obj["links"].telegram_channel_identifier;
+        medium = obj["links"].chat_url[2];
+        reddit = obj["links"].subreddit_url;
       }
       if (twitter != "") {
         twitter = "https://twitter.com/" + twitter;
@@ -282,14 +295,16 @@ export async function getTokenSocialInfofromCoingeckoAPI(address: string, networ
       if (facebook != "") {
         facebook = "https://www.facebook.com/" + facebook;
       }
-      console.log('social', website, twitter, facebook);
-      return [website, twitter, facebook]
+      if (telegram != "") {
+        telegram = "https://t.me/" + telegram;
+      }
+      return [website, twitter, facebook, discord, github, telegram, instagram, medium, reddit]
     }
     catch {
-      return ["","",""]
+      return ["","","","","","","","", ""]
     }
   }
-  return ["","",""]
+  return ["","","","","","","","", ""]
 }
 
 export async function getTokenPricefromCoingeckoAPI(addresses: string, network: number) {
@@ -312,11 +327,12 @@ export async function getLPTokenList(address: string, network: number, tokenside
     "https://etherscan.io/token/" :
     "https://bscscan.com/token/";
   response = await getLPPairs(address, network);
+  console.log('response', response);
   if (response != constant.NOT_FOUND_TOKEN && response != null) {
     response.forEach((value:any) => {
         lpTokenList.push({
-          name:  value.baseCurrency.symbol + "/" + value.quoteCurrency.symbol,
-          symbol: value.baseCurrency.symbol + "/" + value.quoteCurrency.symbol,
+          name:  value.baseCurrency.symbol + " / " + value.quoteCurrency.symbol,
+          symbol: value.baseCurrency.symbol + " / " + value.quoteCurrency.symbol,
           contractAddress: value.smartContract.address.address,
           price: 0,
           marketCap: "",
@@ -414,4 +430,36 @@ export async function getMultiTokenPricefromllama(tokenList:ERC20Token[]){
   } catch (err:any) {
     return constant.NOT_FOUND_TOKEN;
   }  
+}
+
+export async function getLPTransactionListFromWallet(address:string, tokenAddress: string, network: number, resolution:number) {
+ 
+  const res = await getBuySellTransactions(address, network, tokenAddress);
+
+  console.log('buy_res', res);
+  let array:any[] = [];
+  let buy_array:any[] = [];
+  let sell_array:any[] = [];
+  if (res.length != 0 ) {
+    res.forEach((value:any) => {
+      const time = new Date(value["timeInterval"].second + " UTC");
+      const cuTime = makeTemplateDate(time, resolution);
+      if (value["buyCurrency"].address == tokenAddress) {
+        array.push({
+          time:cuTime.getTime(),
+          buy_sell:"sell"
+        })
+      } else {
+        array.push({
+          time:cuTime.getTime(),
+          buy_sell:"buy"
+        })
+      }
+    });
+  }
+  
+  array = array.sort((value1:any, value2:any) => {
+    return value1.time - value2.time
+  })
+  return array;
 }
