@@ -4,9 +4,23 @@ import {
   WebSite,
   FaceBook,
   Twitter,
+  Github,
+  Instagram,
+  Medium,
+  Telegram,
+  Discord,
+  Reddit,
   CopyAddressIconDark,
   CopyAddressIconLight,
-  CoyAddressComfirm
+  CoyAddressComfirm,
+  WebSiteLight,
+  FaceBookLight,
+  GithubLight,
+  InstagramLight,
+  MediumLight,
+  TelegramLight,
+  TwitterLight,
+  DiscordLight
 } from "../../assests/icon"
 import {
   useTokenInfo,
@@ -25,17 +39,11 @@ import {
   getLPTokenList,
   getTokenBurnAmount
 } from '../../api'
-import {
-  setCookie,
-  getCookie,
-  deleteCookie
-} from '../../utils'
 import style from './TokenInfo.module.css'
 import * as constant from '../../utils/constant'
 import LpTokenInfo from './LpTokenInfo'
 import { LPTokenPair, TokenSide } from '../../utils/type'
 import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
-import { isNumber } from 'lodash'
 import { useAddress } from '@thirdweb-dev/react'
 
 
@@ -338,33 +346,114 @@ export default function TokenInfo() {
             flexDirection={"row"}
             alignItems={"center"}
           >
-            <a 
-              className={style.socialUrl} 
-              href={tokenData.website} 
-              style={{marginRight:"0.5rem"}} 
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <WebSite/>
-            </a>            
-            <a 
-              className={style.socialUrl} 
-              href={tokenData.facebook} 
-              style={{marginRight:"0.5rem"}} 
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <FaceBook className={style.socialUrl}/>
-            </a>
-            <a 
-              className={style.socialUrl} 
-              href={tokenData.twitter} 
-              style={{marginRight:"0.7rem"}} 
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <Twitter className={style.socialUrl}/>
-            </a>
+            {
+              tokenData.website != "" && tokenData.website != undefined && 
+              <a 
+                className={style.socialUrl} 
+                href={tokenData.website} 
+                style={{marginRight:"0.5rem"}} 
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <WebSite className={style.socialUrl}/>
+              </a>            
+            }
+            {
+              tokenData.facebook != "" && tokenData.facebook != undefined &&  
+              <a 
+                className={style.socialUrl} 
+                href={tokenData.facebook} 
+                style={{marginRight:"0.5rem"}} 
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <FaceBook className={style.socialUrl}/>
+              </a>
+            }
+            {
+              tokenData.twitter != "" && tokenData.twitter != undefined && 
+              <a 
+                className={style.socialUrl} 
+                href={tokenData.twitter} 
+                style={{marginRight:"0.5rem"}} 
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <Twitter className={style.socialUrl}/>
+              </a>
+            }
+            {
+                tokenData.medium != "" && tokenData.medium != undefined && 
+                <a 
+                className={style.socialUrl} 
+                href={tokenData.medium} 
+                style={{marginRight:"0.5rem"}} 
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <Medium className={style.socialUrl}/>
+              </a>                
+            }
+            {
+                tokenData.instagra != "" && tokenData.instagra != undefined && 
+                <a 
+                className={style.socialUrl} 
+                href={tokenData.instagra} 
+                style={{marginRight:"0.5rem"}} 
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <Instagram className={style.socialUrl}/>
+              </a>                
+            }          
+            {
+                tokenData.telegram != "" && tokenData.telegram != undefined && 
+                <a 
+                className={style.socialUrl} 
+                href={tokenData.telegram} 
+                style={{marginRight:"0.5rem"}} 
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <Telegram className={style.socialUrl}/>
+              </a>                
+            }                   
+            {
+                tokenData.discord != "" && tokenData.discord != undefined && 
+                <a 
+                className={style.socialUrl} 
+                href={tokenData.discord} 
+                style={{marginRight:"0.5rem"}} 
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <Discord className={style.socialUrl}/>
+              </a>                
+            }          
+            {
+                tokenData.reddit != "" && tokenData.reddit != undefined && 
+                <a 
+                className={style.socialUrl} 
+                href={tokenData.reddit} 
+                style={{marginRight:"0.5rem"}} 
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <Reddit className={style.socialUrl}/>
+              </a>                
+            }               
+            {
+                tokenData.github != "" && tokenData.github != undefined &&
+                <a 
+                className={style.socialUrl} 
+                href={tokenData.github} 
+                style={{marginRight:"0.7rem"}} 
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <Github className={style.socialUrl}/>
+              </a>                
+            }                      
           </Box>
         </Box>
         <div className={style.border} style={{borderColor:infoborderColorMode}}/>

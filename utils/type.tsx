@@ -15,6 +15,12 @@ export interface ERC20Token {
   website?: string;
   facebook?: string;
   twitter?: string;
+  medium?: string;
+  instagra?: string;
+  telegram?: string;
+  discord?: string;
+  github?: string;
+  reddit?: string;
   pinSetting: boolean;
   contractCodeURL?: string;
   contractBalanceWalletURL?: string;

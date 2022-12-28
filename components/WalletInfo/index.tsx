@@ -194,7 +194,7 @@ export default function WalletInfo() {
     if (address != undefined && tokenData != undefined) {
       getTokensFromWallet();
     }
-  }, [address, network[0].data.chain?.id]);
+  }, [address, network[0].data.chain?.id, tokenData]);
   return (
     <Box className={walletClass} ref = {walletRef}>
       <Box className={titleClass}>

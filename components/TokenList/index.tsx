@@ -7,7 +7,8 @@ import {
 import {
   getTokenLogoURL,
   getTokenSymbol,
-  getTokenSocialInfofromCoingeckoAPI
+  getTokenSocialInfofromCoingeckoAPI,
+  getTokenInfoFromTokenName
 } from '../../api'
 import {
   useTokenInfo,
@@ -43,7 +44,7 @@ export default function TokenList() {
   const [searchStatus, setSearchStatus] = useState<SearchStatus>(SearchStatus.notsearch);
  
   const searchToken = async() => {
-
+    
     if (debouncedQuery[0] == "0" && debouncedQuery[1] == "x") {
       let foundFlag = false;
       let foundEthToken:ERC20Token={
@@ -113,6 +114,12 @@ export default function TokenList() {
             website: social![0],
             twitter: social![1],
             facebook: social![2],
+            discord: social![3],
+            github: social![4],
+            telegram: social![5],
+            instagra: social![6],
+            medium: social![7],
+            reddit: social![8],
             contractCodeURL: ETHLINK + "address/" + debouncedQuery +"#code",
             contractBalanceWalletURL: ETHLINK + "token/" + debouncedQuery + "?a=",
             contractBalanceURL: ETHLINK + "token/" + debouncedQuery + "#balances",
@@ -144,6 +151,12 @@ export default function TokenList() {
               website: social![0],
               twitter: social![1],
               facebook: social![2],
+              discord: social![3],
+              github: social![4],
+              telegram: social![5],
+              instagra: social![6],
+              medium: social![7],
+              reddit: social![8],
               contractCodeURL: BSCLINK + "address/" + debouncedQuery +"#code",
               contractBalanceWalletURL: BSCLINK + "token/" + debouncedQuery + "?a=",
               contractBalanceURL: BSCLINK + "token/" + debouncedQuery + "#balances",
@@ -219,6 +232,12 @@ export default function TokenList() {
           website:obj["website"],
           twitter:obj["twitter"],
           facebook:obj["facebook"],
+          discord:obj["discord"],
+          github:obj["github"],
+          telegram:obj["telegram"],
+          instagra:obj["instagra"],
+          medium:obj["medium"],
+          reddit:obj["reddit"],
           contractCodeURL:obj["contractCodeURL"],
           contractBalanceWalletURL:obj["contractBalanceWalletURL"],
           contractBalanceURL:obj["contractBalanceURL"],
