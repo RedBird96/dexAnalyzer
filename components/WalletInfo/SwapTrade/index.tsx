@@ -8,14 +8,21 @@ import {
 } from "../../../assests/icon"
 import InputBox from '../InputBox';
 import { ERC20Token } from '../../../utils/type';
-import { useTokenInfo } from '../../../hooks';
+import { useLPTokenPrice, useTokenInfo } from '../../../hooks';
 import * as constant from '../../../utils/constant'
+import { getTokenLogoURL } from '../../../api';
+import { useNetwork } from '@thirdweb-dev/react';
 
 export default function SwapTrade() {
 
+  const {lpTokenPrice} = useLPTokenPrice();
+  const [network, switchNetwork] = useNetwork();
   const {tokenData} = useTokenInfo();
   const colorMode = useColorMode();
+  const {lpTokenAddress} = useLPTokenPrice();
   const mainbg = useColorModeValue("#FFFFFF", "#121212");
+  const [fromTokenValue, setFromTokenValue] = useState<number>(0);
+  const [toTokenValue, setToTokenValue] = useState<number>(0);
   const [fromToken, setFromToken] = useState<ERC20Token>(
     {
       name: 'ETH',
@@ -29,7 +36,49 @@ export default function SwapTrade() {
     image: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png'
   }as ERC20Token);
 
+  useEffect(() => {
 
+    const setTokens = async() => {
+
+      if (network.data.chain.id != lpTokenAddress.network) {
+        switchNetwork(lpTokenAddress.network);
+      }
+
+      const fromTokenimg = await getTokenLogoURL(lpTokenAddress.quoteCurrency_contractAddress, lpTokenAddress.network, lpTokenAddress.quoteCurrency_name);
+      const toTokenimg = await getTokenLogoURL(lpTokenAddress.baseCurrency_contractAddress, lpTokenAddress.network, lpTokenAddress.baseCurrency_name);
+      setFromToken({
+        name: lpTokenAddress.quoteCurrency_name,
+        symbol: lpTokenAddress.quoteCurrency_name,
+        image: fromTokenimg,
+        network: lpTokenAddress.network,
+        contractAddress: lpTokenAddress.quoteCurrency_contractAddress
+      } as ERC20Token)
+
+      setToToken( {
+        name: lpTokenAddress.baseCurrency_name,
+        symbol: lpTokenAddress.baseCurrency_name,
+        image: toTokenimg,
+        network: lpTokenAddress.network,
+        contractAddress: lpTokenAddress.baseCurrency_contractAddress
+      } as ERC20Token)
+
+    }
+
+    if (network != undefined && network.data.chain != undefined)
+      setTokens();
+
+  }, [lpTokenAddress, network]);
+
+  useEffect(() => {
+    setToTokenValue(fromTokenValue / lpTokenPrice.tokenPrice);
+  }, [fromTokenValue])
+
+  const switchSwapTokens = () => {
+    const saveFromToken = fromToken;
+    const saveToToken = toToken;
+    setToToken(fromToken);
+    setFromToken(toToken);
+  }
   return (
     <Box 
       className={style.tradeMain}
@@ -42,11 +91,14 @@ export default function SwapTrade() {
           <InputBox
             showMax = {true}
             token = {fromToken}
+            setValue = {setFromTokenValue}
+            value = {fromTokenValue.toString()}
           ></InputBox>
         </Box>
         <Box
           display = {"flex"}
           justifyContent = {"center"}
+          onClick = {switchSwapTokens}
         >
           <Circle 
             style={{
@@ -69,6 +121,8 @@ export default function SwapTrade() {
           <InputBox
             showMax = {false}
             token = {toToken}
+            setValue = {setToTokenValue}
+            value = {toTokenValue.toString()}
           ></InputBox>
         </Box>
       </Box>
