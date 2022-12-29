@@ -40,9 +40,9 @@ export default function SwapTrade() {
 
     const setTokens = async() => {
 
-      if (network.data.chain.id != lpTokenAddress.network) {
-        switchNetwork(lpTokenAddress.network);
-      }
+      // if (network.data.chain.id != lpTokenAddress.network) {
+      //   switchNetwork(lpTokenAddress.network);
+      // }
 
       const fromTokenimg = await getTokenLogoURL(lpTokenAddress.quoteCurrency_contractAddress, lpTokenAddress.network, lpTokenAddress.quoteCurrency_name);
       const toTokenimg = await getTokenLogoURL(lpTokenAddress.baseCurrency_contractAddress, lpTokenAddress.network, lpTokenAddress.baseCurrency_name);
@@ -64,10 +64,9 @@ export default function SwapTrade() {
 
     }
 
-    if (network != undefined && network.data.chain != undefined)
-      setTokens();
+    setTokens();
 
-  }, [lpTokenAddress, network]);
+  }, [lpTokenAddress]);
 
   useEffect(() => {
     setToTokenValue(fromTokenValue / lpTokenPrice.tokenPrice);
@@ -76,8 +75,8 @@ export default function SwapTrade() {
   const switchSwapTokens = () => {
     const saveFromToken = fromToken;
     const saveToToken = toToken;
-    setToToken(fromToken);
-    setFromToken(toToken);
+    setToToken(saveFromToken);
+    setFromToken(saveToToken);
   }
   return (
     <Box 

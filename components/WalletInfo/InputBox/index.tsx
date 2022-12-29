@@ -22,7 +22,7 @@ import ERC20TokenABI from '../../../config/ERC20ABI.json'
 import BEP20TokenABI from '../../../config/ERC20ABI.json'
 import * as constant from '../../../utils/constant'
 import * as endpoint from '../../../utils/endpoints'
-import { useDebounce } from "../../../hooks";
+import { useDebounce, useTokenInfo } from "../../../hooks";
 
 export default function SwapTrade({
   showMax,
@@ -114,7 +114,7 @@ export default function SwapTrade({
           >
           </Input>
           {
-            showMax &&  address != "" && address != undefined && 
+            showMax && 
             <InputRightElement >
               <p style={{cursor:"pointer", color:"#696969"}} onClick={setMaxInputValue}>Max</p>
             </InputRightElement>
@@ -139,7 +139,7 @@ export default function SwapTrade({
           justifyContent={"center"}
         >
           <img src={token.image} width={"20rem"}/>
-          <p className={style.tokenName}>{makeShortTokenName(token.symbol, 4)}</p>
+          <p className={style.tokenName}>{token.symbol != undefined && makeShortTokenName(token.symbol, 4)}</p>
         </Box>
         <Box
           cursor={"pointer"} 
