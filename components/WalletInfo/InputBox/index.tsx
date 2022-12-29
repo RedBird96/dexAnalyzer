@@ -27,7 +27,7 @@ export default function SwapTrade({
   
   const colorMode = useColorMode();
   const inputRef = useRef(null);
-  const bgColor = useColorModeValue("#121212", "#121212");
+  const bgColor = useColorModeValue("#FFFFFF", "#121212");
 
   return (
     <Box
