@@ -36,11 +36,21 @@
   align-items: center;
 }
 
-.walletData {
+.walletWidget {
   display: flex;
   flex-direction: column;
   align-items: center;
   width:100%;
+  min-height: 33rem;
+}
+
+.tradeWidget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width:100%;
+  min-height: 33rem;
+  margin-top:1.2rem;
 }
 
 .tokenSearch {

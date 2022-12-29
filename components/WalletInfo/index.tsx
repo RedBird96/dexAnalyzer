@@ -37,6 +37,7 @@ import {
   useTokenInfo,
   useWalletTokenBalance 
 } from '../../hooks'
+import SwapTrade from './SwapTrade'
 
 export default function WalletInfo() {
   const titleClass = useColorModeValue(
@@ -70,6 +71,7 @@ export default function WalletInfo() {
   const network = useNetwork();
   const walletRef = useRef(null);
   
+  const [widgetOption, setWidgetOption] = useState<Boolean>(true);
   const [borderWidth, setBorderWidth] = useState(0);
   const [searchContext, setSearchContext] = useState("");
   const [walletBalance, setWalletBalance] = useState(0);
@@ -237,12 +239,13 @@ export default function WalletInfo() {
             fontWeight:"500"
           }}
           _hover={{
-            backgroundColor:notSelectBtnColor
+            backgroundColor:widgetOption == false ? notSelectBtnColor : selectBtnColor
           }}
           width={"50%"}
           borderRadius={"0.7rem 0rem 0rem 0.7rem"}
           height={"2.8rem"}
-          backgroundColor={notSelectBtnColor}
+          backgroundColor={widgetOption == false ? notSelectBtnColor : selectBtnColor}
+          onClick={()=>setWidgetOption(true)}
         >
           TRADE
         </Button>
@@ -254,145 +257,161 @@ export default function WalletInfo() {
             fontWeight:"500"
           }}
           _hover={{
-            backgroundColor:selectBtnColor
+            backgroundColor:widgetOption == false ? selectBtnColor : notSelectBtnColor
           }}
           width={"50%"}
           height={"2.8rem"}
           borderRadius={"0rem 0.7rem 0.7rem 0rem"}
-          backgroundColor={selectBtnColor}
+          backgroundColor={widgetOption == false ? selectBtnColor : notSelectBtnColor}
           color={"#FFFFFF"}
+          onClick={()=>setWidgetOption(false)}
         >
           WALLET
         </Button>
       </Box>
-      <Box className={style.walletData}>
-        <InputGroup className = {searchClass} width={"89%"}>
-          <InputLeftElement
-              paddingTop = '7px'
-              paddingLeft= '5px'
-              pointerEvents='none'
-          >
-            <SearchIcon/>
-          </InputLeftElement>
-          <Input 
-            placeholder='Search token symbol' 
-            _placeholder={{fontsize:'1rem', fontcolor:"#E34B62"}}
-            onChange={handleSearchChange}
-            borderRadius ={"2rem"}
-            value={searchContext}
-            height='2.5rem'
-            background={searchColor}
-            borderColor={searchBorderColor}
-          />  
-          {
-            searchContext.length > 0 && 
-            <InputRightElement
-              onClick={()=>{setSearchContext("");}}
-              cursor='pointer'
-              paddingTop = '7px'
-              paddingRight= '5px'
-            >
-              <SearchCross/>
-            </InputRightElement>
-          }
-        </InputGroup>
+      {
+        widgetOption ?
         <Box 
-          className={tableHeadBorder} 
-          style = {{width:"100%", marginTop:"1rem"}}
-          display = {"flex"}
-          flexDirection = {"column"}
-          alignItems = {"center"}
-        >
-          <Box 
-            style={{width:"89%", maxHeight:"30rem", marginBottom:"0.5rem"}} 
-            display={"flex"} 
-            flexDirection={"row"}
-            alignContent={"center"}
-            color={"#7C7C7C"}
-            paddingRight={"10px"}
-          >
-            <p style={{width:"30%"}}>Token</p>
-            <p style={{width:"35%"}}>Balance</p>
-            <p style={{width:"35%", alignItems:"flex-end", display:"flex", flexDirection:"column"}}>Value</p>
-          </Box>  
-          <Box style={{
-              width:"100%", 
-              height:"25.5rem", 
-              alignItems:"center"
-            }}
-            display={"flex"}
-            flexDirection={"column"}
-            overflow={"auto"}
-            css={{
-              '&::-webkit-scrollbar': {
-                width: '10px',
-                height: '4px',
-              },
-              '&::-webkit-scrollbar-track': {
-                width: '6px',
-                height: '4px',
-              },
-              '&::-webkit-scrollbar-thumb': {
-                backgroundColor: "#3D3D3D",
-                borderRadius: '24px',
-              },
-            }}
-          >
+          className={style.tradeWidget}
+          backgroundColor = {refreshBtnBgColor}
+        > 
           {
-            tokensInfo?.map((token, index) => {
-              if (Number.isNaN(token.decimals))
-                return ;              
-              return (
-                <Box 
-                  key = {index}
-                  style={{
-                    width:"100%",
-                  }} 
-                  display={"flex"} 
-                  alignItems={"center"}
-                  _hover={{
-                    backgroundColor:hoverColor,
-                    color: "#FFFFFF"
-                  }}
-                  paddingTop={"5px"}
-                  paddingBottom={"5px"}
-                  justifyContent={"center"}
-                >
-                  <Box
-                    style={{width:"89%"}} 
+            tokenData != undefined && tokenData.contractAddress != "" ?
+            <SwapTrade></SwapTrade> :
+            <></>
+          }
+          
+        </Box> :
+        <Box className={style.walletWidget}>
+          <InputGroup className = {searchClass} width={"89%"}>
+            <InputLeftElement
+                paddingTop = '7px'
+                paddingLeft= '5px'
+                pointerEvents='none'
+            >
+              <SearchIcon/>
+            </InputLeftElement>
+            <Input 
+              placeholder='Search token symbol' 
+              _placeholder={{fontsize:'1rem', fontcolor:"#E34B62"}}
+              onChange={handleSearchChange}
+              borderRadius ={"2rem"}
+              value={searchContext}
+              height='2.5rem'
+              background={searchColor}
+              borderColor={searchBorderColor}
+            />  
+            {
+              searchContext.length > 0 && 
+              <InputRightElement
+                onClick={()=>{setSearchContext("");}}
+                cursor='pointer'
+                paddingTop = '7px'
+                paddingRight= '5px'
+              >
+                <SearchCross/>
+              </InputRightElement>
+            }
+          </InputGroup>
+          <Box 
+            className={tableHeadBorder} 
+            style = {{width:"100%", marginTop:"1rem"}}
+            display = {"flex"}
+            flexDirection = {"column"}
+            alignItems = {"center"}
+          >
+            <Box 
+              style={{width:"89%", maxHeight:"30rem", marginBottom:"0.5rem"}} 
+              display={"flex"} 
+              flexDirection={"row"}
+              alignContent={"center"}
+              color={"#7C7C7C"}
+              paddingRight={"10px"}
+            >
+              <p style={{width:"30%"}}>Token</p>
+              <p style={{width:"35%"}}>Balance</p>
+              <p style={{width:"35%", alignItems:"flex-end", display:"flex", flexDirection:"column"}}>Value</p>
+            </Box>  
+            <Box style={{
+                width:"100%", 
+                height:"26rem", 
+                alignItems:"center"
+              }}
+              display={"flex"}
+              flexDirection={"column"}
+              overflow={"auto"}
+              css={{
+                '&::-webkit-scrollbar': {
+                  width: '10px',
+                  height: '4px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  width: '6px',
+                  height: '4px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  backgroundColor: "#3D3D3D",
+                  borderRadius: '24px',
+                },
+              }}
+            >
+            {
+              tokensInfo?.map((token, index) => {
+                if (Number.isNaN(token.decimals))
+                  return ;              
+                return (
+                  <Box 
+                    key = {index}
+                    style={{
+                      width:"100%",
+                    }} 
                     display={"flex"} 
-                    flexDirection={"row"}
+                    alignItems={"center"}
+                    _hover={{
+                      backgroundColor:hoverColor,
+                      color: "#FFFFFF"
+                    }}
+                    paddingTop={"5px"}
+                    paddingBottom={"5px"}
+                    justifyContent={"center"}
                   >
                     <Box
-                      style={{width:"30%"}}
-                      display={"flex"}
-                      alignItems={"center"}
-                      _hover={{
-                        "textDecoration":"underline",
-                      }}
-                      cursor="pointer"
+                      style={{width:"89%"}} 
+                      display={"flex"} 
+                      flexDirection={"row"}
                     >
-                      <a className={style.tokenName}
-                        href={token.contractPage}
-                        target="_blank" rel="noreferrer noopener"
+                      <Box
+                        style={{width:"30%"}}
+                        display={"flex"}
+                        alignItems={"center"}
+                        _hover={{
+                          "textDecoration":"underline",
+                        }}
+                        cursor="pointer"
                       >
-                        {makeShortTokenName(token.symbol, 10)}
-                      </a>
+                        <a className={style.tokenName}
+                          href={token.contractPage}
+                          target="_blank" rel="noreferrer noopener"
+                        >
+                          {makeShortTokenName(token.symbol, 10)}
+                        </a>
+                      </Box>
+                      <p className={style.tokenBalance} style={{width:"35%",marginRight:"5px", alignItems:"flex-start", paddingLeft:"2px"}}>
+                        {makeShortTokenName(numberWithCommasTwoDecimals(token.balance), 25)}
+                      </p>
+                      <p className={style.tokenBalance} style={{width:"35%", color:priceColor, alignItems:"flex-end"}} >
+                        ({makeShortTokenName(convertBalanceCurrency(token.usdBalance, 2), 20)})
+                      </p>
                     </Box>
-                    <p className={style.tokenBalance} style={{width:"35%",marginRight:"5px", alignItems:"flex-start", paddingLeft:"2px"}}>
-                      {makeShortTokenName(numberWithCommasTwoDecimals(token.balance), 25)}
-                    </p>
-                    <p className={style.tokenBalance} style={{width:"35%", color:priceColor, alignItems:"flex-end"}} >
-                      ({makeShortTokenName(convertBalanceCurrency(token.usdBalance, 2), 20)})
-                    </p>
                   </Box>
-                </Box>
-              )
-            })
-          }
+                )
+              })
+            }
+            </Box>
           </Box>
         </Box>
-      </Box>
+      }
+      
       <nav><hr aria-orientation='horizontal' style={{width:borderWidth}}></hr></nav>
       <Box width={"100%"} height={"100%"} background={refreshBtnBgColor}>
 

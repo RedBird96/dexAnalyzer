@@ -1,0 +1,11 @@
+@import '../../../styles/font.css';
+
+.tokenName {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 500;
+  font-size:1rem;
+  line-height: 1rem;
+  align-items: center;
+  padding-left: 0.5rem;
+}

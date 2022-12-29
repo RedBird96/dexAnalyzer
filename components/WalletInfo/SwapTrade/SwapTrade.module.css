@@ -1,0 +1,73 @@
+@import '../../../styles/font.css';
+
+.tradeMain {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 80%;
+  padding: 1rem;
+}
+
+.tradeInputSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.inputBlock{
+  display:flex;
+  flex-direction: column;
+  width:100%;
+  margin-bottom: 0.7rem;
+}
+
+.detailsSection {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  margin-bottom: 1rem;
+}
+
+.detailSlippage{
+  display: flex;
+  flex-direction: column;
+  width:100%;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.detailComment {
+  display: flex;
+  flex-direction: column;
+  padding:1rem;
+  border-radius: 10px;
+}
+
+.commentText {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1rem;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;;
+}
+
+.buttonSection {
+  display:flex;
+  width:100%;
+  border-radius: 1rem !important;
+  height:3rem !important;
+}
+
+.headerText {
+  display: flex;
+  font-family: 'Inter';
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 0.2rem;
+}
