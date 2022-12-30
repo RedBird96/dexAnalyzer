@@ -48,8 +48,8 @@ export async function getContractInfoFromWalletAddress(address:string, network: 
     return JSON.parse(text);
   } else {
     const web3_bsc = new Web3(constant.BSCRPC_URL);
-    const BSCLINK = " https://bscscan.com/address/";
     const bnbBalance = parseInt(await web3_bsc.eth.getBalance(address))/ Math.pow(10, 18);
+    const BSCLINK = " https://bscscan.com/address/";
     const bnbPrice = await getTokenPricefromllama(constant.WHITELIST_TOKENS.BSC.BNB, constant.BINANCE_NETOWRK);
     const usdBalance = bnbPrice * bnbBalance;
     let bnbToken:ERC20Token = {
@@ -462,4 +462,31 @@ export async function getLPTransactionListFromWallet(address:string, tokenAddres
     return value1.time - value2.time
   })
   return array;
+}
+
+export async function getTokenBalance(tokenAddress:string, walletAdderss:string, network:number) {
+  
+  let provider;
+  let TokenContract:any;
+  let balance, decimal ;
+  if (network == constant.ETHEREUM_NETWORK) {
+    provider = new ethers.providers.JsonRpcProvider(constant.ETHRPC_URL, constant.ETHEREUM_NETWORK);
+    TokenContract = new ethers.Contract(tokenAddress == "BNB" ? walletAdderss : tokenAddress, ERC20TokenABI, provider)
+  } else if (network == constant.BINANCE_NETOWRK) {
+    provider = new ethers.providers.JsonRpcProvider(constant.BSCRPC_URL, constant.BINANCE_NETOWRK);
+    TokenContract = new ethers.Contract(tokenAddress == "BNB" ? walletAdderss : tokenAddress, BEP20TokenABI, provider)
+  }
+  try {
+    if (tokenAddress == "BNB") {
+      balance = await provider.getBalance(walletAdderss);
+      decimal = 18;
+    } else {
+      decimal = await TokenContract.decimals();
+      balance = await TokenContract.balanceOf(walletAdderss);
+    }
+    return ethers.utils.formatUnits(balance, decimal);
+  } catch (err:any) {
+    return constant.NOT_FOUND_TOKEN;
+  }
+
 }
