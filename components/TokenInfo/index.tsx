@@ -323,7 +323,7 @@ export default function TokenInfo() {
                 cursor="pointer"
               >
                 <a className={style.tokenAddress} 
-                  style={{color:textColor}}
+                  style={{color:"#767676"}}
                   href = {tokenData.contractCodeURL}
                   target="_blank"
                   rel="noreferrer noopener"

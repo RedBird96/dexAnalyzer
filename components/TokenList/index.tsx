@@ -26,10 +26,12 @@ export default function TokenList() {
     style.tokenList + " " + style.tokenListLight,
     style.tokenList + " " + style.tokenListDark
   );
-  const searchClass = useColorModeValue(
-    style.tokenSearchLight,
-    style.tokenSearchDark,
-  );
+  // const searchClass = useColorModeValue(
+  //   style.tokenSearchLight,
+  //   style.tokenSearchDark,
+  // );
+  const searchColor = useColorModeValue("#FFFFFF", "#323232");
+  const searchBorderColor = useColorModeValue("#CFCFCF", "#323232");
   const walletAddress = useAddress();
   const {setTokenData} = useTokenInfo();
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -342,7 +344,8 @@ export default function TokenList() {
             onKeyDown={handleEnter}
             borderRadius={'2rem'}
             height='2.5rem'
-            className={searchClass}
+            background={searchColor}
+            borderColor={searchBorderColor}
             value={searchQuery}
           />
           {

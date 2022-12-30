@@ -10,19 +10,23 @@ import InputBox from '../InputBox';
 import { ERC20Token } from '../../../utils/type';
 import { useLPTokenPrice, useTokenInfo } from '../../../hooks';
 import * as constant from '../../../utils/constant'
-import { getTokenLogoURL } from '../../../api';
-import { useNetwork } from '@thirdweb-dev/react';
+import { getTokenBalance, getTokenLogoURL } from '../../../api';
+import { useAddress, useNetwork } from '@thirdweb-dev/react';
 
 export default function SwapTrade() {
 
   const {lpTokenPrice} = useLPTokenPrice();
+  const address = useAddress();
   const [network, switchNetwork] = useNetwork();
   const {tokenData} = useTokenInfo();
   const colorMode = useColorMode();
   const {lpTokenAddress} = useLPTokenPrice();
-  const mainbg = useColorModeValue("#FFFFFF", "#121212");
+  const borderColor = useColorModeValue("#C3C3C3", "#2E2E2E");
+  const mainbg = useColorModeValue("#efefef", "#121212");
+  const textColor = useColorModeValue("#5E5E5E","#A7A7A7");
   const [fromTokenValue, setFromTokenValue] = useState<number>(0);
   const [toTokenValue, setToTokenValue] = useState<number>(0);
+  const [maxFromToken, setMaxFromToken] = useState<number>(0);
   const [fromToken, setFromToken] = useState<ERC20Token>(
     {
       name: 'ETH',
@@ -40,33 +44,51 @@ export default function SwapTrade() {
 
     const setTokens = async() => {
 
-      // if (network.data.chain.id != lpTokenAddress.network) {
-      //   switchNetwork(lpTokenAddress.network);
-      // }
-
-      const fromTokenimg = await getTokenLogoURL(lpTokenAddress.quoteCurrency_contractAddress, lpTokenAddress.network, lpTokenAddress.quoteCurrency_name);
-      const toTokenimg = await getTokenLogoURL(lpTokenAddress.baseCurrency_contractAddress, lpTokenAddress.network, lpTokenAddress.baseCurrency_name);
+      const fromTokenimg = await getTokenLogoURL(
+        lpTokenAddress.quoteCurrency_contractAddress, 
+        lpTokenAddress.network, 
+        lpTokenAddress.quoteCurrency_name
+      );
+      const toTokenimg = await getTokenLogoURL(lpTokenAddress.baseCurrency_contractAddress,
+        lpTokenAddress.network, 
+        lpTokenAddress.baseCurrency_name
+      );
       setFromToken({
-        name: lpTokenAddress.quoteCurrency_name,
-        symbol: lpTokenAddress.quoteCurrency_name,
+        name: lpTokenAddress.quoteCurrency_name == "WBNB" ? "BNB" : lpTokenAddress.quoteCurrency_name,
+        symbol: lpTokenAddress.quoteCurrency_name == "WBNB" ? "BNB" : lpTokenAddress.quoteCurrency_name,
         image: fromTokenimg,
         network: lpTokenAddress.network,
         contractAddress: lpTokenAddress.quoteCurrency_contractAddress
       } as ERC20Token)
 
       setToToken( {
-        name: lpTokenAddress.baseCurrency_name,
-        symbol: lpTokenAddress.baseCurrency_name,
+        name: lpTokenAddress.baseCurrency_name == "WBNB" ? "BNB" : lpTokenAddress.baseCurrency_name,
+        symbol: lpTokenAddress.baseCurrency_name == "WBNB" ? "BNB" : lpTokenAddress.baseCurrency_name,
         image: toTokenimg,
         network: lpTokenAddress.network,
         contractAddress: lpTokenAddress.baseCurrency_contractAddress
       } as ERC20Token)
 
+      if (address != undefined) {
+        const bal = await getTokenBalance(
+          lpTokenAddress.quoteCurrency_name == "WBNB" ? "BNB" : lpTokenAddress.quoteCurrency_contractAddress,
+          address, 
+          lpTokenAddress.network
+        );
+        console.log('bal', bal);
+        if (bal != constant.NOT_FOUND_TOKEN) {
+          setMaxFromToken(parseFloat(bal));
+        }
+      }
     }
 
-    setTokens();
+    if (lpTokenAddress.quoteCurrency_contractAddress != undefined &&
+        lpTokenAddress.baseCurrency_contractAddress != undefined
+      ){
+      setTokens();  
+    }
 
-  }, [lpTokenAddress]);
+  }, [lpTokenAddress, address]);
 
   useEffect(() => {
     setToTokenValue(fromTokenValue / lpTokenPrice.tokenPrice);
@@ -86,7 +108,14 @@ export default function SwapTrade() {
         className={style.tradeInputSection}
       >
         <Box className={style.inputBlock}>
-          <p className={style.headerText} style = {{marginBottom:"1rem"}}>From</p>
+          <Box className={style.headerText} style = {{marginBottom:"1rem"}}>
+            <p>From</p>
+            <p style={{
+              fontSize:"0.8rem",
+              color:textColor
+            }}>
+              Balance: {maxFromToken.toFixed(5)}</p>
+          </Box>
           <InputBox
             showMax = {true}
             token = {fromToken}
@@ -153,7 +182,12 @@ export default function SwapTrade() {
             placeholder = "0%"
             >
             </Input>
-            <Divider orientation="vertical"/>
+            <Divider 
+              orientation="vertical" 
+              style= {{
+                borderColor:borderColor,
+                height:"90%"
+            }}/>
             <Box
               display = {"flex"}
               width = {"4rem"}
@@ -206,6 +240,7 @@ export default function SwapTrade() {
         _hover = {{
           bg: tokenData.network == constant.BINANCE_NETOWRK ? "#F0B90B" : "#FB118E"
         }}
+        color = {tokenData.network == constant.BINANCE_NETOWRK ? "black" : "white"}
       >
         SWAP
       </Button>

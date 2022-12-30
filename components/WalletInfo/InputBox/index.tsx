@@ -23,6 +23,7 @@ import BEP20TokenABI from '../../../config/ERC20ABI.json'
 import * as constant from '../../../utils/constant'
 import * as endpoint from '../../../utils/endpoints'
 import { useDebounce, useTokenInfo } from "../../../hooks";
+import { getTokenBalance } from "../../../api";
 
 export default function SwapTrade({
   showMax,
@@ -40,30 +41,23 @@ export default function SwapTrade({
   const network = useNetwork();
   const colorMode = useColorMode();
   const inputRef = useRef(null);
-  const bgColor = useColorModeValue("#FFFFFF", "#121212");
+  const borderColor = useColorModeValue("#C3C3C3", "#2E2E2E");
+  const bgColor = useColorModeValue("#efefef", "#121212");
   const [inputValue, setInputValue] = useState<string>("0");
   const debouncedQuery = useDebounce(inputValue, 200);
 
   const setMaxInputValue = async () => {
-
-    let TokenContract:Contract;
-    let balance = 0, decimal ;
-    if (token.network == constant.ETHEREUM_NETWORK) {
-      const provider = new ethers.providers.JsonRpcProvider(constant.ETHRPC_URL, constant.ETHEREUM_NETWORK);
-      TokenContract = new ethers.Contract(token.contractAddress, ERC20TokenABI, provider)
-    } else if (token.network == constant.BINANCE_NETOWRK) {
-      const provider = new ethers.providers.JsonRpcProvider(constant.BSCRPC_URL, constant.BINANCE_NETOWRK);
-      TokenContract = new ethers.Contract(token.contractAddress, BEP20TokenABI, provider)
+    if (address != undefined) {
+      const bal = await getTokenBalance(
+        token.name == "BNB" ? "BNB" : token.contractAddress, 
+        address, token.network
+      );
+      if (bal != constant.NOT_FOUND_TOKEN) {
+        setInputValue(bal);
+        setValue(parseFloat(bal));
+      }
     }
-    try {
-      decimal = await TokenContract.decimals();
-      balance = await TokenContract.balanceOf(address);
-      setInputValue(ethers.utils.formatUnits(balance, decimal));
-      setValue(parseFloat(ethers.utils.formatUnits(balance, decimal)));
-    } catch (err:any) {
-      return constant.NOT_FOUND_TOKEN;
-    }
-
+  
   }
 
   useEffect(() => {
@@ -72,7 +66,11 @@ export default function SwapTrade({
   }, [debouncedQuery]);
 
   const handleInputValueChange = async (e: { target: { value: string; }; }) => {
+    const regExpr = new RegExp("/^\-?\d+((\.|\,)\d+)?$/");
     const value = e.target.value.toLowerCase();
+    if (!regExpr.test(value)) {
+      console.log('test result');
+    }
     setInputValue(value);
   };
 
@@ -86,6 +84,7 @@ export default function SwapTrade({
       flexDirection = {"row"}
       borderRadius={"5px"}
       padding = {"0.2rem"}
+      justifyContent = {"center"}
     >
       <Box
         style={{
@@ -108,6 +107,7 @@ export default function SwapTrade({
               boxShadow: 'none',
               borderColor: bgColor
             }}
+            pattern="^[0-9]*[.,]?[0-9]*$"
             readOnly = {!showMax}
             value = {showMax ? inputValue : value}
             onChange = {handleInputValueChange}
@@ -121,7 +121,10 @@ export default function SwapTrade({
           }
         </InputGroup>
       </Box>
-      <Divider orientation="vertical"></Divider>
+      <Divider orientation="vertical" style= {{
+              borderColor:borderColor,
+              height:"90%"
+            }}></Divider>
       <Box
         style={{
           width: "30%",

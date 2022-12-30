@@ -61,7 +61,7 @@
 .tokenAddress {
   font-family: 'Inter';
   font-style: normal;
-  font-size: calc(0.1rem + 0.4vw);
+  font-size: calc(0rem + 0.4vw);
   line-height:1.5rem;
   color: #A7A7A7;  
   margin-right:0.3rem;

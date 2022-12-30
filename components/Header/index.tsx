@@ -7,14 +7,9 @@ import {
 from "@chakra-ui/react"
 import {
   useMetamask,
-  useWalletConnect,
-  useCoinbaseWallet,
-  useNetwork,
-  useAddress,
-  useDisconnect,
   ConnectWallet
 } from '@thirdweb-dev/react'
-import {Moon, Sun} from "../../assests/icon"
+import {Moon, Sun, SiteLogo} from "../../assests/icon"
 import style from './Header.module.css'
 
 export default function Header() {
@@ -25,13 +20,11 @@ export default function Header() {
 
   const { colorMode, toggleColorMode  } = useColorMode()
 
-  const connectWithMetamask = useMetamask()
-
   return (
     <Box className={menuClass}>
         <Box display={"flex"} flexDirection="row" alignItems={"center"}>
-        <img src="https://s2.coinmarketcap.com/static/img/coins/64x64/74.png" width={"28rem"}/>
-          <p style={{marginLeft:"1rem", fontSize:"1rem"}}>Site Title</p>
+          <SiteLogo/>
+          <p className={style.logo}>BlockPortal</p>
         </Box>
         <Box display={"flex"} flexDirection="row" alignItems={"center"}>
           {

@@ -28,12 +28,13 @@ const TokenListItem = ({
 
   const colorMode = useColorMode();
   const nameColor = useColorModeValue("#3b2c2c","#FFFFFF");
-  const textColor = useColorModeValue("#3b2c2c","#A7A7A7");
+  const textColor = useColorModeValue("#3b2c2c","#767676");
   const textColorActive = useColorModeValue("#bfbfbf","#A7A7A7");
   const whiteColor = useColorModeValue("#000000","#FFFFFF");
   const hoverColor = useColorModeValue("#005CE5","#3A3A29");
   const addressColor = useColorModeValue("#6a6a6a","#6a6a6a");
   const addressColorActive  = useColorModeValue("#a7a7a7","#6a6a6a");
+  const itemBackcolor = useColorModeValue("#E9E9E9", "#2F2F2F");
   const [isHover, setIsHover] = useState<Boolean>(false);
   const [isActive, setIsActive] = useState<Boolean>(false);
   const [showCrossIcon, setShowCrossIcon] = useState<Boolean>(false);
@@ -50,10 +51,10 @@ const TokenListItem = ({
   }
   return(
     <Box className= {style.tokenListInfo} 
-      _hover={{bg:hoverColor}}
+      _hover={{ bg: hoverColor }}
       onMouseOver={() => {setIsHover(true)}}
       onMouseOut={() => {setIsHover(false)}}
-      backgroundColor={isActive ? hoverColor:"#transparent"}
+      backgroundColor={isActive ? colorMode.colorMode == "dark" ? hoverColor : "#0085FF" : tokenData.pinSetting ? itemBackcolor : "transparent"}
       color={isActive?"#FFFFFF":whiteColor}
       onMouseMove={() => {
         setShowCrossIcon(true)

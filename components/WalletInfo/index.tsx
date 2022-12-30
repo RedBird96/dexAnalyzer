@@ -55,7 +55,8 @@ export default function WalletInfo() {
 
   const {setWalletTokens} = useWalletTokenBalance();
   const {tokenData, setTokenData} = useTokenInfo();
-  const selectBtnColor ="#0067C6";// useColorModeValue("#0070D7","#494949");
+  const widgetfontColor = useColorModeValue("#000000", "#FFFFFF");
+  const selectBtnColor ="#0085FF";// useColorModeValue("#0070D7","#494949");
   const searchColor = useColorModeValue("#FFFFFF", "#323232");
   const searchBorderColor = useColorModeValue("#CFCFCF", "#323232");
   const notSelectBtnColor = useColorModeValue("#E0E0E0","#1C1C1C");
@@ -238,7 +239,8 @@ export default function WalletInfo() {
             marginTop:"1rem",
             fontSize:"1rem",
             fontFamily:"Inter",
-            fontWeight:"500"
+            fontWeight:"500",
+            color:widgetOption == false ? widgetfontColor : "#FFFFFF"
           }}
           _hover={{
             backgroundColor:widgetOption == false ? notSelectBtnColor : selectBtnColor
@@ -256,7 +258,8 @@ export default function WalletInfo() {
             marginTop:"1rem",
             fontSize:"1rem",
             fontFamily:"Inter",
-            fontWeight:"500"
+            fontWeight:"500",
+            color:widgetOption == false ? "#FFFFFF" : widgetfontColor
           }}
           _hover={{
             backgroundColor:widgetOption == false ? selectBtnColor : notSelectBtnColor
@@ -275,7 +278,7 @@ export default function WalletInfo() {
         widgetOption ?
         <Box 
           className={style.tradeWidget}
-          backgroundColor = {refreshBtnBgColor}
+          // backgroundColor = {refreshBtnBgColor}
         > 
           {
             tokenData != undefined && tokenData.contractAddress != "" ?

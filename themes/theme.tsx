@@ -35,7 +35,7 @@ export const theme = extendTheme({
     borderColor: 'white',
     transactionTable: {
       100: '#F1F1F1',
-      700: '#1a1a1a',
+      700: '#212121',
     },
   },
   borders: {
