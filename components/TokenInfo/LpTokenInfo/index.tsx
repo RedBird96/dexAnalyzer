@@ -169,7 +169,7 @@ export default function LpTokenInfo({
             <DownArrowLight/> 
           }
         </Box>
-        : lpTokenList.length > 0 ?
+        : lpTokenList.length > 1 ?
         <div style={{
           width:"90%",
           borderWidth:isLast?"0":"thin",

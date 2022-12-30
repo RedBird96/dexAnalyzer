@@ -312,7 +312,7 @@ export default function TokenInfo() {
               <Box display={"flex"} flexDirection={"row"}>
                 <p className={style.tokenName}>{tokenData.symbol}</p>
                 <p className={style.tokenName} style={{color:"#767676"}}>&nbsp;({lpTokenAddress.symbol})</p>
-                <p className={style.tokenPrice} style={{color:priceColor}}>{convertBalanceCurrency( tokenPriceshow, 6)}</p>
+                <p className={style.tokenPrice} style={{color:priceColor}}>{convertBalanceCurrency( tokenPriceshow, 9)}</p>
               </Box>
               <Box 
                 display={"flex"} 

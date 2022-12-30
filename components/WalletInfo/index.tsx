@@ -163,7 +163,7 @@ export default function WalletInfo() {
     setWalletTokens([]);
   }
   const getTokensFromWallet = async() => {
-    if (address == null || address == "" || tokenData == undefined)
+    if (address == null || address == "")
       return;
       
     initAllInfos();
@@ -176,12 +176,14 @@ export default function WalletInfo() {
       if (res != constant.NOT_FOUND_TOKEN){
         res.forEach((value: ERC20Token) => {
           usdBalance += value.usdBalance;
+          if (tokenData != undefined) {
           if (value.contractAddress.toLocaleLowerCase() == tokenData.contractAddress.toLocaleLowerCase() && 
               value.symbol.toLocaleLowerCase() == tokenData.symbol.toLocaleLowerCase()) { 
                   tokenData.balance = value.balance;
                   tokenData.usdBalance = value.usdBalance;
                   setTokenData(tokenData);
             }
+          }
         });
         setTokensInfo(res);
         setInitTokensInfo(res);
@@ -193,7 +195,7 @@ export default function WalletInfo() {
 
   useEffect(() => {
     initAllInfos();
-    if (address != undefined && tokenData != undefined) {
+    if (address != undefined) {
       getTokensFromWallet();
     }
   }, [address, network[0].data.chain?.id, tokenData]);
@@ -304,7 +306,10 @@ export default function WalletInfo() {
             {
               searchContext.length > 0 && 
               <InputRightElement
-                onClick={()=>{setSearchContext("");}}
+                onClick={()=>{
+                  setSearchContext("");
+                  setTokensInfo(initTokensInfo);
+                }}
                 cursor='pointer'
                 paddingTop = '7px'
                 paddingRight= '5px'
