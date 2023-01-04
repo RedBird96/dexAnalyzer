@@ -436,10 +436,9 @@ export async function getLPTransactionListFromWallet(address:string, tokenAddres
  
   const res = await getBuySellTransactions(address, network, tokenAddress);
 
-  console.log('buy_res', res);
+  if (res == constant.NOT_FOUND_TOKEN) 
+    return constant.NOT_FOUND_TOKEN;
   let array:any[] = [];
-  let buy_array:any[] = [];
-  let sell_array:any[] = [];
   if (res.length != 0 ) {
     res.forEach((value:any) => {
       const time = new Date(value["timeInterval"].second + " UTC");
@@ -471,13 +470,13 @@ export async function getTokenBalance(tokenAddress:string, walletAdderss:string,
   let balance, decimal ;
   if (network == constant.ETHEREUM_NETWORK) {
     provider = new ethers.providers.JsonRpcProvider(constant.ETHRPC_URL, constant.ETHEREUM_NETWORK);
-    TokenContract = new ethers.Contract(tokenAddress == "BNB" ? walletAdderss : tokenAddress, ERC20TokenABI, provider)
+    TokenContract = new ethers.Contract(tokenAddress == "NATIVE" ? walletAdderss : tokenAddress, ERC20TokenABI, provider)
   } else if (network == constant.BINANCE_NETOWRK) {
     provider = new ethers.providers.JsonRpcProvider(constant.BSCRPC_URL, constant.BINANCE_NETOWRK);
-    TokenContract = new ethers.Contract(tokenAddress == "BNB" ? walletAdderss : tokenAddress, BEP20TokenABI, provider)
+    TokenContract = new ethers.Contract(tokenAddress == "NATIVE" ? walletAdderss : tokenAddress, BEP20TokenABI, provider)
   }
   try {
-    if (tokenAddress == "BNB") {
+    if (tokenAddress == "NATIVE") {
       balance = await provider.getBalance(walletAdderss);
       decimal = 18;
     } else {

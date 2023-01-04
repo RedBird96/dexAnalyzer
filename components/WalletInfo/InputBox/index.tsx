@@ -68,9 +68,6 @@ export default function SwapTrade({
   const handleInputValueChange = async (e: { target: { value: string; }; }) => {
     const regExpr = new RegExp("/^\-?\d+((\.|\,)\d+)?$/");
     const value = e.target.value.toLowerCase();
-    if (!regExpr.test(value)) {
-      console.log('test result');
-    }
     setInputValue(value);
   };
 

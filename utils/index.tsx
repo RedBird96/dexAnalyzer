@@ -1,3 +1,7 @@
+import BigNumber from "bignumber.js";
+import { memoize } from "lodash";
+import { BIG_TEN } from "./constant";
+
 /**
  *
  * @param x
@@ -130,4 +134,21 @@ export function makeTemplateDate(originDate : Date, resolution: number): Date{
 
   res = new Date(year, month, day, hour, minute,0);
   return res;
+}
+
+/**
+ * Take a formatted amount, e.g. 15 BNB and convert it to full decimal value, e.g. 15000000000000000
+ */
+
+export const getFullDecimalMultiplier = memoize((decimals: number): BigNumber => {
+  return BIG_TEN.pow(decimals)
+})
+
+
+export const getDecimalAmount = (amount: BigNumber, decimals = 18) => {
+  return new BigNumber(amount).times(getFullDecimalMultiplier(decimals))
+}
+
+export const getBalanceAmount = (amount: BigNumber, decimals = 18) => {
+  return new BigNumber(amount).dividedBy(getFullDecimalMultiplier(decimals))
 }

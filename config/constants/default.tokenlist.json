@@ -1,0 +1,22 @@
+{
+  "name": "DeHub Default Token List to Swap",
+  "timestamp": "2022-05-05T17:30:32Z",
+  "tokens": [
+    {
+      "name": "WBNB Token",
+      "symbol": "WBNB",
+      "address": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+      "chainId": 97,
+      "decimals": 18,
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c/logo.png"
+    },
+    {
+      "name": "BUSD Token",
+      "symbol": "BUSD",
+      "address": "0x78867BbEeF44f2326bF8DDd1941a4439382EF2A7",
+      "chainId": 97,
+      "decimals": 18,
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56/logo.png"
+    }
+  ]
+}

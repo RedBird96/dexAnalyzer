@@ -256,7 +256,6 @@ export default function TokenList() {
   const TokenActionHandler = (token:ERC20Token, add:boolean) => {
     let filterTokens = listTokens;
     filterTokens = filterTokens.filter(item => (item.contractAddress + item.network) != (token.contractAddress + token.network));
-    
 
     filterTokens = filterTokens.sort((value1, value2) => {
       if (value1.pinSetting && !value2.pinSetting)
@@ -402,10 +401,10 @@ export default function TokenList() {
               }}>
                 <p style={{display:"flex", justifyContent:"center", width:"90%"}}> Search Result </p>
                 {
-                  foundToken.map((token) => {
+                  foundToken.map((token, index) => {
                     return(
                       <TokenListItem
-                        key={token.contractAddress + token.network}
+                        key={index}
                         tokenData = {token}
                         activeToken = {debouncedActiveToken!}
                         activeTokenHandler = {setActiveTokenHandler}
@@ -441,13 +440,13 @@ export default function TokenList() {
           }
           {
             showListToken &&
-            listTokens.map((token) => {
+            listTokens.map((token, index) => {
               const alreadyListed = foundToken.find(element => (element.contractAddress + element.network) == (token.contractAddress + token.network));
               if (alreadyListed != undefined)
                 return;
               return (
               <TokenListItem
-                key={token.name+token.network}
+                key={index}
                 tokenData = {token}
                 activeToken = {debouncedActiveToken!}
                 activeTokenHandler = {setActiveTokenHandler}

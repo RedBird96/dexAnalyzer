@@ -13,15 +13,16 @@ import {
   getCookie,
   deleteCookie
 } from '../../utils'
-import { useLPTokenPrice, useLPTransaction } from '../../hooks'
+import { useLPTokenPrice, useLPTransaction, useTokenInfo } from '../../hooks'
 import { getLimitTimeHistoryData } from '../../api/bitquery_graphql'
 import { TokenSide } from '../../utils/type'
 import { makeTemplateDate } from '../../utils'
-import { getLastTransactionsLogsByTopic } from '../../api'
+import { getLastTransactionsLogsByTopic, getLPTransactionListFromWallet } from '../../api'
 import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
 import { ConvertEventtoTransaction } from '../TokenTransaction/module'
 import * as constant from '../../utils/constant'
 import { slice } from 'lodash'
+import { useAddress } from '@thirdweb-dev/react'
 
 // eslint-disable-next-line import/extensions
 
@@ -70,6 +71,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
   const { colorMode } = useColorMode();
   let tvWidget: IChartingLibraryWidget | null = null
   const {lpTokenAddress} = useLPTokenPrice();
+  const {tokenData} = useTokenInfo();
   const {coinPrice} = useStableCoinPrice();
   const [showOrder, setShowOrder] = React.useState<boolean>(false);
   const {transactionData, setTransactionData} = useLPTransaction();
@@ -77,6 +79,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
   let preReserve0 = 0;
   let preReserve1 = 0;
 
+  const address = useAddress();
   let myInterval: any
   let currentResolutions: any
   const [tokendetails, setTokenDetails] = React.useState({
@@ -87,7 +90,10 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
   let lastBarsCache: any;
 
   const configurationData = {
-    supported_resolutions: ['1', '5', '10', '30', '1H', '6H', '12H', '1D']
+    supported_resolutions: ['1', '5', '10', '30', '1H', '6H', '12H', '1D'],
+    supports_marks: true,
+    supports_timescale_marks: true,
+    supports_time: true,
   }
 
 
@@ -214,7 +220,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
 
         // console.log('from to', new Date(from * 1000).toISOString(), new Date(to * 1000).toISOString(), resolution);
         
-        console.log('lp info', lpTokenAddress.token0_reserve, lpTokenAddress.token1_reserve);
+        // console.log('lp info', lpTokenAddress.token0_reserve, lpTokenAddress.token1_reserve);
 
         if (firstDataRequest) {
 
@@ -328,7 +334,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
           
         }
 
-        console.log('bars', bars);
+        // console.log('bars', bars);
         onHistoryCallback(bars, {
           noData: false,
         })
@@ -362,7 +368,6 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
             '1W': 7 * 24 * 3600000,
             '1M': 30 * 24 * 3600000,
           }
-          console.log('current resolution', currentResolutions);
           if (lastBarsCache === undefined) return
           const time = new Date();
           const cuTime = makeTemplateDate(time, currentResolutions);
@@ -385,7 +390,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
             currentPrice = currentReserve0 / currentReserve1 * price;
             volume += (Math.abs(currentReserve0 - preReserve0)) * price
           }
-          console.log('bar should be updated', time.toUTCString(), cuTime, currentPrice, temp);
+          // console.log('bar should be updated', time.toUTCString(), cuTime, currentPrice, temp);
           if (isNew) {
             lastBarsCache.time = cuTime.getTime()
             lastBarsCache.open = temp.close
@@ -411,7 +416,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
           onRealtimeCallback(lastBarsCache)
           preReserve0 = currentReserve0;
           preReserve1 = currentReserve1;
-          console.log('lastBarsCache', lastBarsCache);
+          // console.log('lastBarsCache', lastBarsCache);
         }
 
       }, 1000 * 1)
@@ -423,6 +428,102 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       clearInterval(myInterval)
       // console.log('[unsubscribeBars]: cleared')
     },
+    getMarks: async(symbolInfo: any, from: number, to: number, onDataCallback: any, resolution: any) => {
+      
+        // const res = await getLPTransactionListFromWallet(address, tokenData.contractAddress, tokenData.network, resolution);
+        // if (showOrder) {
+        //   let Arr:any[] = [];
+        //   if ( res != constant.NOT_FOUND_TOKEN && res.length > 0) {
+        //     let id = 0;
+        //     res.forEach((value: any, index: any) => {
+        //       if (index > 1 && value.time == res[index - 1].time) {
+        //         id ++;
+        //       } else {
+        //         id = 1;
+        //       }
+        //       if (value.buy_sell == "buy") {
+        //         Arr.push({
+        //           id: id,
+        //           time: value.time / 1000,
+        //           text: 'Buy',
+        //           color: 'green',
+        //           minSize: 5
+        //         })
+        //       } else {
+        //         Arr.push({
+        //           id: id,
+        //           time: value.time / 1000,
+        //           text: 'Sell',
+        //           color: 'red',
+        //           minSize: 5
+        //         })
+        //       }
+        //     })
+        //   }
+        // }
+        
+          // const Arr = [   
+          //   {
+          //     id: 1,
+          //     time: 1671992100000 / 1000,
+          //     color: 'green',
+          //     text: 'First',
+          //     label: 'B',
+          //     labelFontColor: 'yellow',
+          //     minSize: 5        
+          //   },     
+          //   {
+          //     id: 2,
+          //     time: 1671992100000 / 1000,
+          //     color: 'red',
+          //     text: 'Second',
+          //     label: 'S',
+          //     labelFontColor: 'yellow',
+          //     minSize: 5        
+          //   },          
+          // ]
+        //   console.log("Arr", Arr);
+        //   onDataCallback(Arr);
+    },
+    getTimescaleMarks: async(symbolInfo:any,startDate:any,endDate:any,onDataCallback:any,resolution:any) => {
+      // const res = await getLPTransactionListFromWallet(address, tokenData.contractAddress, tokenData.network, resolution);
+      // console.log('getTimescaleMarks', showOrder);
+      // if (showOrder) {
+      //   let Arr:any[] = [];
+      //     if (res.length > 0) {
+      //       let id = 0;
+      //       res.forEach((value: any, index: any) => {
+      //         if (index > 1 && value.time == res[index - 1].time) {
+      //           id ++;
+      //         } else {
+      //           id = 1;
+      //         }
+      //         if (value.buy_sell == "buy") {
+      //           Arr.push({
+      //             id: id,
+      //             time: value.time / 1000,
+      //             text: 'Buy',
+      //             color: 'green',
+      //             minSize: 5,
+      //             tooltip:["Buy position"]
+      //           })
+      //         } else {
+      //           Arr.push({
+      //             id: id,
+      //             time: value.time / 1000,
+      //             text: 'Sell',
+      //             color: 'red',
+      //             minSize: 5,
+      //             tooltip:["Sell position"]
+      //           })
+      //         }
+      //       })
+      //     }
+
+      //   onDataCallback(Arr);
+      //   }
+      // },
+    }
   }
   // const tvWidget = null;
   //   React.useEffect(()=>{
@@ -456,19 +557,25 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
 
     tvWidget = new widget(widgetOptions)
 		tvWidget.onChartReady(() => {
+      tvWidget.changeTheme(colorMode == "dark" ? 'Dark' : 'Light');
 			tvWidget!.headerReady().then(() => {
 				const button = tvWidget!.createButton();
 				button.setAttribute('title', 'Click to show positions');
         button.setAttribute('style', "height:90%;display:flex;align-items:center;background:transparent");
 				button.classList.add('apply-common-tooltip');
-				button.addEventListener('click', () => {
+				button.addEventListener('click', async () => {
           const currentStatus = button.getAttribute('style');
           if (currentStatus.includes("background:#2a2e39")) {
-            tvWidget.activeChart().removeAllShapes();
+            
+            tvWidget.activeChart().clearMarks();
             button.setAttribute('style', "height:90%;display:flex;align-items:center;background:transparent");
+            setShowOrder(false);
           } else {
-            tvWidget.activeChart().createShape(lastBarsCache.time, {shape:"long_position"})
             button.setAttribute('style', "height:90%;display:flex;align-items:center;background:#2a2e39");
+            if (address != undefined && address != "") {
+              setShowOrder(true);
+              tvWidget.activeChart().refreshMarks();
+            }
           }
         });
 				button.innerHTML = 'Trade Show';

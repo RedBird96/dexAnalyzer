@@ -84,7 +84,7 @@ export default function TokenInfo() {
     }
     const token0_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token1);
     // const token1_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token0);
-
+    
     setLPTokenList([]);
     const lptoken_Res = token0_Res;//token0_Res.concat(token1_Res);
     const emptyLP = {
@@ -119,7 +119,7 @@ export default function TokenInfo() {
       if (value.protocolType == "Uniswap v3")
         continue;
       const res = await getLPTokenReserve(value.contractAddress, value.network);
-      if (res[2] != constant.PANCAKESWAP_FACTORY.v2 && res[2] != constant.UNISWAP_FACTORY.v2)
+      if (res[2].toLowerCase() != constant.PANCAKESWAP_FACTORY.v2.toLowerCase() && res[2].toLowerCase() != constant.UNISWAP_FACTORY.v2.toLowerCase())
         continue;
 
       if (res[3].toLowerCase() == tokenData.contractAddress.toLowerCase()) {
@@ -162,7 +162,7 @@ export default function TokenInfo() {
                     value.token1_contractAddress + value.network);
       
       if (coin != undefined)
-      price = coin.price;
+        price = coin.price;
 
       if (index == 0) {
         selectLP_temp = value;

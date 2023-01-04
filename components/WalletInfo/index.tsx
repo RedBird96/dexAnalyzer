@@ -164,7 +164,7 @@ export default function WalletInfo() {
     setWalletTokens([]);
   }
   const getTokensFromWallet = async() => {
-    if (address == null || address == "")
+    if (address == null || address == "" || tokenData == undefined)
       return;
       
     initAllInfos();

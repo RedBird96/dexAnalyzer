@@ -1,11 +1,16 @@
+import { Token } from "./type";
+import BigNumber from 'bignumber.js';
+
 export const NOT_FOUND_TOKEN = "No results found";
 
 export const ETHEREUM_NETWORK = 1;
 export const BINANCE_NETOWRK = 56;
 export const ETHRPC_URL = "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161";
-export const BSCRPC_URL = "https://bsc-dataseed.binance.org/";
+export const BSCRPC_URL = "https://bsc-dataseed1.binance.org/";
 export const WSSETHRPC_URL = "wss://mainnet.infura.io/ws/v3/e0e919cefdf04a40875a387f51d64516";
 export const WSSBSCRPC_URL = "wss://bsc-mainnet.nodereal.io/ws/v1/62368f2c5ac94dc59139d5b255ba1adb";
+
+const GELATO_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
 export const WHITELIST_TOKENS ={
   ETH:{
@@ -28,10 +33,44 @@ export const WHITELIST_TOKENS ={
 
 export const PANCAKESWAP_FACTORY = {
   v1:"0xBCfCcbde45cE874adCB698cC183deBcF17952812",
-  v2:"0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73"
+  v2:"0xca143ce32fe78f1f7019d7d551a6402fc5350c73"
 }
 
 export const UNISWAP_FACTORY = {
   v2:"0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
   v3:"0x1F98431c8aD98523631AE4a59f267346ea31F984"
 }
+
+export const PANCAKESWAP_ROUTER = {
+  v2:"0x10ed43c718714eb63d5aa57b78b54704e256024e"
+}
+
+export const UNISWAP_ROUTER = {
+  v2: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+}
+
+export const MULTICALL_ADDRESS = {
+  ETH:"0x5ba1e12693dc8f9c48aad8770482f4739beed696",
+  BSC:"0xff6fd90a470aaa0c1b8a54681746b07acdfedc9b"
+}
+
+export const INIT_CODE_HASH = "0x00fb7f630766e6a796048ea87d01acd3068e8ff67d078148a3fa3f4a84f69bd5";
+
+export const ETHERToken: Token = {
+  decimals: 18,
+  symbol: 'BNB',
+  name: 'BNB',
+  chainId: BINANCE_NETOWRK,
+  address: GELATO_ADDRESS,
+};
+
+export const FEES_NUMERATOR = new BigNumber(9975);
+export const FEES_DENOMINATOR = new BigNumber(10000);
+export const BIG_ZERO = new BigNumber(0)
+export const BIG_ONE = new BigNumber(1)
+export const BIG_TWO = new BigNumber(2)
+export const BIG_NINE = new BigNumber(9)
+export const BIG_TEN = new BigNumber(10)
+
+
+export const MAX_DECIMAL_DIGITS = 6;
