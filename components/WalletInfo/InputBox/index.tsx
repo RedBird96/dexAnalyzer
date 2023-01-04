@@ -3,26 +3,21 @@ import {
   Divider, 
   Input, 
   InputGroup, 
-  InputRightAddon, 
   InputRightElement, 
   useColorMode, 
   useColorModeValue
 } from "@chakra-ui/react";
-import { useAddress, useNetwork } from "@thirdweb-dev/react";
+import { useAddress } from "@thirdweb-dev/react";
 import {
   SwapDownArrowDark,
   SwapDownArrowLight,
 } from "../../../assests/icon"
-import { Contract, ethers } from "ethers";
 import style from './InputBox.module.css'
 import { useEffect, useRef, useState } from "react";
 import { ERC20Token } from "../../../utils/type";
 import { makeShortTokenName } from "../../../utils";
-import ERC20TokenABI from '../../../config/ERC20ABI.json'
-import BEP20TokenABI from '../../../config/ERC20ABI.json'
 import * as constant from '../../../utils/constant'
-import * as endpoint from '../../../utils/endpoints'
-import { useDebounce, useTokenInfo } from "../../../hooks";
+import { useDebounce, useLPTokenPrice } from "../../../hooks";
 import { getTokenBalance } from "../../../api";
 
 export default function SwapTrade({
@@ -38,14 +33,13 @@ export default function SwapTrade({
 }) {
   
   const address = useAddress();
-  const network = useNetwork();
   const colorMode = useColorMode();
   const inputRef = useRef(null);
   const borderColor = useColorModeValue("#C3C3C3", "#2E2E2E");
   const bgColor = useColorModeValue("#efefef", "#121212");
   const [inputValue, setInputValue] = useState<string>("0");
   const debouncedQuery = useDebounce(inputValue, 200);
-
+  const lpTokenAddress = useLPTokenPrice();
   const setMaxInputValue = async () => {
     if (address != undefined) {
       const bal = await getTokenBalance(
@@ -60,6 +54,9 @@ export default function SwapTrade({
   
   }
 
+  useEffect(() => {
+    setInputValue("0");
+  },[lpTokenAddress])
   useEffect(() => {
     if (debouncedQuery != "")
       setValue(debouncedQuery);

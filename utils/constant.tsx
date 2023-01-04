@@ -58,6 +58,14 @@ export const INIT_CODE_HASH = "0x00fb7f630766e6a796048ea87d01acd3068e8ff67d07814
 
 export const ETHERToken: Token = {
   decimals: 18,
+  symbol: 'ETH',
+  name: 'ETH',
+  chainId: BINANCE_NETOWRK,
+  address: GELATO_ADDRESS,
+};
+
+export const BNBToken: Token = {
+  decimals: 18,
   symbol: 'BNB',
   name: 'BNB',
   chainId: BINANCE_NETOWRK,

@@ -80,8 +80,8 @@ export default function SwapTrade() {
 
   const { fetchPairReserves } = useInitialize();
   
-  const [pricebase, setPriceBase] = useState<string>("0");
-  const [pricequote, setPriceQuote] = useState<string>("0");
+  const [pricebase, setPriceBase] = useState<number>(0);
+  const [pricequote, setPriceQuote] = useState<number>(0);
   const [label, setLabel] = useState<BTN_LABEL>(BTN_LABEL.LOADING);
   const {
     [Field.Input]: { currencyId: inputCurrencyId },
@@ -212,10 +212,10 @@ export default function SwapTrade() {
   useEffect(() => {
     setFromTokenValue(0);
     setToTokenValue(0);
-  }, [tokenData])
+  }, [tokenData, lpTokenAddress.quoteCurrency_contractAddress])
   useEffect(() => {
     setShowConnect(connection[0].data.connected);
-    if (connection[0].data.connected) {
+    if (connection[0].data.connected && fromToken.name != undefined) {
       if (network[0].data.chain.id != tokenData.network) {
         setLabel(BTN_LABEL.SWITCHNETWORK)
       } else if (!isApproved) {
@@ -281,11 +281,11 @@ export default function SwapTrade() {
       );
 
       if (lpTokenAddress.tokenside == TokenSide.token1){
-        setPriceBase((lpTokenAddress.token0_reserve / lpTokenAddress.token1_reserve).toFixed(5));
-        setPriceQuote((lpTokenAddress.token1_reserve / lpTokenAddress.token0_reserve).toFixed(5));
+        setPriceBase((lpTokenAddress.token0_reserve / lpTokenAddress.token1_reserve));
+        setPriceQuote((lpTokenAddress.token1_reserve / lpTokenAddress.token0_reserve));
       } else {
-        setPriceQuote((lpTokenAddress.token0_reserve / lpTokenAddress.token1_reserve).toFixed(5));
-        setPriceBase((lpTokenAddress.token1_reserve / lpTokenAddress.token0_reserve).toFixed(5));
+        setPriceQuote((lpTokenAddress.token0_reserve / lpTokenAddress.token1_reserve));
+        setPriceBase((lpTokenAddress.token1_reserve / lpTokenAddress.token0_reserve));
       }
     }
 
@@ -298,28 +298,31 @@ export default function SwapTrade() {
   }, [lpTokenAddress, address]);
 
   useEffect(() => {
-    if (!isApproved) {
-      setLabel(BTN_LABEL.APPROVE);
-    } else if (fromTokenValue > maxFromToken) {
-      setLabel(BTN_LABEL.INSUFFICENT);
-    } else {
-      setLabel(BTN_LABEL.SWAP);
+    if (fromToken.name != undefined && toToken.name != undefined) {
+      if (!isApproved) {
+        setLabel(BTN_LABEL.APPROVE);
+      } else if (fromTokenValue > maxFromToken) {
+        setLabel(BTN_LABEL.INSUFFICENT);
+      } else {
+        setLabel(BTN_LABEL.SWAP);
+      }
+
+      if (bestTrade != undefined) {
+        const outMinAmount = getBalanceAmount(
+          minimumAmountOut(bestTrade.tradeType, bestTrade.amountOut, allowedSlippage)
+          .integerValue(),
+          bestTrade.tokenOut.decimals).toFixed(5);      
+        setMiniValue(parseFloat(outMinAmount));
+      }
+
+      if (fromToken.contractAddress == tokenData.contractAddress) {
+        setToTokenValue(fromTokenValue * pricebase);
+      }
+      else {
+        setToTokenValue(fromTokenValue * pricequote);
+      }
     }
-
-    if (bestTrade != undefined) {
-      const outMinAmount = getBalanceAmount(
-        minimumAmountOut(bestTrade.tradeType, bestTrade.amountOut, allowedSlippage)
-        .integerValue(),
-        bestTrade.tokenOut.decimals).toFixed(5);      
-      setMiniValue(parseFloat(outMinAmount));
-    }
-
-    if (fromToken.contractAddress == tokenData.contractAddress)
-      setToTokenValue(fromTokenValue * lpTokenPrice.tokenPrice);
-    else 
-      setToTokenValue(fromTokenValue / lpTokenPrice.tokenPrice);
-
-  }, [fromTokenValue, fromToken, bestTrade, lpTokenPrice])
+  }, [fromTokenValue, fromToken, bestTrade, lpTokenPrice, allowedSlippage])
 
   const switchSwapTokens = async () => {
     const saveFromToken = fromToken;
@@ -454,8 +457,9 @@ export default function SwapTrade() {
                 width = {"10%"}
                 borderColor ={mainbg}
                 background = {mainbg}
-                children='%'
-              />
+              >
+                %
+              </InputRightAddon>
             </InputGroup>
             <Divider 
               orientation="vertical" 
@@ -492,21 +496,21 @@ export default function SwapTrade() {
             flexDirection:"row"
           }}>
             <p className = {style.commentText} style= {{ color :"#696969"}}>Price Impact:</p>
-            <p className = {style.commentText}>&lt;0.01%</p>
+            <p className = {style.commentText}>{label == BTN_LABEL.LOADING ? "0%" : "<0.01%"}</p>
           </Box>
           <Box style = {{
             display:"flex",
             flexDirection:"row"
           }}>
             <p className = {style.commentText} style= {{ color :"#696969"}}>Price:</p>
-            <p className = {style.commentText}>{pricebase}&nbsp;{lpTokenAddress.baseCurrency_name+"/"+lpTokenAddress.quoteCurrency_name}</p>
+            <p className = {style.commentText}>{pricebase.toFixed(5)}&nbsp;{lpTokenAddress.baseCurrency_name+"/"+lpTokenAddress.quoteCurrency_name}</p>
           </Box>
           <Box style = {{
             display:"flex",
             flexDirection:"row"
           }}>
             <p className = {style.commentText} style= {{ color :"#696969"}}>Price:</p>
-            <p className = {style.commentText}>{pricequote}&nbsp;{lpTokenAddress.quoteCurrency_name+"/"+lpTokenAddress.baseCurrency_name}</p>
+            <p className = {style.commentText}>{pricequote.toFixed(5)}&nbsp;{lpTokenAddress.quoteCurrency_name+"/"+lpTokenAddress.baseCurrency_name}</p>
           </Box>
         </Box>
       </Box>
@@ -522,12 +526,17 @@ export default function SwapTrade() {
       >
         {
           executing === true ? "PROCESSING..." :
-          label === BTN_LABEL.SWAP ? 
-          "SWAP" : label === BTN_LABEL.INSUFFICENT ?
-          "INSUFFICIENT FUND": label == BTN_LABEL.APPROVE?
-          "APPROVE": label == BTN_LABEL.LOADING ?
-          "LOADING":
-          "SWITCH NETWORK"
+          label == BTN_LABEL.LOADING ?
+          "LOADING...":
+          label == BTN_LABEL.CONNECT ?
+          "CONNECT WALLET" :
+          label == BTN_LABEL.SWITCHNETWORK ?
+          "SWITCH NETWORK":
+          label == BTN_LABEL.APPROVE ?
+          "APPROVE" :
+          label == BTN_LABEL.INSUFFICENT ?
+          "INSUFFICIENT FUND":
+          "SWAP"
         }
       </Button>
     </Box>

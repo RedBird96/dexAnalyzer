@@ -4,11 +4,10 @@ import { Contract } from '@ethersproject/contracts';
 import { useCallback, useMemo } from 'react';
 import { maximumAmountIn, minimumAmountOut } from '../utils/pairs';
 import { Trade, TradeType } from '../utils/type';
-import { ETHERToken, WHITELIST_TOKENS } from '../utils/constant';
+import { BINANCE_NETOWRK, BNBToken, ETHERToken, WHITELIST_TOKENS } from '../utils/constant';
 import isZero, { calculateGasMargin } from '../utils/tx';
 import { getRouterContract } from '../utils/contract';
 import { useAddress, useSigner } from '@thirdweb-dev/react';
-import { getBalanceAmount, getDecimalAmount } from '../utils';
 import { useTokenInfo } from './useTokenInfo';
 
 interface SwapParameters {
@@ -39,14 +38,14 @@ export const useSwapArguments = (
     if (!trade || !library || !account) return [];
 
     const contract = getRouterContract(library, tokenData.network);
-    const etherIn = trade.tokenIn === ETHERToken;
-    const etherOut = trade.tokenOut === ETHERToken;
+    const etherIn = (trade.tokenIn === ETHERToken || trade.tokenIn === BNBToken);
+    const etherOut = (trade.tokenOut === ETHERToken || trade.tokenOut == BNBToken);
 
-    const wbnb = WHITELIST_TOKENS.BSC.BNB;
+    const wNative = tokenData.network == BINANCE_NETOWRK ? WHITELIST_TOKENS.BSC.BNB : WHITELIST_TOKENS.ETH.ETH;
 
     const path = [
-      etherIn ? wbnb : trade.tokenIn.address,
-      etherOut ? wbnb : trade.tokenOut.address,
+      etherIn ? wNative : trade.tokenIn.address,
+      etherOut ? wNative : trade.tokenOut.address,
     ];
     const amountIn = trade.amountIn
       ? `0x${maximumAmountIn(trade.tradeType, trade.amountIn, allowedSlippage)
@@ -58,7 +57,6 @@ export const useSwapArguments = (
           .integerValue()
           .toString(16)}`
       : '0x0';
-
 
     const deadline = `0x${(
       Math.floor(new Date().getTime() / 1000) + 300
@@ -125,6 +123,7 @@ const useSwap = (
   const account = useAddress();
 
   const swapCalls = useSwapArguments(trade, allowedSlippage);
+  console.log('swapCalls', swapCalls);
   const onSwap = useCallback(async () => {
     const estimateCalls = await Promise.all(
       swapCalls.map(call => {
@@ -152,7 +151,6 @@ const useSwap = (
     if (!successfulEstimation) {
       throw new Error('Unexpected error. Could not estimate gas for the swap');
     }
-
     const {
       call: {
         contract,
