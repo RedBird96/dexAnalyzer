@@ -59,7 +59,6 @@ export const getToken0Info = async (
       params: [],
     },
   ];
-  console.log('pair', pair);
   const [reserves] = await multicallv2(network == BINANCE_NETOWRK ? PancakePairAbi : UniswapPairAbi, reserveCalls, network);
   if (reserves.length < 0) return null;
 

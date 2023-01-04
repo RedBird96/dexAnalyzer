@@ -1,7 +1,8 @@
 import { Box, Button, Circle, Divider, Input, InputGroup, InputRightAddon, useColorMode, useColorModeValue } from '@chakra-ui/react'
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import { useToast } from '@chakra-ui/react'
 import BigNumber from 'bignumber.js';
-import { Signer } from 'ethers';
+import { Signer, ethers } from 'ethers';
 import style from './SwapTrade.module.css'
 import {
   DownArrowDark,
@@ -31,11 +32,13 @@ import Erc20Abi from '../../../config/ERC20ABI.json'
 import { MaxUint256 } from '@ethersproject/constants';
 
 enum BTN_LABEL {
+  LOADING,
   CONNECT,
   SWITCHNETWORK,
   SWAP,
   INSUFFICENT,
-  APPROVE
+  APPROVE,
+  PROCESSING,
 }
 
 export default function SwapTrade() {
@@ -44,6 +47,7 @@ export default function SwapTrade() {
   const address = useAddress();
   const {tokenData} = useTokenInfo();
   const colorMode = useColorMode();
+  const toast = useToast()
   const {lpTokenAddress} = useLPTokenPrice();
   const borderColor = useColorModeValue("#C3C3C3", "#2E2E2E");
   const mainbg = useColorModeValue("#efefef", "#121212");
@@ -78,7 +82,7 @@ export default function SwapTrade() {
   
   const [pricebase, setPriceBase] = useState<string>("0");
   const [pricequote, setPriceQuote] = useState<string>("0");
-  const [label, setLabel] = useState<BTN_LABEL>(BTN_LABEL.SWAP);
+  const [label, setLabel] = useState<BTN_LABEL>(BTN_LABEL.LOADING);
   const {
     [Field.Input]: { currencyId: inputCurrencyId },
     [Field.Output]: { currencyId: outputCurrencyId },
@@ -119,47 +123,46 @@ export default function SwapTrade() {
   const bestTrade = isExactIn ? tradeOnExactInOut : tradeOnInExactOut;
   const [allowedSlippage, setUserSlippageTolerance] = useState(0.5);
   const { onSwap } = useSwap(bestTrade, allowedSlippage);
-
   const { isApproved, handleApprove, handleConfirm } =
     useApproveConfirmTransaction({
       onRequiresApproval: async (
+        tokenAddress: string,
         signer: Signer,
-        approvalAccount: string 
+        approvalAccount: string,
+        network: number
       ) => {
         try {
-          console.log('approve fromToken', fromToken.contractAddress);
-
           const tokenContract = getContract(
-            fromToken.contractAddress,
-            tokenData.network == constant.BINANCE_NETOWRK ? Bep20Abi : Erc20Abi,
-            tokenData.network,
+            tokenAddress,
+            network == constant.BINANCE_NETOWRK ? Bep20Abi : Erc20Abi,
+            network,
             signer,
           );
 
-          console.log('approve getContract', tokenContract);
-
           const response = await tokenContract['allowance'](
             approvalAccount,
-            tokenData.network == constant.BINANCE_NETOWRK ? constant.PANCAKESWAP_ROUTER.v2 : constant.UNISWAP_ROUTER.v2
+            network== constant.BINANCE_NETOWRK ? constant.PANCAKESWAP_ROUTER.v2 : constant.UNISWAP_ROUTER.v2
           );
-          console.log('allowance response', response);
-          const currentAllowance = response;
-          return currentAllowance.gt(0);
+          const currentAllowance = ethers.utils.formatEther(response);
+          return currentAllowance > "0.0";
         } catch (error) {
           return false;
         }
       },
-      onApprove: async () => {
+      onApprove: async (
+        tokenAddress:string, 
+        network: number
+      ) => {
         try {
           setExecuting(true);
           const tokenContract = getContract(
-            fromToken.contractAddress,
-            tokenData.network == constant.BINANCE_NETOWRK ? Bep20Abi : Erc20Abi,
-            tokenData.network,
+            tokenAddress,
+            network == constant.BINANCE_NETOWRK ? Bep20Abi : Erc20Abi,
+            network,
             signer,
           );
           return await tokenContract['approve'](
-            tokenData.network == constant.BINANCE_NETOWRK ? constant.PANCAKESWAP_ROUTER.v2 : constant.UNISWAP_ROUTER.v2, 
+            network == constant.BINANCE_NETOWRK ? constant.PANCAKESWAP_ROUTER.v2 : constant.UNISWAP_ROUTER.v2, 
             MaxUint256);
         } catch (error) {
           console.error(error);
@@ -171,6 +174,12 @@ export default function SwapTrade() {
         // if (isToastEnabled && toastInfo) {
         //   toastInfo('Approved', 'Contract enabled - you can now buy $DeHub');
         // }
+        toast({
+          title: `Transaction receipt`,
+          status: 'success',
+          position: 'bottom-right',
+          isClosable: true,
+        })
         handleConfirm();
       },
       onConfirm: async () => {
@@ -181,12 +190,21 @@ export default function SwapTrade() {
         return onSwap();
       },
       onFail: async () => {
+        toast({
+          title: `Transaction failed`,
+          status: 'warning',
+          position: 'bottom-right',
+          isClosable: true,
+        })        
         setExecuting(false);
       },
       onSuccess: async () => {
-        // if (isToastEnabled && toastSuccess) {
-        //   toastSuccess('Buy DeHub', `You've successfully purchased DeHub`);
-        // }
+        toast({
+          title: `Transaction receipt`,
+          status: 'success',
+          position: 'bottom-right',
+          isClosable: true,
+        })
         setExecuting(false);
         fetchPairReserves();
       },
@@ -200,6 +218,8 @@ export default function SwapTrade() {
     if (connection[0].data.connected) {
       if (network[0].data.chain.id != tokenData.network) {
         setLabel(BTN_LABEL.SWITCHNETWORK)
+      } else if (!isApproved) {
+        setLabel(BTN_LABEL.APPROVE);
       } else if (fromTokenValue > maxFromToken) {
         setLabel(BTN_LABEL.INSUFFICENT);
       } else {
@@ -278,7 +298,9 @@ export default function SwapTrade() {
   }, [lpTokenAddress, address]);
 
   useEffect(() => {
-    if (fromTokenValue > maxFromToken) {
+    if (!isApproved) {
+      setLabel(BTN_LABEL.APPROVE);
+    } else if (fromTokenValue > maxFromToken) {
       setLabel(BTN_LABEL.INSUFFICENT);
     } else {
       setLabel(BTN_LABEL.SWAP);
@@ -333,6 +355,8 @@ export default function SwapTrade() {
   const handleOther = () => {
     if (label == BTN_LABEL.SWITCHNETWORK) {
       account[0].data.connector.switchChain(tokenData.network);
+    } else if (label == BTN_LABEL.APPROVE) {
+      handleApprove();
     } else if (label == BTN_LABEL.INSUFFICENT) {
 
     }
@@ -493,14 +517,16 @@ export default function SwapTrade() {
           bg: tokenData.network == constant.BINANCE_NETOWRK ? "#F0B90B" : "#FB118E"
         }}
         color = {tokenData.network == constant.BINANCE_NETOWRK ? "black" : "white"}
-        onClick = {label == BTN_LABEL.SWAP ? onSwap : handleOther}
-        isDisabled = {!showConnect}
+        onClick = {label == BTN_LABEL.SWAP ? handleConfirm : handleOther}
+        isDisabled = {!showConnect || label == BTN_LABEL.LOADING || executing}
       >
         {
+          executing === true ? "PROCESSING..." :
           label === BTN_LABEL.SWAP ? 
           "SWAP" : label === BTN_LABEL.INSUFFICENT ?
           "INSUFFICIENT FUND": label == BTN_LABEL.APPROVE?
-          "APPROVE":
+          "APPROVE": label == BTN_LABEL.LOADING ?
+          "LOADING":
           "SWITCH NETWORK"
         }
       </Button>

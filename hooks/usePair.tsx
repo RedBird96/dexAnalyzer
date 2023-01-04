@@ -56,7 +56,7 @@ export function usePairs(currencies: [Currency | undefined, Currency | undefined
   
   useEffect(() => {
     const callMulticall = async () => {
-      const results = await multicallv2(PancakeFactoryAbi, reserveCalls);
+      const results = await multicallv2(PancakeFactoryAbi, reserveCalls, tokenData.network);
       if (results.length > 0)
         setCallRes(results);
     }

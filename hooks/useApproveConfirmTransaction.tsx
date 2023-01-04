@@ -8,6 +8,7 @@ import { Signer } from 'ethers';
 import { useEffect, useReducer, useRef } from 'react';
 import { useSwapState } from '../state/swap/hooks';
 import { Field } from '../state/swap/types';
+import { useTokenInfo } from './useTokenInfo';
 
 type LoadingState = 'idle' | 'loading' | 'success' | 'fail';
 
@@ -84,11 +85,16 @@ interface OnSuccessProps {
 }
 
 interface ApproveConfirmTransaction {
-  onApprove: () => Promise<TransactionResponse>;
+  onApprove: (
+    tokenAddress:string,
+    network:number
+  ) => Promise<TransactionResponse>;
   onConfirm: () => Promise<TransactionResponse>;
   onRequiresApproval?: (
+    tokenAddress: string,
     signer: Signer,
-    account: string
+    account: string,
+    network: number
   ) => Promise<boolean>;
   onSuccess: ({ state, receipt }: OnSuccessProps) => void;
   onApproveSuccess?: ({ state, receipt }: OnSuccessProps) => void;
@@ -107,7 +113,7 @@ export const useApproveConfirmTransaction = ({
 }: ApproveConfirmTransaction) => {
   const address = useAddress();
   const library = useSigner();
-
+  const {tokenData} = useTokenInfo();
   const {
     [Field.Input]: { currencyId: inputCurrencyId },
     [Field.Output]: { currencyId: outputCurrencyId },
@@ -125,10 +131,9 @@ export const useApproveConfirmTransaction = ({
 
   const handlePreApprove = useRef(onRequiresApproval);
   useEffect(() => {
-    console.log('inputCurrencyId', inputCurrencyId);
     mountedRef.current = true;
-    if (address && handlePreApprove.current && library) {
-      handlePreApprove.current(library, address).then(result => {
+    if (address && handlePreApprove.current && library && inputCurrencyId) {
+      handlePreApprove.current(inputCurrencyId, library, address, tokenData.network).then(result => {
         if (!mountedRef.current) {
           return;
         }
@@ -148,7 +153,7 @@ export const useApproveConfirmTransaction = ({
     isConfirmed: state.confirmState === 'success',
     handleApprove: async () => {
       try {
-        const tx = await onApprove();
+        const tx = await onApprove(inputCurrencyId, tokenData.network);
         dispatch({ type: 'approve_sending' });
         const receipt = await tx.wait();
         if (receipt.status) {
