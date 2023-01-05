@@ -53,6 +53,7 @@ export default function SwapTrade() {
   const borderColor = useColorModeValue("#C3C3C3", "#2E2E2E");
   const mainbg = useColorModeValue("#efefef", "#121212");
   const textColor = useColorModeValue("#5E5E5E","#A7A7A7");
+  const slectedColor = useColorModeValue("#005CE5","#3A3A29");
   const [fromTokenValue, setFromTokenValue] = useState<number>(0);
   const [toTokenValue, setToTokenValue] = useState<number>(0);
   const [maxFromToken, setMaxFromToken] = useState<number>(0);
@@ -118,8 +119,9 @@ export default function SwapTrade() {
     !isExactIn ? outputToken : undefined
   );
   const bestTrade = isExactIn ? tradeOnExactInOut : tradeOnInExactOut;
+  const [autoSlippage, setAutoSlippage] = useState<boolean>(false);
   const [allowedSlippage, setUserSlippageTolerance] = useState(0.5);
-  const { onSwap } = useSwap(bestTrade, allowedSlippage);
+  const { onSwap } = useSwap(bestTrade, allowedSlippage * 100);
   const { isApproved, handleApprove, handleConfirm } =
     useApproveConfirmTransaction({
       onRequiresApproval: async (
@@ -177,7 +179,6 @@ export default function SwapTrade() {
           position: 'bottom-right',
           isClosable: true,
         })
-        handleConfirm();
       },
       onConfirm: async () => {
         if (!onSwap) {
@@ -311,27 +312,6 @@ export default function SwapTrade() {
 
   useEffect(() => {
 
-    const getPrice = async() => {
-      if (fromTokenValue != 0) {
-        let toAmount = 0;
-        const value = new BigNumber(fromTokenValue * Math.pow(10, lpTokenAddress.quoteCurrency_decimals));
-        const res = await getAmountOut(lpTokenAddress.quoteCurrency_contractAddress, lpTokenAddress.baseCurrency_contractAddress, value, fromToken.network);
-        if (res != undefined) {
-          toAmount = parseFloat(utils.formatEther(res[0][1]));
-          setToTokenValue(toAmount);
-        }
-
-        if (bestTrade != undefined) {
-          const amount = getDecimalAmount(BigNumber(toAmount), toToken.decimals);
-          const outMinAmount = getBalanceAmount(
-            minimumAmountOut(bestTrade.tradeType, amount, allowedSlippage)
-            .integerValue(),
-            bestTrade.tokenOut.decimals).toFixed(5);      
-          setMiniValue(parseFloat(outMinAmount));
-        }
-      }
-    }
-
     if (fromToken.name != undefined && toToken.name != undefined) {
       if (!isApproved) {
         setLabel(BTN_LABEL.APPROVE);
@@ -344,6 +324,40 @@ export default function SwapTrade() {
       getPrice();
     }
   }, [fromTokenValue, fromToken, bestTrade, lpTokenPrice, allowedSlippage])
+  
+  const getPrice = async() => {
+    if (fromTokenValue != 0) {
+      let toAmount = 0;
+      const value = new BigNumber(fromTokenValue * Math.pow(10, lpTokenAddress.quoteCurrency_decimals));
+      console.log('value', fromTokenValue, value);
+      if (lpTokenAddress.baseCurrency_contractAddress.toLowerCase() == fromToken.contractAddress.toLowerCase()) {
+        const res = await getAmountOut(lpTokenAddress.baseCurrency_contractAddress, lpTokenAddress.quoteCurrency_contractAddress, value, fromToken.network);
+        if (res != undefined) {
+          toAmount = parseFloat(utils.formatEther(res[0][1]));
+          setToTokenValue(toAmount);
+          setPriceBase(1 / fromTokenValue * toAmount);
+          setPriceQuote(1 / (1 / fromTokenValue * toAmount));
+        }
+      } else {
+        const res = await getAmountOut(lpTokenAddress.quoteCurrency_contractAddress, lpTokenAddress.baseCurrency_contractAddress, value, fromToken.network);
+        if (res != undefined) {
+          toAmount = parseFloat(utils.formatEther(res[0][1]));
+          setToTokenValue(toAmount);
+          setPriceQuote(1 / fromTokenValue * toAmount);
+          setPriceBase(1 / (1 / fromTokenValue * toAmount));
+        }
+      }
+
+      if (bestTrade != undefined) {
+        const amount = getDecimalAmount(BigNumber(toAmount), toToken.decimals);
+        const outMinAmount = getBalanceAmount(
+          minimumAmountOut(bestTrade.tradeType, amount, allowedSlippage * 100)
+          .integerValue(),
+          bestTrade.tokenOut.decimals).toFixed(5);      
+        setMiniValue(parseFloat(outMinAmount));
+      }
+    }
+  }
 
   const switchSwapTokens = async () => {
     const saveFromToken = fromToken;
@@ -353,7 +367,7 @@ export default function SwapTrade() {
 
     if (address != undefined) {
       const bal = await getTokenBalance(
-        (saveToToken.symbol == "WBNB" || saveToToken.symbol == "WETH") ? "NATIVE" : saveToToken.contractAddress,
+        (saveToToken.symbol == "BNB" || saveToToken.symbol == "ETH") ? "NATIVE" : saveToToken.contractAddress,
         address, 
         lpTokenAddress.network
       );
@@ -364,11 +378,12 @@ export default function SwapTrade() {
 
     dispatch(
       replaceState({
-        inputCurrencyId: saveToToken.contractAddress,
-        outputCurrencyId: saveFromToken.contractAddress,
+        inputCurrencyId: saveToToken.symbol == "BNB" ? constant.WHITELIST_TOKENS.BSC.BNB : saveToToken.symbol == "ETH" ? constant.WHITELIST_TOKENS.ETH.ETH : saveToToken.contractAddress,
+        outputCurrencyId: saveFromToken.symbol == "BNB" ? constant.WHITELIST_TOKENS.BSC.BNB : saveFromToken.symbol == "ETH" ? constant.WHITELIST_TOKENS.ETH.ETH : saveFromToken.contractAddress,
       })
     );
-    
+
+    getPrice();
   }
 
   const handleSlippage = (e: { target: { value: string; }; }) => {
@@ -386,6 +401,13 @@ export default function SwapTrade() {
     }
   }
 
+  const handleAutoSlippage = () => {
+    if (!autoSlippage) {
+      setUserSlippageTolerance(0.5);
+    }
+
+    setAutoSlippage(!autoSlippage);
+  }
   return (
     <Box 
       className={style.tradeMain}
@@ -469,7 +491,7 @@ export default function SwapTrade() {
                   borderColor: mainbg
                 }}
                 placeholder = "0%"
-                
+                isDisabled = {autoSlippage}
                 value = {allowedSlippage}
                 onChange = {handleSlippage}
               >
@@ -495,7 +517,8 @@ export default function SwapTrade() {
               justifyContent = {"center"}
               height = {"100%"}
               cursor = {"pointer"}
-              onClick = {() => setUserSlippageTolerance(0.5)}
+              background = {autoSlippage ? slectedColor : "transparent"}
+              onClick = {handleAutoSlippage}
             >
               <p className={style.headerText}>Auto</p>
             </Box>
