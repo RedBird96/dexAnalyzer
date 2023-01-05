@@ -444,13 +444,17 @@ export async function getLPTransactionListFromWallet(address:string, tokenAddres
       const cuTime = makeTemplateDate(time, resolution);
       if (value["buyCurrency"].address == tokenAddress) {
         array.push({
-          time:cuTime.getTime(),
-          buy_sell:"sell"
+          intervalTime:cuTime.getTime(),
+          time:time.getTime(),
+          buy_sell:"sell",
+          amount:value["baseAmount"]
         })
       } else {
         array.push({
-          time:cuTime.getTime(),
-          buy_sell:"buy"
+          intervalTime:cuTime.getTime(),
+          time:time.getTime(),
+          buy_sell:"buy",
+          amount:value["baseAmount"]
         })
       }
     });
