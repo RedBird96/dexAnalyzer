@@ -11,7 +11,7 @@ export const INFO_CLIENT = 'https://bsc.streamingfast.io/subgraphs/name/pancakes
 export const BITQUERY_ENDPOINT = "https://graphql.bitquery.io";
 
 export const ETHPLORER_API_KEY = 'EK-32KDR-3MoJfLq-QoUAU';
-export const BITQUERY_API_KEY = 'BQY1hd2LPoxnm8ouc723BqPL47Jk7k46';
+export const BITQUERY_API_KEY = 'BQYOlzIJkKcaiJFbq1u8GrBCLxbkBB1G';
 export const COINMARKETCAP_API_KEY = 'd27ab07a-3853-4402-8d56-651767ba4da5';
 export const ETHERSCAN_API_KEY = 'DF8U1AYKKAW8NHQQJ2H34W6B49H38JI9SU';
 export const BSCSCAN_API_KEY = '9JXFSN6Y82GSADZZRHHNDD29AMYFMB7XYS';
