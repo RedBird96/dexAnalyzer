@@ -179,6 +179,7 @@ export default function SwapTrade() {
           position: 'bottom-right',
           isClosable: true,
         })
+        setExecuting(true);
       },
       onConfirm: async () => {
         if (!onSwap) {
