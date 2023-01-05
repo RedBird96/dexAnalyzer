@@ -57,7 +57,6 @@ export const useSwapArguments = (
           .integerValue()
           .toString(16)}`
       : '0x0';
-
     const deadline = `0x${(
       Math.floor(new Date().getTime() / 1000) + 300
     ).toString(16)}`;
@@ -119,7 +118,7 @@ const useSwap = (
 ): {
   onSwap: () => Promise<TransactionResponse>;
 } => {
-  // const account = useActiveWeb3React();
+  
   const account = useAddress();
 
   const swapCalls = useSwapArguments(trade, allowedSlippage);

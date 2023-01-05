@@ -245,7 +245,6 @@ export async function getTokenSymbol(address: string, network: number) {
 
 const getTokenId = async (address: string): Promise<string[] | undefined> => {
   const response = await fetch(`${endpoint.CMC_ENDPOINT}${address}`)
-
   if (response.ok) {
     const obj = await response.json();
     return [obj.data.id, obj.data.symbol]

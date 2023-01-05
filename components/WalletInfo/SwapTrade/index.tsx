@@ -2,7 +2,7 @@ import { Box, Button, Circle, Divider, Input, InputGroup, InputRightAddon, useCo
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import { useToast } from '@chakra-ui/react'
 import BigNumber from 'bignumber.js';
-import { Signer, ethers } from 'ethers';
+import { Signer, ethers, utils } from 'ethers';
 import style from './SwapTrade.module.css'
 import {
   DownArrowDark,
@@ -30,6 +30,7 @@ import { getContract } from '../../../utils/contract';
 import Bep20Abi from '../../../config/BEP20ABI.json'
 import Erc20Abi from '../../../config/ERC20ABI.json'
 import { MaxUint256 } from '@ethersproject/constants';
+import { getAmountOut } from '../../../utils/router';
 
 enum BTN_LABEL {
   LOADING,
@@ -225,7 +226,6 @@ export default function SwapTrade() {
   }, [connection, account])
 
   useEffect(() => {
-
     const setTokens = async() => {
 
       if (lpTokenAddress.quoteCurrency_name == "WBNB" || lpTokenAddress.quoteCurrency_name == "WETH") {
@@ -307,9 +307,31 @@ export default function SwapTrade() {
       setTokens();  
     }
 
-  }, [lpTokenAddress, address]);
+  }, [lpTokenAddress.quoteCurrency_contractAddress, address]);
 
   useEffect(() => {
+
+    const getPrice = async() => {
+      if (fromTokenValue != 0) {
+        let toAmount = 0;
+        const value = new BigNumber(fromTokenValue * Math.pow(10, lpTokenAddress.quoteCurrency_decimals));
+        const res = await getAmountOut(lpTokenAddress.quoteCurrency_contractAddress, lpTokenAddress.baseCurrency_contractAddress, value, fromToken.network);
+        if (res != undefined) {
+          toAmount = parseFloat(utils.formatEther(res[0][1]));
+          setToTokenValue(toAmount);
+        }
+
+        if (bestTrade != undefined) {
+          const amount = getDecimalAmount(BigNumber(toAmount), toToken.decimals);
+          const outMinAmount = getBalanceAmount(
+            minimumAmountOut(bestTrade.tradeType, amount, allowedSlippage)
+            .integerValue(),
+            bestTrade.tokenOut.decimals).toFixed(5);      
+          setMiniValue(parseFloat(outMinAmount));
+        }
+      }
+    }
+
     if (fromToken.name != undefined && toToken.name != undefined) {
       if (!isApproved) {
         setLabel(BTN_LABEL.APPROVE);
@@ -319,20 +341,7 @@ export default function SwapTrade() {
         setLabel(BTN_LABEL.SWAP);
       }
 
-      if (bestTrade != undefined) {
-        const outMinAmount = getBalanceAmount(
-          minimumAmountOut(bestTrade.tradeType, bestTrade.amountOut, allowedSlippage)
-          .integerValue(),
-          bestTrade.tokenOut.decimals).toFixed(5);      
-        setMiniValue(parseFloat(outMinAmount));
-      }
-
-      if (fromToken.contractAddress == tokenData.contractAddress) {
-        setToTokenValue(fromTokenValue * pricebase);
-      }
-      else {
-        setToTokenValue(fromTokenValue * pricequote);
-      }
+      getPrice();
     }
   }, [fromTokenValue, fromToken, bestTrade, lpTokenPrice, allowedSlippage])
 

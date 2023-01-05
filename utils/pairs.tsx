@@ -1,6 +1,4 @@
 import BigNumber from 'bignumber.js';
-import { getCreate2Address } from '@ethersproject/address';
-import { keccak256, pack } from '@ethersproject/solidity';
 import { TradeType } from './type';
 import { 
   BIG_ONE, 
@@ -8,9 +6,8 @@ import {
   BINANCE_NETOWRK, 
   FEES_DENOMINATOR, 
   FEES_NUMERATOR, 
-  INIT_CODE_HASH, 
   PANCAKESWAP_FACTORY, 
-  UNISWAP_FACTORY
+  UNISWAP_FACTORY,
 } from './constant';
 import PancakePairAbi from '../config/IPancakeswapV2Pair.json'
 import PancakeFactoryAbi from '../config/IPancakeswapV2Factory.json'
@@ -64,6 +61,7 @@ export const getToken0Info = async (
 
   return reserves[0];
 };
+
 
 export const getTradeExactInOut = (
   amountIn: BigNumber,
