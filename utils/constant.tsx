@@ -62,6 +62,7 @@ export const ETHERToken: Token = {
   name: 'ETH',
   chainId: BINANCE_NETOWRK,
   address: GELATO_ADDRESS,
+  logoUri: "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png"
 };
 
 export const BNBToken: Token = {
@@ -70,6 +71,7 @@ export const BNBToken: Token = {
   name: 'BNB',
   chainId: BINANCE_NETOWRK,
   address: GELATO_ADDRESS,
+  logoUri: "https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png"
 };
 
 export const FEES_NUMERATOR = new BigNumber(9975);

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import DefaultTokenList from '../config/constants/default.tokenlist.json';
 import DefaultTokenProdList from '../config/constants/default.tokenlist.prod.json';
 import { ERC20Token, Token } from '../utils/type';
-import { BINANCE_NETOWRK, ETHERToken } from '../utils/constant';
+import { BINANCE_NETOWRK, BNBToken, ETHERToken } from '../utils/constant';
 import { useAccount, useConnect, useNetwork } from '@thirdweb-dev/react';
 import { Field } from '../state/swap/types';
 import { useLPTokenPrice } from './useLPTokenPrice';
@@ -56,7 +56,7 @@ export const useToken = (token_address: string) : Token => {
           address: lpTokenAddress.baseCurrency_contractAddress,
           logoUri: lpTokenAddress.image
         } as Token
-        return token;
+        return token.name == "WBNB" ? BNBToken : token.name == "WETH" ? ETHERToken : token;
       }, [lpTokenAddress.baseCurrency_contractAddress, lpTokenAddress.quoteCurrency_contractAddress])
     } else {
       return useMemo(() => {
@@ -68,7 +68,7 @@ export const useToken = (token_address: string) : Token => {
           address: lpTokenAddress.quoteCurrency_contractAddress,
           logoUri: lpTokenAddress.image
         } as Token
-        return token;
+        return token.name == "WBNB" ? BNBToken : token.name == "WETH" ? ETHERToken : token;
       }, [lpTokenAddress.quoteCurrency_contractAddress, lpTokenAddress.quoteCurrency_contractAddress])
     }
 

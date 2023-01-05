@@ -123,7 +123,6 @@ const useSwap = (
   const account = useAddress();
 
   const swapCalls = useSwapArguments(trade, allowedSlippage);
-  console.log('swapCalls', swapCalls);
   const onSwap = useCallback(async () => {
     const estimateCalls = await Promise.all(
       swapCalls.map(call => {

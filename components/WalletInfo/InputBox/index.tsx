@@ -20,7 +20,7 @@ import * as constant from '../../../utils/constant'
 import { useDebounce, useLPTokenPrice } from "../../../hooks";
 import { getTokenBalance } from "../../../api";
 
-export default function SwapTrade({
+export default function InputBox({
   showMax,
   token,
   setValue,
@@ -39,11 +39,12 @@ export default function SwapTrade({
   const bgColor = useColorModeValue("#efefef", "#121212");
   const [inputValue, setInputValue] = useState<string>("0");
   const debouncedQuery = useDebounce(inputValue, 200);
-  const lpTokenAddress = useLPTokenPrice();
+  const {lpTokenAddress} = useLPTokenPrice();
+
   const setMaxInputValue = async () => {
     if (address != undefined) {
       const bal = await getTokenBalance(
-        token.name == "BNB" ? "BNB" : token.contractAddress, 
+        (token.name == "BNB" || token.name == "ETH") ? "NATIVE" : token.contractAddress, 
         address, token.network
       );
       if (bal != constant.NOT_FOUND_TOKEN) {
@@ -56,7 +57,7 @@ export default function SwapTrade({
 
   useEffect(() => {
     setInputValue("0");
-  },[lpTokenAddress])
+  },[lpTokenAddress.quoteCurrency_contractAddress])
   useEffect(() => {
     if (debouncedQuery != "")
       setValue(debouncedQuery);

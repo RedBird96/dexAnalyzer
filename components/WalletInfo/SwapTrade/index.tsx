@@ -59,20 +59,16 @@ export default function SwapTrade() {
   const [executing, setExecuting] = useState<boolean>(false);
   const [fromToken, setFromToken] = useState<ERC20Token>(
     {
-      name: lpTokenAddress.quoteCurrency_name == "WBNB" ? "BNB" : 
-            lpTokenAddress.quoteCurrency_name == "WETH" ? "ETH" : lpTokenAddress.quoteCurrency_name,
-      symbol: lpTokenAddress.quoteCurrency_name == "WBNB" ? "BNB" :
-              lpTokenAddress.quoteCurrency_name == "WETH" ? "ETH" : lpTokenAddress.quoteCurrency_name,
+      name: "",
+      symbol: "",
       image: "",
       network: lpTokenAddress.network,
       contractAddress: lpTokenAddress.quoteCurrency_contractAddress
     } as ERC20Token
   );
   const [toToken, setToToken] = useState<ERC20Token>({
-    name: lpTokenAddress.baseCurrency_name == "WBNB" ? "BNB" : 
-          lpTokenAddress.baseCurrency_name == "WETH" ? "ETH" : lpTokenAddress.baseCurrency_name,
-    symbol: lpTokenAddress.baseCurrency_name == "WBNB" ? "BNB" :
-            lpTokenAddress.baseCurrency_name == "WETH" ? "ETH" : lpTokenAddress.baseCurrency_name,
+    name: "",
+    symbol: "",
     image: "",
     network: lpTokenAddress.network,
     contractAddress: lpTokenAddress.baseCurrency_contractAddress
@@ -232,43 +228,59 @@ export default function SwapTrade() {
 
     const setTokens = async() => {
 
-      const fromTokenimg = await getTokenLogoURL(
-        lpTokenAddress.quoteCurrency_contractAddress, 
-        lpTokenAddress.network, 
-        lpTokenAddress.quoteCurrency_name
-      );
-      const toTokenimg = await getTokenLogoURL(
-        lpTokenAddress.baseCurrency_contractAddress,
-        lpTokenAddress.network, 
-        lpTokenAddress.baseCurrency_name
-      );
-      setFromToken({
-        name: lpTokenAddress.quoteCurrency_name == "WBNB" ? "BNB" : 
-              lpTokenAddress.quoteCurrency_name == "WETH" ? "ETH" : lpTokenAddress.quoteCurrency_name,
-        symbol: lpTokenAddress.quoteCurrency_name == "WBNB" ? "BNB" :
-                lpTokenAddress.quoteCurrency_name == "WETH" ? "ETH" : lpTokenAddress.quoteCurrency_name,
-        image: fromTokenimg,
-        network: lpTokenAddress.network,
-        contractAddress: lpTokenAddress.quoteCurrency_contractAddress
-      } as ERC20Token)
+      if (lpTokenAddress.quoteCurrency_name == "WBNB" || lpTokenAddress.quoteCurrency_name == "WETH") {
+        setFromToken({
+          name: lpTokenAddress.quoteCurrency_name == "WBNB" ? constant.BNBToken.name : constant.ETHERToken.name,
+          symbol: lpTokenAddress.quoteCurrency_name == "WBNB" ? constant.BNBToken.name : constant.ETHERToken.name,
+          image: lpTokenAddress.quoteCurrency_name == "WBNB" ? constant.BNBToken.logoUri : constant.ETHERToken.logoUri,
+          network: lpTokenAddress.network,
+          contractAddress: lpTokenAddress.quoteCurrency_name == "WBNB" ? constant.BNBToken.address : constant.ETHERToken.address
+        } as ERC20Token)        
+      } else {
+        const fromTokenimg = await getTokenLogoURL(
+          lpTokenAddress.quoteCurrency_contractAddress, 
+          lpTokenAddress.network, 
+          lpTokenAddress.quoteCurrency_name
+        );
+        setFromToken({
+          name: lpTokenAddress.quoteCurrency_name,
+          symbol: lpTokenAddress.quoteCurrency_name,
+          image: fromTokenimg,
+          network: lpTokenAddress.network,
+          contractAddress: lpTokenAddress.quoteCurrency_contractAddress
+        } as ERC20Token)        
+      }
 
-      setToToken( {
-        name: lpTokenAddress.baseCurrency_name == "WBNB" ? "BNB" : 
-              lpTokenAddress.baseCurrency_name == "WETH" ? "ETH" : lpTokenAddress.baseCurrency_name,
-        symbol: lpTokenAddress.baseCurrency_name == "WBNB" ? "BNB" :
-                lpTokenAddress.baseCurrency_name == "WETH" ? "ETH" : lpTokenAddress.baseCurrency_name,
-        image: toTokenimg,
-        network: lpTokenAddress.network,
-        contractAddress: lpTokenAddress.baseCurrency_contractAddress
-      } as ERC20Token)
-
+      if (lpTokenAddress.baseCurrency_name == "WBNB" || lpTokenAddress.baseCurrency_name == "WETH") {
+        setToToken({
+          name: lpTokenAddress.baseCurrency_name == "WBNB" ? constant.BNBToken.name : constant.ETHERToken.name,
+          symbol: lpTokenAddress.baseCurrency_name == "WBNB" ? constant.BNBToken.name : constant.ETHERToken.name,
+          image: lpTokenAddress.baseCurrency_name == "WBNB" ? constant.BNBToken.logoUri : constant.ETHERToken.logoUri,
+          network: lpTokenAddress.network,
+          contractAddress: lpTokenAddress.baseCurrency_name == "WBNB" ? constant.BNBToken.address : constant.ETHERToken.address
+        } as ERC20Token)        
+      } else {
+        const toTokenimg = await getTokenLogoURL(
+          lpTokenAddress.baseCurrency_contractAddress, 
+          lpTokenAddress.network, 
+          lpTokenAddress.baseCurrency_name
+        );
+        setToToken({
+          name: lpTokenAddress.baseCurrency_name,
+          symbol: lpTokenAddress.baseCurrency_name,
+          image: toTokenimg,
+          network: lpTokenAddress.network,
+          contractAddress: lpTokenAddress.baseCurrency_contractAddress
+        } as ERC20Token)        
+      }
+      
       if (address != undefined) {
         const bal = await getTokenBalance(
           (lpTokenAddress.quoteCurrency_name == "WBNB" || lpTokenAddress.quoteCurrency_name == "WETH") ? "NATIVE" : lpTokenAddress.quoteCurrency_contractAddress,
           address, 
           lpTokenAddress.network
         );
-        if (bal != constant.NOT_FOUND_TOKEN) {
+        if (bal != constant.NOT_FOUND_TOKEN) {  
           setMaxFromToken(parseFloat(bal));
         }
       }

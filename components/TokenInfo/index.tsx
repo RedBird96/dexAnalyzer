@@ -285,7 +285,6 @@ export default function TokenInfo() {
   }, [])
  
   useEffect(() => {
-    
     let tp = 0.0;
     if (lpTokenPrice.lpBaseTokenAddress.toLowerCase() == tokenData.contractAddress.toLowerCase()) {
       tp = lpTokenPrice.tokenPrice;

@@ -147,7 +147,8 @@ export default function WalletInfo() {
           owner: value.tokenInfo.owner,
           totalSupply: value.tokenInfo.totalSupply,
           marketCap: value.tokenInfo.totalSupply,
-          contractPage: ETHLINK + value.tokenInfo.address
+          contractPage: ETHLINK + value.tokenInfo.address,
+          network: constant.ETHEREUM_NETWORK
         } as ERC20Token)
       });
     }
