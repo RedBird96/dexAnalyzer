@@ -245,7 +245,14 @@ export default function SwapTrade() {
       }
     }
   }, [fromToken, toToken, address])
-  
+
+  const setZero = () => {
+    setFromTokenValue(0);
+    setMiniValue(0);
+    setPriceBase(0);
+    setPriceQuote(0);
+  }
+
   fetchBalance();
 
   useEffect(() => {
@@ -317,7 +324,7 @@ export default function SwapTrade() {
         } as ERC20Token)        
       }
 
-      setFromTokenValue(0);
+      setZero();
       dispatch(
         replaceState({
           inputCurrencyId: lpTokenAddress.quoteCurrency_contractAddress,
@@ -385,6 +392,7 @@ export default function SwapTrade() {
         }
       } else {
         setToTokenValue(0);
+        setMiniValue(0);
       }
     } else {
       if (toTokenValue != 0){
@@ -417,7 +425,8 @@ export default function SwapTrade() {
           setMiniValue(parseFloat(outMinAmount));
         }
       } else {
-        setFromTokenValue(0);}
+        setZero();
+      }
     }
   }
 
