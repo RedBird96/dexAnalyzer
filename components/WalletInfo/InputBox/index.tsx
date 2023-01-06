@@ -57,7 +57,7 @@ export default function InputBox({
 
   useEffect(() => {
     setInputValue("0");
-  },[lpTokenAddress.quoteCurrency_contractAddress])
+  },[lpTokenAddress.quoteCurrency_contractAddress, lpTokenAddress.baseCurrency_contractAddress])
   useEffect(() => {
     if (debouncedQuery != "")
       setValue(debouncedQuery);

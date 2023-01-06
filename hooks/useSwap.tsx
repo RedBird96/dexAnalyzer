@@ -26,6 +26,11 @@ interface SuccessfulSwapCall {
   gasEstimate: BigNumber;
 }
 
+interface FailSwapCall {
+  call: SwapCall;
+  gasError: any;
+}
+
 export const useSwapArguments = (
   trade: Trade | null,
   allowedSlippage: number
@@ -143,12 +148,17 @@ const useSwap = (
       })
     );
     
+    console.log('before successfulEstimation', swapCalls, estimateCalls);
     const successfulEstimation = estimateCalls.find(
       (el): el is SuccessfulSwapCall => 'gasEstimate' in el
     );
+    const errorEstimation = estimateCalls.find(
+      (el): el is FailSwapCall => 'gasError' in el
+    );
     if (!successfulEstimation) {
-      throw new Error('Unexpected error. Could not estimate gas for the swap');
+      throw new Error(errorEstimation.gasError.reason);
     }
+    console.log('successfulEstimation', successfulEstimation);
     const {
       call: {
         contract,

@@ -98,7 +98,7 @@ interface ApproveConfirmTransaction {
   ) => Promise<boolean>;
   onSuccess: ({ state, receipt }: OnSuccessProps) => void;
   onApproveSuccess?: ({ state, receipt }: OnSuccessProps) => void;
-  onFail: () => void;
+  onFail: (error:any) => void;
   onToast?: (severity: string, detail: string) => void;
 }
 
@@ -162,7 +162,7 @@ export const useApproveConfirmTransaction = ({
         }
       } catch (error) {
         dispatch({ type: 'approve_error' });
-        onFail();
+        onFail(error);
         onToast &&
           onToast(
             'Error',
@@ -181,7 +181,7 @@ export const useApproveConfirmTransaction = ({
         }
       } catch (error) {
         dispatch({ type: 'confirm_error' });
-        onFail();
+        onFail(error);
         onToast &&
           onToast(
             'Error',

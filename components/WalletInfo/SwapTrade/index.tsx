@@ -65,7 +65,8 @@ export default function SwapTrade() {
       symbol: "",
       image: "",
       network: lpTokenAddress.network,
-      contractAddress: lpTokenAddress.quoteCurrency_contractAddress
+      contractAddress: lpTokenAddress.quoteCurrency_contractAddress,
+      decimals:0
     } as ERC20Token
   );
   const [toToken, setToToken] = useState<ERC20Token>({
@@ -73,7 +74,8 @@ export default function SwapTrade() {
     symbol: "",
     image: "",
     network: lpTokenAddress.network,
-    contractAddress: lpTokenAddress.baseCurrency_contractAddress
+    contractAddress: lpTokenAddress.baseCurrency_contractAddress,
+    decimals:0
   } as ERC20Token);
 
   const { fetchPairReserves } = useInitialize();
@@ -174,12 +176,12 @@ export default function SwapTrade() {
         //   toastInfo('Approved', 'Contract enabled - you can now buy $DeHub');
         // }
         toast({
-          title: `Transaction receipt`,
+          title: `Transaction approved`,
           status: 'success',
           position: 'bottom-right',
           isClosable: true,
         })
-        setExecuting(true);
+        setExecuting(false);
       },
       onConfirm: async () => {
         if (!onSwap) {
@@ -188,18 +190,25 @@ export default function SwapTrade() {
         setExecuting(true);
         return onSwap();
       },
-      onFail: async () => {
+      onFail: async (error: any) => {
+        setExecuting(false);
+        const error_msg = error.toString();
+        let msg = "";
+        if (error_msg.includes("user reject")) {
+          msg = "User denied transaction signature";
+        } else if (error_msg.includes("INSUFFICIENT_OUTPUT_AMOUNT")) {
+          msg = "Slippage too low"
+        }
         toast({
-          title: `Transaction failed`,
+          title: `Transaction failed: ${msg}`,
           status: 'warning',
           position: 'bottom-right',
           isClosable: true,
         })        
-        setExecuting(false);
       },
       onSuccess: async () => {
         toast({
-          title: `Transaction receipt`,
+          title: `Transaction approved`,
           status: 'success',
           position: 'bottom-right',
           isClosable: true,
@@ -208,10 +217,7 @@ export default function SwapTrade() {
         fetchPairReserves();
       },
   });
-  useEffect(() => {
-    setFromTokenValue(0);
-    setToTokenValue(0);
-  }, [tokenData, lpTokenAddress.quoteCurrency_contractAddress])
+  
   useEffect(() => {
     setShowConnect(connection[0].data.connected);
     if (connection[0].data.connected && fromToken.name != undefined) {
@@ -230,13 +236,17 @@ export default function SwapTrade() {
   useEffect(() => {
     const setTokens = async() => {
 
+      setFromTokenValue(0);
+      setToTokenValue(0);
+
       if (lpTokenAddress.quoteCurrency_name == "WBNB" || lpTokenAddress.quoteCurrency_name == "WETH") {
         setFromToken({
           name: lpTokenAddress.quoteCurrency_name == "WBNB" ? constant.BNBToken.name : constant.ETHERToken.name,
           symbol: lpTokenAddress.quoteCurrency_name == "WBNB" ? constant.BNBToken.name : constant.ETHERToken.name,
           image: lpTokenAddress.quoteCurrency_name == "WBNB" ? constant.BNBToken.logoUri : constant.ETHERToken.logoUri,
           network: lpTokenAddress.network,
-          contractAddress: lpTokenAddress.quoteCurrency_name == "WBNB" ? constant.BNBToken.address : constant.ETHERToken.address
+          contractAddress: lpTokenAddress.quoteCurrency_name == "WBNB" ? constant.BNBToken.address : constant.ETHERToken.address,
+          decimals: lpTokenAddress.quoteCurrency_decimals
         } as ERC20Token)        
       } else {
         const fromTokenimg = await getTokenLogoURL(
@@ -249,7 +259,8 @@ export default function SwapTrade() {
           symbol: lpTokenAddress.quoteCurrency_name,
           image: fromTokenimg,
           network: lpTokenAddress.network,
-          contractAddress: lpTokenAddress.quoteCurrency_contractAddress
+          contractAddress: lpTokenAddress.quoteCurrency_contractAddress,
+          decimals: lpTokenAddress.quoteCurrency_decimals
         } as ERC20Token)        
       }
 
@@ -259,7 +270,8 @@ export default function SwapTrade() {
           symbol: lpTokenAddress.baseCurrency_name == "WBNB" ? constant.BNBToken.name : constant.ETHERToken.name,
           image: lpTokenAddress.baseCurrency_name == "WBNB" ? constant.BNBToken.logoUri : constant.ETHERToken.logoUri,
           network: lpTokenAddress.network,
-          contractAddress: lpTokenAddress.baseCurrency_name == "WBNB" ? constant.BNBToken.address : constant.ETHERToken.address
+          contractAddress: lpTokenAddress.baseCurrency_name == "WBNB" ? constant.BNBToken.address : constant.ETHERToken.address,
+          decimals: lpTokenAddress.baseCurrency_decimals
         } as ERC20Token)        
       } else {
         const toTokenimg = await getTokenLogoURL(
@@ -272,7 +284,8 @@ export default function SwapTrade() {
           symbol: lpTokenAddress.baseCurrency_name,
           image: toTokenimg,
           network: lpTokenAddress.network,
-          contractAddress: lpTokenAddress.baseCurrency_contractAddress
+          contractAddress: lpTokenAddress.baseCurrency_contractAddress,
+          decimals: lpTokenAddress.baseCurrency_decimals
         } as ERC20Token)        
       }
       
@@ -293,14 +306,6 @@ export default function SwapTrade() {
           outputCurrencyId: lpTokenAddress.baseCurrency_contractAddress,
         })
       );
-
-      if (lpTokenAddress.tokenside == TokenSide.token1){
-        setPriceBase((lpTokenAddress.token0_reserve / lpTokenAddress.token1_reserve));
-        setPriceQuote((lpTokenAddress.token1_reserve / lpTokenAddress.token0_reserve));
-      } else {
-        setPriceQuote((lpTokenAddress.token0_reserve / lpTokenAddress.token1_reserve));
-        setPriceBase((lpTokenAddress.token1_reserve / lpTokenAddress.token0_reserve));
-      }
     }
 
     if (lpTokenAddress.quoteCurrency_contractAddress != undefined &&
@@ -309,7 +314,7 @@ export default function SwapTrade() {
       setTokens();  
     }
 
-  }, [lpTokenAddress.quoteCurrency_contractAddress, address]);
+  }, [lpTokenAddress.quoteCurrency_contractAddress, lpTokenAddress.baseCurrency_contractAddress, address]);
 
   useEffect(() => {
 
@@ -328,13 +333,13 @@ export default function SwapTrade() {
   
   const getPrice = async() => {
     if (fromTokenValue != 0) {
+      console.log('fromTokenValue', fromTokenValue);
       let toAmount = 0;
-      const value = new BigNumber(fromTokenValue * Math.pow(10, lpTokenAddress.quoteCurrency_decimals));
-      console.log('value', fromTokenValue, value);
+      const value = new BigNumber(fromTokenValue * Math.pow(10, fromToken.decimals));
       if (lpTokenAddress.baseCurrency_contractAddress.toLowerCase() == fromToken.contractAddress.toLowerCase()) {
         const res = await getAmountOut(lpTokenAddress.baseCurrency_contractAddress, lpTokenAddress.quoteCurrency_contractAddress, value, fromToken.network);
         if (res != undefined) {
-          toAmount = parseFloat(utils.formatEther(res[0][1]));
+          toAmount = parseFloat(utils.formatUnits(res[0][1],lpTokenAddress.quoteCurrency_decimals));
           setToTokenValue(toAmount);
           setPriceBase(1 / fromTokenValue * toAmount);
           setPriceQuote(1 / (1 / fromTokenValue * toAmount));
@@ -342,7 +347,7 @@ export default function SwapTrade() {
       } else {
         const res = await getAmountOut(lpTokenAddress.quoteCurrency_contractAddress, lpTokenAddress.baseCurrency_contractAddress, value, fromToken.network);
         if (res != undefined) {
-          toAmount = parseFloat(utils.formatEther(res[0][1]));
+          toAmount = parseFloat(utils.formatUnits(res[0][1],lpTokenAddress.baseCurrency_decimals));
           setToTokenValue(toAmount);
           setPriceQuote(1 / fromTokenValue * toAmount);
           setPriceBase(1 / (1 / fromTokenValue * toAmount));
@@ -404,11 +409,12 @@ export default function SwapTrade() {
 
   const handleAutoSlippage = () => {
     if (!autoSlippage) {
-      setUserSlippageTolerance(0.5);
+      setUserSlippageTolerance(10);
     }
 
     setAutoSlippage(!autoSlippage);
   }
+
   return (
     <Box 
       className={style.tradeMain}
