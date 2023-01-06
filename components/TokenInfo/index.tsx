@@ -37,7 +37,8 @@ import {
   getLPTokenReserve,
   getTokenHolderandTransactionCount,
   getLPTokenList,
-  getTokenBurnAmount
+  getTokenBurnAmount,
+  getTokenBalance
 } from '../../api'
 import style from './TokenInfo.module.css'
 import * as constant from '../../utils/constant'
@@ -285,20 +286,30 @@ export default function TokenInfo() {
   }, [])
  
   useEffect(() => {
-    let tp = 0.0;
-    if (lpTokenPrice.lpBaseTokenAddress.toLowerCase() == tokenData.contractAddress.toLowerCase()) {
-      tp = lpTokenPrice.tokenPrice;
+
+    const setTokneBalanceAndPrice = async() => {
+      let tp = 0.0;
+      if (lpTokenPrice.lpBaseTokenAddress.toLowerCase() == tokenData.contractAddress.toLowerCase()) {
+        tp = lpTokenPrice.tokenPrice;
+      }
+
+      const bal = await getTokenBalance(
+        tokenData.contractAddress,
+        address, 
+        tokenData.network
+      );
+        
+      if (bal != constant.NOT_FOUND_TOKEN) {
+        setBalance(parseFloat(bal));
+        setBalanceUSD(parseFloat(bal) * tp);
+      } else {
+        setBalance(0);
+        setBalanceUSD(0);
+      }
+      setTokenPriceShow(tp);
     }
-    const res = walletTokens.find((value) => value.contractAddress.toLowerCase() + value.network ==
-                tokenData.contractAddress.toLowerCase() + tokenData.network);
-    if (res != undefined) {
-      setBalance(res.balance);
-      setBalanceUSD(res.balance * tp);
-    } else {
-      setBalance(0);
-      setBalanceUSD(0);
-    }
-    setTokenPriceShow(tp);
+
+    setTokneBalanceAndPrice();
   }, [walletTokens, tokenData, lpTokenPrice])
 
   return (
