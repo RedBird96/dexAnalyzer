@@ -5,12 +5,11 @@ import BigNumber from 'bignumber.js';
 import { Signer, ethers, utils } from 'ethers';
 import style from './SwapTrade.module.css'
 import {
-  DownArrowDark,
   DownArrowLight,
   SwitchToken
 } from "../../../assests/icon"
 import InputBox from '../InputBox';
-import { ERC20Token, TokenSide, TradeType } from '../../../utils/type';
+import { ERC20Token, TradeType } from '../../../utils/type';
 import { useDebounce, useLPTokenPrice, useTokenInfo } from '../../../hooks';
 import * as constant from '../../../utils/constant'
 import { getTokenBalance, getTokenLogoURL } from '../../../api';
@@ -19,9 +18,9 @@ import { Field } from '../../../state/swap/types';
 import { useToken } from '../../../hooks/useTokenList';
 import { useTradeExactInOut, useTradeInExactOut } from '../../../hooks/useTradeInOut';
 import { getBalanceAmount, getDecimalAmount } from '../../../utils';
-import useSwap, { useSwapArguments } from '../../../hooks/useSwap';
+import useSwap from '../../../hooks/useSwap';
 import useInitialize from '../../../hooks/useInitialize';
-import { maximumAmountIn, minimumAmountOut } from '../../../utils/pairs';
+import { minimumAmountOut } from '../../../utils/pairs';
 import { useAppDispatch } from '../../../state';
 import { replaceState } from '../../../state/swap';
 import { useSwapState } from '../../../state/swap/hooks';
@@ -195,7 +194,6 @@ export default function SwapTrade() {
       },
       onFail: async (error: any) => {
         setExecuting(false);
-        console.log('error', error);
         const error_msg = error.toString();
         let msg = "";
         if (error_msg.includes("user reject") || error_msg.includes("User denied transaction")) {
@@ -262,7 +260,7 @@ export default function SwapTrade() {
         setLabel(BTN_LABEL.SWITCHNETWORK)
       } else if (!isApproved) {
         setLabel(BTN_LABEL.APPROVE);
-      } else if ((inputSide && fromTokenValue) > maxFromToken || (!inputSide && toTokenValue > maxToToken)) {
+      } else if ((inputSide && fromTokenValue) > maxFromToken) {
         setLabel(BTN_LABEL.INSUFFICENT);
       } else {
         setLabel(BTN_LABEL.SWAP);
@@ -346,7 +344,7 @@ export default function SwapTrade() {
     if (fromToken.name != "" && toToken.name != "") {
       if (!isApproved) {
         setLabel(BTN_LABEL.APPROVE);
-      } else if ((inputSide && fromTokenValue) > maxFromToken || (!inputSide && toTokenValue > maxToToken)) {
+      } else if ((inputSide && fromTokenValue) > maxFromToken) {
         setLabel(BTN_LABEL.INSUFFICENT);
       } else {
         setLabel(BTN_LABEL.SWAP);
@@ -451,7 +449,6 @@ export default function SwapTrade() {
       setToTokenValue(savefromValue);
     }
     else {
-      console.log('switch BNB down ')
       setInputSide(false);
       const savetoValue = toTokenValue;
       setToTokenValue(fromTokenValue);
