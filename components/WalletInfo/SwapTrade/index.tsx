@@ -10,7 +10,7 @@ import {
   SwitchToken
 } from "../../../assests/icon"
 import InputBox from '../InputBox';
-import { ERC20Token, TokenSide } from '../../../utils/type';
+import { ERC20Token, TokenSide, TradeType } from '../../../utils/type';
 import { useDebounce, useLPTokenPrice, useTokenInfo } from '../../../hooks';
 import * as constant from '../../../utils/constant'
 import { getTokenBalance, getTokenLogoURL } from '../../../api';
@@ -409,11 +409,11 @@ export default function SwapTrade() {
         }
 
         if (bestTrade != undefined) {
-          const amount = getDecimalAmount(BigNumber(fromAmount), toToken.decimals);
+          const amount = getDecimalAmount(BigNumber(toTokenValue), toToken.decimals);
           const outMinAmount = getBalanceAmount(
-            maximumAmountIn(bestTrade.tradeType, amount, allowedSlippage * 100)
+            minimumAmountOut(TradeType.EXACT_INPUT, amount, allowedSlippage * 100)
             .integerValue(),
-            bestTrade.tokenOut.decimals).toFixed(5);      
+            toToken.decimals).toFixed(5);      
           setMiniValue(parseFloat(outMinAmount));
         }
       } else {
