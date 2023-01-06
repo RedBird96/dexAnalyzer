@@ -260,7 +260,7 @@ export default function SwapTrade() {
         setLabel(BTN_LABEL.SWITCHNETWORK)
       } else if (!isApproved) {
         setLabel(BTN_LABEL.APPROVE);
-      } else if ((inputSide && fromTokenValue) > maxFromToken) {
+      } else if (fromTokenValue > maxFromToken) {
         setLabel(BTN_LABEL.INSUFFICENT);
       } else {
         setLabel(BTN_LABEL.SWAP);
@@ -344,7 +344,7 @@ export default function SwapTrade() {
     if (fromToken.name != "" && toToken.name != "") {
       if (!isApproved) {
         setLabel(BTN_LABEL.APPROVE);
-      } else if ((inputSide && fromTokenValue) > maxFromToken) {
+      } else if (fromTokenValue > maxFromToken) {
         setLabel(BTN_LABEL.INSUFFICENT);
       } else {
         setLabel(BTN_LABEL.SWAP);
