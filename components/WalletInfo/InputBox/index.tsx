@@ -39,7 +39,6 @@ export default function InputBox({
   const bgColor = useColorModeValue("#efefef", "#121212");
   const [inputValue, setInputValue] = useState<string>("0");
   const debouncedQuery = useDebounce(inputValue, 200);
-  const {lpTokenAddress} = useLPTokenPrice();
 
   const setMaxInputValue = async () => {
     if (address != undefined) {
@@ -56,9 +55,6 @@ export default function InputBox({
   }
 
   useEffect(() => {
-    setInputValue("0");
-  },[lpTokenAddress.quoteCurrency_contractAddress, lpTokenAddress.baseCurrency_contractAddress])
-  useEffect(() => {
     if (debouncedQuery != "")
       setValue(debouncedQuery);
   }, [debouncedQuery]);
@@ -66,7 +62,7 @@ export default function InputBox({
   const handleInputValueChange = async (e: { target: { value: string; }; }) => {
     const regExpr = new RegExp("/^\-?\d+((\.|\,)\d+)?$/");
     const value = e.target.value.toLowerCase();
-    setInputValue(value);
+    setValue(value);
   };
 
   return (
@@ -104,7 +100,7 @@ export default function InputBox({
             }}
             pattern="^[0-9]*[.,]?[0-9]*$"
             readOnly = {!showMax}
-            value = {showMax ? inputValue : value}
+            value = {value}
             onChange = {handleInputValueChange}
           >
           </Input>

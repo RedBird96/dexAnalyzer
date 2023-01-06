@@ -236,9 +236,6 @@ export default function SwapTrade() {
   useEffect(() => {
     const setTokens = async() => {
 
-      setFromTokenValue(0);
-      setToTokenValue(0);
-
       if (lpTokenAddress.quoteCurrency_name == "WBNB" || lpTokenAddress.quoteCurrency_name == "WETH") {
         setFromToken({
           name: lpTokenAddress.quoteCurrency_name == "WBNB" ? constant.BNBToken.name : constant.ETHERToken.name,
@@ -300,6 +297,7 @@ export default function SwapTrade() {
         }
       }
 
+      setFromTokenValue(0);
       dispatch(
         replaceState({
           inputCurrencyId: lpTokenAddress.quoteCurrency_contractAddress,
@@ -329,11 +327,10 @@ export default function SwapTrade() {
 
       getPrice();
     }
-  }, [fromTokenValue, fromToken, bestTrade, lpTokenPrice, allowedSlippage])
+  }, [fromTokenValue, fromToken, toToken,bestTrade, lpTokenPrice, allowedSlippage])
   
   const getPrice = async() => {
     if (fromTokenValue != 0) {
-      console.log('fromTokenValue', fromTokenValue);
       let toAmount = 0;
       const value = new BigNumber(fromTokenValue * Math.pow(10, fromToken.decimals));
       if (lpTokenAddress.baseCurrency_contractAddress.toLowerCase() == fromToken.contractAddress.toLowerCase()) {
@@ -362,6 +359,8 @@ export default function SwapTrade() {
           bestTrade.tokenOut.decimals).toFixed(5);      
         setMiniValue(parseFloat(outMinAmount));
       }
+    } else {
+      setToTokenValue(0);
     }
   }
 
@@ -370,6 +369,7 @@ export default function SwapTrade() {
     const saveToToken = toToken;
     setToToken(saveFromToken);
     setFromToken(saveToToken);
+    setFromTokenValue(toTokenValue);
 
     if (address != undefined) {
       const bal = await getTokenBalance(
