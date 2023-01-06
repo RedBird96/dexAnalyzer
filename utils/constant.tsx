@@ -6,7 +6,7 @@ export const NOT_FOUND_TOKEN = "No results found";
 export const ETHEREUM_NETWORK = 1;
 export const BINANCE_NETOWRK = 56;
 export const ETHRPC_URL = "https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161";
-export const BSCRPC_URL = "https://bsc-dataseed1.binance.org/";
+export const BSCRPC_URL = "https://bsc-dataseed3.binance.org/";
 export const WSSETHRPC_URL = "wss://mainnet.infura.io/ws/v3/e0e919cefdf04a40875a387f51d64516";
 export const WSSBSCRPC_URL = "wss://bsc-mainnet.nodereal.io/ws/v1/62368f2c5ac94dc59139d5b255ba1adb";
 

@@ -17,7 +17,6 @@ export const getAmountOut = async(
 ): Promise<any> => {
   
   const amountIn = tokenAmount.toString(10);
-  const amountOut = amountIn;
   const path = [token0, token1];
   const address = network == BINANCE_NETOWRK ? PANCAKESWAP_ROUTER.v2 : UNISWAP_ROUTER.v2;
   const reserveCalls: Call[] = [
@@ -34,6 +33,33 @@ export const getAmountOut = async(
   if (reserves.length < 0) return null;
   return reserves[0];
 }
+
+
+export const getAmountIn = async(
+  token0: string,
+  token1: string,
+  tokenAmount: BigNumber,
+  network: number
+): Promise<any> => {
+  
+  const amountOut = tokenAmount.toString(10);
+  const path = [token0, token1];
+  const address = network == BINANCE_NETOWRK ? PANCAKESWAP_ROUTER.v2 : UNISWAP_ROUTER.v2;
+  const reserveCalls: Call[] = [
+    {
+      name: 'getAmountsIn',
+      address: address,
+      params: [
+        amountOut,
+        path
+      ],
+    }
+  ];
+  const reserves = await multicallv2(network == BINANCE_NETOWRK ? PancakeRouterAbi : UniswapRouterAbi, reserveCalls, network);
+  if (reserves.length < 0) return null;
+  return reserves[0];
+}
+
 
 export const getPairPrice = async (
   quoteToken: string,
