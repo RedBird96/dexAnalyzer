@@ -499,7 +499,10 @@ export default function SwapTrade() {
       >
         <Box className={style.inputBlock}>
           <Box className={style.headerText} style = {{marginBottom:"1rem"}}>
-            <p>From</p>
+            <p style={{
+              color:"#a7a7a7", 
+              fontSize:"0.8rem"
+            }}>From</p>
             <p style={{
               fontSize:"0.8rem",
               color:textColor
@@ -537,7 +540,10 @@ export default function SwapTrade() {
         </Box>
         <Box className={style.inputBlock}>
           <Box className={style.headerText} style = {{marginBottom:"1rem"}}>
-            <p>To</p>
+            <p style={{
+              color:"#a7a7a7", 
+              fontSize:"0.8rem"
+            }}>To</p>
             <p style={{
               fontSize:"0.8rem",
               color:textColor
@@ -557,7 +563,11 @@ export default function SwapTrade() {
         className={style.detailsSection}
       >
         <Box className={style.detailSlippage}>
-          <p className={style.headerText} style = {{marginBottom:"1rem"}}>Slippage</p>
+          <p className={style.headerText} style = {{
+            marginBottom:"1rem", 
+            color:"#a7a7a7", 
+            fontSize:"0.8rem"
+          }}>Slippage</p>
           <Box 
             display={"flex"}
             flexDirection={"row"}

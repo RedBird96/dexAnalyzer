@@ -87,11 +87,11 @@ export default function TokenTransaction() {
         <Table variant='striped' colorScheme='transactionTable' size={"sm"}>
         <Thead position="sticky" top={0} zIndex="docked" backgroundColor={headerColor}>
           <Tr>
-            <Th color={"#7C7C7C"} width={"8%"} textTransform={"initial"} paddingLeft={"1.5rem"}>Activity</Th>
-            <Th color={"#7C7C7C"} width={"18%"} textTransform={"initial"} paddingLeft={"0.7rem"}>Tokens</Th>
-            <Th color={"#7C7C7C"} width={"42%"} textTransform={"initial"} paddingLeft={"10rem"}>Amount</Th>
-            <Th color={"#7C7C7C"} width={"24%"} textTransform={"initial"} paddingLeft={"3rem"}>Date</Th>
-            <Th color={"#7C7C7C"} width={"16%"} textTransform={"initial"} paddingLeft={"0rem"}>Txn</Th>
+            <Th fontWeight={"medium"} color={"#7C7C7C"} width={"8%"} textTransform={"initial"} paddingLeft={"1.5rem"}>Activity</Th>
+            <Th fontWeight={"medium"} color={"#7C7C7C"} width={"18%"} textTransform={"initial"} paddingLeft={"0.7rem"}>Tokens</Th>
+            <Th fontWeight={"medium"} color={"#7C7C7C"} width={"42%"} textTransform={"initial"} paddingLeft={"10rem"}>Amount</Th>
+            <Th fontWeight={"medium"} color={"#7C7C7C"} width={"24%"} textTransform={"initial"} paddingLeft={"3rem"}>Date</Th>
+            <Th fontWeight={"medium"} color={"#7C7C7C"} width={"16%"} textTransform={"initial"} paddingLeft={"0rem"}>Txn</Th>
           </Tr>
         </Thead>
         <Tbody className={style.tbody} style={{overflow:"auto"}}>
@@ -110,7 +110,6 @@ export default function TokenTransaction() {
                 <Tr key={index} color={color} className={style.txData}>
                   <Td width={"8%"} paddingLeft={"1.5rem"}>
                     <Box
-                      paddingTop={"2px"}
                       background={boxColor}
                       width={"50px"}
                       height={"24px"}

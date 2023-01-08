@@ -237,7 +237,7 @@ export default function WalletInfo() {
       >
         <Button
           style={{
-            marginTop:"1rem",
+            marginTop:"1.3rem",
             fontSize:"1rem",
             fontFamily:"Inter",
             fontWeight:"500",
@@ -247,8 +247,8 @@ export default function WalletInfo() {
             backgroundColor:widgetOption == false ? notSelectBtnColor : selectBtnColor
           }}
           width={"50%"}
-          borderRadius={"0.7rem 0rem 0rem 0.7rem"}
-          height={"2.8rem"}
+          borderRadius={"1rem 0rem 0rem 1rem"}
+          height={"2.5rem"}
           backgroundColor={widgetOption == false ? notSelectBtnColor : selectBtnColor}
           onClick={()=>setWidgetOption(true)}
         >
@@ -256,7 +256,7 @@ export default function WalletInfo() {
         </Button>
         <Button
           style={{
-            marginTop:"1rem",
+            marginTop:"1.3rem",
             fontSize:"1rem",
             fontFamily:"Inter",
             fontWeight:"500",
@@ -266,8 +266,8 @@ export default function WalletInfo() {
             backgroundColor:widgetOption == false ? selectBtnColor : notSelectBtnColor
           }}
           width={"50%"}
-          height={"2.8rem"}
-          borderRadius={"0rem 0.7rem 0.7rem 0rem"}
+          height={"2.5rem"}
+          borderRadius={"0rem 1rem 1rem 0rem"}
           backgroundColor={widgetOption == false ? selectBtnColor : notSelectBtnColor}
           color={"#FFFFFF"}
           onClick={()=>setWidgetOption(false)}
