@@ -3,7 +3,7 @@ import MenuBar from "../../MenuBar";
 import { PlayChess } from "../../../assests/icon";
 import { ERC20Token, PlayMode } from "../../../utils/type";
 import { useTokenInfo } from "../../../hooks";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 
 export default function ChessBody() {
 
@@ -11,7 +11,6 @@ export default function ChessBody() {
   const {setTokenData} = useTokenInfo();
 
   const initToken = useMemo(() =>{
-    console.log('set zero tokenData');
     setTokenData({
       name:"",
       symbol:"",

@@ -17,6 +17,7 @@ import {
 import * as constant from '../utils/constant'
 import * as endpoint from '../utils/endpoints'
 import { makeTemplateDate } from "../utils";
+import { NODEREAL_BSC_API_KEY, NODEREAL_ETH_API_KEY, NODREAL_BSC_ENDPOINT, NODREAL_ETH_ENDPOINT } from "../utils/endpoints";
 
 const ETH_MAINNET_CONNECTION = {
   apiKey: endpoint.ETHERSCAN_API_KEY,
@@ -200,36 +201,32 @@ export async function getTokenTransactionCount(address:string, network: number) 
 
 export async function getTokenHolderCount(address:string, network: number) {
 
-  // const LIMIT_COUNT = 10000;
-  // let holderCount = 0;
-  // try{
-  //   for(let index = 0; index < LIMIT_COUNT; index ++) {
-  //     const response = await getTokenHolder(address, network, LIMIT_COUNT, index * LIMIT_COUNT);
-  //     if (response != constant.NOT_FOUND_TOKEN) {
-  //         if (response.length == 0)
-  //           break;
-  //         response.forEach((value:any) => {
-  //           if (value.receiver.smartContract.contractType == null)
-  //             holderCount ++;
-  //         })
-  //     }
-  //   }
-  //   return holderCount;
-  // } catch {
-
-  // }
-  // return 0;
-
-  const response = await getTransferCount(address, network);
-  if (response != constant.NOT_FOUND_TOKEN) {
-    try{
-      const transfercnt = response[0].count;
-      return transfercnt;
-    }catch {
-
-    }
+  let url = "";
+  if (network == constant.ETHEREUM_NETWORK) {
+    url = NODREAL_ETH_ENDPOINT + NODEREAL_ETH_API_KEY;
+  } else {
+    url = NODREAL_BSC_ENDPOINT + NODEREAL_BSC_API_KEY;
   }
-  return 0;  
+
+  const data = {
+    method: 'nr_getTokenHolderCount',
+    params: [address],
+    id: 1
+  };
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(data)
+  });
+
+  if (response.ok) {
+    const obj = await response.json();
+    return parseInt(obj["result"].result, 16);
+  }
+
+  return 0;
+
 }
 
 export async function getTokenInfoFromTokenName() {
@@ -239,12 +236,10 @@ export async function getTokenInfoFromTokenName() {
     headers: {'X-CMC_PRO_API_KEY': endpoint.COINMARKETCAP_API_KEY}
   });
   
-  console.log('response', response.body);
   if (!response.ok) { /* Handle */ }
   
   // If you care about a response:
   if (response.body !== null) {
-    console.log('response', response.body);
     // const asString = new TextDecoder("utf-8").decode(response.body);
     // const asJSON = JSON.parse(asString);  // implicitly 'any', make sure to verify type on runtime.
   }
@@ -353,7 +348,6 @@ export async function getTokenPricefromCoingeckoAPI(addresses: string, network: 
 export async function getLPTokenList(address: string, network: number, tokenside: number): Promise<LPTokenPair[]> {
       
   let response;
-  let checkTokenList: string[] = [];
   let lpTokenList: LPTokenPair[] = [];
   const NETWORKURL = network == constant.ETHEREUM_NETWORK ? 
     "https://etherscan.io/token/" :
