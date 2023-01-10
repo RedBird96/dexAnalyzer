@@ -1,5 +1,10 @@
 import BigNumber from "bignumber.js";
 
+export enum PlayMode {
+  Trade,
+  Game,
+}
+
 export interface ERC20Token {
   name: string;
   symbol: string;

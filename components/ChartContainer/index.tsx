@@ -73,7 +73,6 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
   const {lpTokenAddress} = useLPTokenPrice();
   const {tokenData} = useTokenInfo();
   const {coinPrice} = useStableCoinPrice();
-  const {transactionData, setTransactionData} = useLPTransaction();
   let preReserve0 = 0;
   let preReserve1 = 0;
 
@@ -434,20 +433,20 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
         if ( res != constant.NOT_FOUND_TOKEN && res.length > 0) {
           let id = 0;
           res.forEach((value: any, index: any) => {
-            const tradeTime = new Date(value.time).toISOString().replace("T", " ").slice(0, -5);
+            const tradeTime = new Date(value.time).toISOString().replace("T", " ").slice(0, -5) + " (UTC)";
             id ++;
             if (value.buy_sell == "buy") {
-              const text = `Buy at ${tradeTime} \n` + 
-                            `Amount: ${value.amount}`;
+              const text = `Buy at ${tradeTime}`;
+              const text1 = `Amount: ${value.amount}`;
               Arr.push({
                 id: id,
                 time: value.intervalTime / 1000,
-                text: text,
+                text: text + "    " + text1,
                 color: 'green',
                 minSize: 5
               })
             } else {
-              const text = `Sell at ${tradeTime} \n` + 
+              const text = `Sell at ${tradeTime} \n\n` + 
                             `Amount: ${value.amount}`;
               Arr.push({
                 id: id,
@@ -479,7 +478,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
                 id: id,
                 time: value.intervalTime / 1000,
                 color: 'green',
-                label: 'B',
+                label: 'Buy',
                 minSize: 5
               })
             } else {
@@ -487,7 +486,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
                 id: id,
                 time: value.intervalTime / 1000,
                 color: 'red',
-                label: 'S',
+                label: 'Sell',
                 minSize: 5
               })
             }

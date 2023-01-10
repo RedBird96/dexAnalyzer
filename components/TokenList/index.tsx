@@ -19,24 +19,25 @@ import * as constant from '../../utils/constant'
 import TokenListItem from './TokenListItem'
 import style from './TokenList.module.css'
 import { SearchCross, SearchIcon } from '../../assests/icon'
+import { add } from 'lodash'
 
-export default function TokenList() {
-  const colorMode = useColorMode();
+export default function TokenList({
+  network,
+  address
+}:{
+  network: string,
+  address: string
+}) {
   const listClass = useColorModeValue(
     style.tokenList + " " + style.tokenListLight,
     style.tokenList + " " + style.tokenListDark
   );
-  // const searchClass = useColorModeValue(
-  //   style.tokenSearchLight,
-  //   style.tokenSearchDark,
-  // );
+  
   const searchColor = useColorModeValue("#FFFFFF", "#323232");
   const searchBorderColor = useColorModeValue("#CFCFCF", "#323232");
-  const walletAddress = useAddress();
   const {setTokenData} = useTokenInfo();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const debouncedQuery = useDebounce(searchQuery.replace(/\s/g, ''), 200);
-  const network = useNetwork();
 
   const [showListToken, setShowListToken] = useState<Boolean>();
   const [activeToken, setActiveToken] = useState<ERC20Token>();
@@ -210,6 +211,7 @@ export default function TokenList() {
   }, [debouncedActiveToken])
 
   useEffect(() => {
+
     // const cookieString = getCookie("PinnedToken");
     const cookieString = localStorage.getItem("PinnedToken");
     const tokenString = cookieString?.split(";");
@@ -252,6 +254,38 @@ export default function TokenList() {
     });
     setListTokens(cookieToken); 
   }, []);
+
+  useEffect(() => {
+
+    console.log('here', network, address);
+    if (network == "" && address == "") {
+      setTokenData({
+        name:"",
+        symbol:"",
+        contractAddress:"",
+        price: 1,
+        marketCap: "0",
+        totalSupply: 0,
+        holdersCount: 0,
+        balance: 0,
+        usdBalance: 0,
+        decimals: 6,
+        image: "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png"
+      } as ERC20Token);
+    } else {
+      const network_number = network == "eth" ? constant.ETHEREUM_NETWORK : constant.BINANCE_NETOWRK;
+      console.log('find Token');
+      const findRes = listTokens.find((value) => {
+        if (value.contractAddress == address && value.network == network_number)
+          return true;
+      });
+      console.log('findRes', findRes);
+      if (findRes == undefined ) {
+        setSearchQuery(address);
+        searchToken();
+      }
+    }
+  },[network, address])
 
   const TokenActionHandler = (token:ERC20Token, add:boolean) => {
     let filterTokens = listTokens;

@@ -199,7 +199,7 @@ export const getLPPairs = async (
 }
 
 
-export const getHoldTransferCount = async (
+export const getTransferCount = async (
   address: string, 
   network: number
 ) => {
@@ -216,8 +216,8 @@ export const getHoldTransferCount = async (
           name
           decimals
         }
-        count(uniq: receivers, amount: {gteq: 1})
         countBigInt(uniq: transfers)
+        count(uniq: receivers, amount: {gteq: 1})
       }
     }
   }
@@ -244,6 +244,59 @@ export const getHoldTransferCount = async (
 
 }
 
+
+export const getTokenHolder = async (
+  address: string, 
+  network: number,
+  limit: number,
+  offset: number
+) => {
+
+  const query = `
+  {
+    ethereum(network: ${network == constant.ETHEREUM_NETWORK ? "ethereum" : "bsc"}) {
+      transfers(
+        currency: {is: "${address}"}
+        options: {limitBy: {each: "currency.address", limit: ${limit}, offset: ${offset}}}
+      ) {
+        currency {
+          address
+          name
+          decimals
+        }
+        receiver {
+          address
+          smartContract{
+            contractType
+          }
+        }
+        count(uniq: receivers, amount: {gteq: 1})
+      }
+    }
+  }
+  `;
+
+  const raw = JSON.stringify({query,"variables": "{}"});
+
+  const response = await fetch(endpoint.BITQUERY_ENDPOINT, {
+    method: 'POST',
+    headers: {'X-API-KEY': endpoint.BITQUERY_API_KEY,
+              "Content-Type":"application/json"},
+    body:raw,
+    redirect:'follow'
+  });  
+  if (response.status != 200) {
+    return constant.NOT_FOUND_TOKEN;
+  }
+  try {
+    const text = await response.json();
+    console.log('response text', text);
+    return text["data"].ethereum.transfers;
+  } catch (err:any) {
+    return constant.NOT_FOUND_TOKEN;
+  }
+
+}
 
 export const getHoldTokenList = async (
   address: string, 

@@ -1,11 +1,10 @@
-import dynamic from 'next/dynamic'
-import style from './PageLayout.module.css'
+import style from './GameLayout.module.css'
 import React from "react"
 import Header from "../Header"
-import TokenBody from "../TokenBody"
 import { Box, useColorMode } from "@chakra-ui/react"
+import ChessBody from './ChessBody'
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function GameLayout() {
   const { colorMode } = useColorMode()
 
   return (
@@ -13,7 +12,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <Header/>
       <nav><hr aria-orientation='horizontal'/></nav>
       <Box className={colorMode == "light" ? style.mainBodylight : style.mainBodyblack} >
-        <TokenBody/>
+        <ChessBody/>
       </Box> 
     </Box>
   );

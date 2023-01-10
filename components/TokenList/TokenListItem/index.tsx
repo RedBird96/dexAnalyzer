@@ -14,6 +14,7 @@ import style from './TokenListItem.module.css'
 import {makeShortAddress, makeShortTokenName} from '../../../utils'
 import { ERC20Token } from '../../../utils/type'
 import * as constant from '../../../utils/constant'
+import Link from 'next/link'
 
 const TokenListItem = ({
   tokenData,
@@ -51,60 +52,68 @@ const TokenListItem = ({
     activeTokenHandler(tokenData);
   }
   return(
-    <Box className= {style.tokenListInfo} 
-      _hover={{ bg: hoverColor }}
-      onMouseOver={() => {setIsHover(true)}}
-      onMouseOut={() => {setIsHover(false)}}
-      backgroundColor={isActive ? colorMode.colorMode == "dark" ? hoverColor : "#0085FF" : tokenData.pinSetting ? itemBackcolor : "transparent"}
-      color={isActive?"#FFFFFF":whiteColor}
-      onMouseMove={() => {
-        setShowCrossIcon(true)
-      }}
-      onMouseLeave={() => setShowCrossIcon(false)}      
-    >
-      <Box display={"flex"} flexDirection={"row"} alignItems={"center"} width={"90%"} justifyContent={"space-between"}>
-        <Box 
-          style={{display:"flex", flexDirection:"row", alignItems:"center", width:"80%"}}
-          onClick={setActiveToken}
-        >
-          <img src={tokenData?.image} width={"40rem"}/>
-          <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
-            <Box display={"flex"} flexDirection={"row"} >
-              <p className={style.tokenName} style={{color:isActive || isHover ? "#FFFFFF" : nameColor}}>{makeShortTokenName(tokenData?.name, 13)}</p>
-              <p className={style.tokenName} style={{color:isActive || isHover ? textColorActive : textColor}}>&nbsp;({makeShortTokenName(tokenData?.symbol, 5)})</p>
+      <Box className= {style.tokenListInfo} 
+        _hover={{ bg: hoverColor }}
+        onMouseOver={() => {setIsHover(true)}}
+        onMouseOut={() => {setIsHover(false)}}
+        backgroundColor={isActive ? colorMode.colorMode == "dark" ? hoverColor : "#0085FF" : tokenData.pinSetting ? itemBackcolor : "transparent"}
+        color={isActive?"#FFFFFF":whiteColor}
+        onMouseMove={() => {
+          setShowCrossIcon(true)
+        }}
+        onMouseLeave={() => setShowCrossIcon(false)}      
+      >
+        <Box display={"flex"} flexDirection={"row"} alignItems={"center"} width={"90%"} justifyContent={"space-between"}>
+          <Link href={`/trade/${tokenData.network == constant.ETHEREUM_NETWORK ? "eth" : "bsc"}/${tokenData.contractAddress}`}    >
+            <Box 
+              style={{display:"flex", flexDirection:"row", alignItems:"center", width:"80%"}}
+              onClick={setActiveToken}
+            >
+              <img src={tokenData?.image} width={"40rem"}/>
+              <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
+                <Box display={"flex"} flexDirection={"row"} >
+                  <p className={style.tokenName} style={{color:isActive || isHover ? "#FFFFFF" : nameColor}}>{makeShortTokenName(tokenData?.name, 13)}</p>
+                  <p className={style.tokenName} style={{color:isActive || isHover ? textColorActive : textColor}}>&nbsp;({makeShortTokenName(tokenData?.symbol, 5)})</p>
+                </Box>
+                <p className={style.tokenAddress} style ={{color:isActive || isHover ? addressColorActive : addressColor}}>{makeShortAddress(tokenData?.contractAddress!)}</p>
+              </Box>
             </Box>
-            <p className={style.tokenAddress} style ={{color:isActive || isHover ? addressColorActive : addressColor}}>{makeShortAddress(tokenData?.contractAddress!)}</p>
-          </Box>
+          </Link>
+          <Box style={{
+            display:"flex", 
+            flexDirection:"row", 
+            alignItems:"center", 
+            justifyContent:"space-between",
+            }}
+            width = {showCrossIcon?"4.5rem":"3rem"}
+          >
+            {
+              tokenData?.network == constant.ETHEREUM_NETWORK ?
+              <ETHIcon/> :
+              <BNBIcon/>
+            }
+            <Box onClick={setPinIcon}>
+            {
+              colorMode.colorMode == "light" ? 
+              tokenData?.pinSetting == false ? <UnPinLightIcon/> : <PinLightIcon/> : 
+              tokenData?.pinSetting == false ? <UnPinIcon/> : <PinIcon/>
+            }    
+            </Box>   
+            {
+              showCrossIcon == true && 
+              <Box onClick={()=>pinTokenHandler(tokenData, false)}>
+                {
+                  isActive ? 
+                  <Link href={'/trade'}>
+                    {colorMode.colorMode == "dark" ? <SearchCross/> : <LightCross/>}
+                  </Link> :
+                  colorMode.colorMode == "dark" ? <SearchCross/> : <LightCross/>
+                }
+              </Box>
+            }   
+          </Box>  
         </Box>
-        <Box style={{
-          display:"flex", 
-          flexDirection:"row", 
-          alignItems:"center", 
-          justifyContent:"space-between",
-          }}
-          width = {showCrossIcon?"4.5rem":"3rem"}
-        >
-          {
-            tokenData?.network == constant.ETHEREUM_NETWORK ?
-            <ETHIcon/> :
-            <BNBIcon/>
-          }
-          <Box onClick={setPinIcon}>
-          {
-            colorMode.colorMode == "light" ? 
-            tokenData?.pinSetting == false ? <UnPinLightIcon/> : <PinLightIcon/> : 
-            tokenData?.pinSetting == false ? <UnPinIcon/> : <PinIcon/>
-          }    
-          </Box>   
-          {
-            showCrossIcon == true && 
-            <Box onClick={()=>pinTokenHandler(tokenData, false)}>
-              {colorMode.colorMode == "dark" ? <SearchCross/> : <LightCross/>}
-            </Box>
-          }   
-        </Box>  
       </Box>
-    </Box>
   );
 }
 

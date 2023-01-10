@@ -8,7 +8,7 @@ import {
   Tr,
   Th,
   Td,
-  TableCaption,
+  
   TableContainer,
 } from '@chakra-ui/react'
 import { useLPTokenPrice, useLPTransaction, useTokenInfo } from '../../hooks'
@@ -18,7 +18,7 @@ import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
 import * as constant from '../../utils/constant'
 import { TokenSide, TransactionType } from '../../utils/type'
 import { appendPastTransactions } from './module'
-import { format } from 'path'
+
 
 export default function TokenTransaction() {
   const transactionClass = useColorModeValue(
@@ -37,7 +37,6 @@ export default function TokenTransaction() {
   const infoborderColorMode = useColorModeValue("#E2E8F0","#505050");
   const LINK_BSCNETWORK = "https://bscscan.com/tx/";
   const LINK_ETHNETWORK = "https://etherscan.io/tx/";
-  const listInnerRef = useRef();
 
   const handleScroll = async (e:any) => {
     const bottom = e.target.scrollHeight - e.target.scrollTop <= (e.target.clientHeight + 20);
@@ -58,6 +57,7 @@ export default function TokenTransaction() {
       setquotePrice(coin.price);
     setTXTransaction(transactionData);
   }, [transactionData])
+
   useEffect(() => {
     setTXTransaction([]);
     setquotePrice(1);

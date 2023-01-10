@@ -12,15 +12,7 @@ import {
   Reddit,
   CopyAddressIconDark,
   CopyAddressIconLight,
-  CoyAddressComfirm,
-  WebSiteLight,
-  FaceBookLight,
-  GithubLight,
-  InstagramLight,
-  MediumLight,
-  TelegramLight,
-  TwitterLight,
-  DiscordLight
+  CoyAddressComfirm
 } from "../../assests/icon"
 import {
   useTokenInfo,
@@ -35,10 +27,11 @@ import {
 } from '../../utils'
 import {
   getLPTokenReserve,
-  getTokenHolderandTransactionCount,
+  getTokenTransactionCount,
   getLPTokenList,
   getTokenBurnAmount,
-  getTokenBalance
+  getTokenBalance,
+  getTokenHolderCount
 } from '../../api'
 import style from './TokenInfo.module.css'
 import * as constant from '../../utils/constant'
@@ -183,9 +176,10 @@ export default function TokenInfo() {
   }
   const setTokenInfo = async() => {
     const burn_res = await getTokenBurnAmount(tokenData.contractAddress, tokenData.network);
-    const res = await getTokenHolderandTransactionCount(tokenData.contractAddress, tokenData.network);
-    setHoldersCount(res[0]);
-    setTransactionCount(res[1]);
+    const res = await getTokenTransactionCount(tokenData.contractAddress, tokenData.network);
+    const holderCnt = await getTokenHolderCount(tokenData.contractAddress, tokenData.network);
+    setHoldersCount(holderCnt);
+    setTransactionCount(res);
     if (!isNaN(burn_res))
       setBurnAmount(burn_res);
   }

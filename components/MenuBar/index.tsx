@@ -4,8 +4,14 @@ import style from './MenuBar.module.css'
 import {GameMenuBar, TopMenuBar} from '../../assests/icon'
 import {TradeMenuBar} from '../../assests/icon'
 import { usePlayMode } from '../../hooks/usePlayMode'
+import { PlayMode } from '../../utils/type'
+import Link from 'next/link'
 
-export default function MenuBar() {
+export default function MenuBar({
+  selectMode
+}:{
+  selectMode: PlayMode
+}) {
   const {showMode, setShowMode} = usePlayMode();
   const menuClass = useColorModeValue(
     style.menuBar + " " + style.menuBarLight,
@@ -36,11 +42,12 @@ export default function MenuBar() {
         width:"100%",
         alignItems:"center"
         }}
-        onClick = {() => setShowMode("Trade")}
         _hover={{bg:chartSelectColor}}
-        background = {showMode === "Trade" ? chartSelectColor : "transparent"}
+        background = {selectMode === PlayMode.Trade ? chartSelectColor : "transparent"}
       >
-        <TradeMenuBar/>
+        <Link href = {'/trade'}>
+          <TradeMenuBar/>
+        </Link>
       </Box>
       <Box style={{
         display: "flex", 
@@ -53,11 +60,12 @@ export default function MenuBar() {
         alignItems:"center"
         }}
         _hover={{bg:chartSelectColor}}
-        onClick = {() => setShowMode("Games")}
-        background = {showMode === "Games" ? chartSelectColor : "transparent"}
+        background = {selectMode === PlayMode.Game ? chartSelectColor : "transparent"}
       >
-        <GameMenuBar/>
-      </Box>      
+        <Link href = {'/game'}>
+          <GameMenuBar/>
+        </Link>   
+      </Box>   
       
     </Box>
   );

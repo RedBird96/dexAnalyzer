@@ -12,20 +12,19 @@ const TokenInfoContext: React.Context<null | TokenInfoInterface> =
 export function TokenInfoProvider({children}:any) {
 
   let temp:ERC20Token;
-  const usdtAddress = "";
-    temp = {
-      name:"",
-      symbol:"",
-      contractAddress:"",
-      price: 1,
-      marketCap: "0",
-      totalSupply: 0,
-      holdersCount: 0,
-      balance: 0,
-      usdBalance: 0,
-      decimals: 6,
-      image: "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png"
-    } as ERC20Token
+  temp = {
+    name:"",
+    symbol:"",
+    contractAddress:"",
+    price: 1,
+    marketCap: "0",
+    totalSupply: 0,
+    holdersCount: 0,
+    balance: 0,
+    usdBalance: 0,
+    decimals: 6,
+    image: "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png"
+  } as ERC20Token
   
   const [token, setToken] = useState<ERC20Token>(temp);
   return(

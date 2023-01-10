@@ -30,6 +30,7 @@ import Bep20Abi from '../../../config/BEP20ABI.json'
 import Erc20Abi from '../../../config/ERC20ABI.json'
 import { MaxUint256 } from '@ethersproject/constants';
 import { getAmountIn, getAmountOut } from '../../../utils/router';
+import usePriceImpact from '../../../hooks/usePriceImpact';
 
 enum BTN_LABEL {
   LOADING,
@@ -62,6 +63,7 @@ export default function SwapTrade() {
   const [maxToToken, setMaxToToken] = useState<number>(0);
   const [miniValue, setMiniValue] = useState(0);
   const [executing, setExecuting] = useState<boolean>(false);
+  const priceImpact = usePriceImpact();
   const [fromToken, setFromToken] = useState<ERC20Token>(
     {
       name: "",
@@ -200,6 +202,8 @@ export default function SwapTrade() {
           msg = "User denied transaction signature";
         } else if (error_msg.includes("INSUFFICIENT_OUTPUT_AMOUNT")) {
           msg = "Slippage too low"
+        } else if (error_msg.includes("EXPIRED")) {
+          msg = "Trade is expired"
         }
         toast({
           title: `Transaction failed: ${msg}`,
@@ -355,7 +359,7 @@ export default function SwapTrade() {
   
   useEffect(() => {
     getPrice(); 
-  }, [debouncedFromTokenValue, debouncedToTokenValue])
+  }, [debouncedFromTokenValue, debouncedToTokenValue, lpTokenPrice, lpTokenAddress.token0_reserve, lpTokenAddress.token1_reserve])
 
   const getPrice = async() => {
     if (inputSide) {
@@ -641,21 +645,21 @@ export default function SwapTrade() {
             flexDirection:"row"
           }}>
             <p className = {style.commentText} style= {{ color :"#696969"}}>Price Impact:</p>
-            <p className = {style.commentText}>{label == BTN_LABEL.LOADING ? "0%" : "<0.01%"}</p>
+            <p className = {style.commentText}>{label == BTN_LABEL.LOADING ? "0%" : "<" + priceImpact.toFixed(2) + "%"}</p>
           </Box>
           <Box style = {{
             display:"flex",
             flexDirection:"row"
           }}>
             <p className = {style.commentText} style= {{ color :"#696969"}}>Price:</p>
-            <p className = {style.commentText}>{pricebase.toFixed(5)}&nbsp;{lpTokenAddress.baseCurrency_name+"/"+lpTokenAddress.quoteCurrency_name}</p>
+            <p className = {style.commentText}>{pricequote.toFixed(5)}&nbsp;{lpTokenAddress.baseCurrency_name+"/"+lpTokenAddress.quoteCurrency_name}</p>
           </Box>
           <Box style = {{
             display:"flex",
             flexDirection:"row"
           }}>
             <p className = {style.commentText} style= {{ color :"#696969"}}>Price:</p>
-            <p className = {style.commentText}>{pricequote.toFixed(5)}&nbsp;{lpTokenAddress.quoteCurrency_name+"/"+lpTokenAddress.baseCurrency_name}</p>
+            <p className = {style.commentText}>{pricebase.toFixed(5)}&nbsp;{lpTokenAddress.quoteCurrency_name+"/"+lpTokenAddress.baseCurrency_name}</p>
           </Box>
         </Box>
       </Box>

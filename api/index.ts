@@ -10,9 +10,10 @@ import UniswapV2Pair from '../config/IUniswapV2Pair.json';
 import PancakeswapV2Pair from '../config/IPancakeswapV2Pair.json';
 import {
   getHoldTokenList, 
-  getHoldTransferCount, 
+  getTransferCount, 
   getLPPairs, 
-  getBuySellTransactions 
+  getBuySellTransactions, 
+  getTokenHolder
 } from "./bitquery_graphql";
 import * as constant from '../utils/constant'
 import * as endpoint from '../utils/endpoints'
@@ -184,19 +185,52 @@ export async function getLastTransactionsLogsByTopic(address:string, network: nu
   return constant.NOT_FOUND_TOKEN;
 }
 
-export async function getTokenHolderandTransactionCount(address:string, network: number) {
+export async function getTokenTransactionCount(address:string, network: number) {
 
-  const response = await getHoldTransferCount(address, network);
+  const response = await getTransferCount(address, network);
   if (response != constant.NOT_FOUND_TOKEN) {
     try{
-      const holder = response[0].count;
       const transfercnt = response[0].countBigInt;
-      return [holder, transfercnt];
+      return transfercnt;
     }catch {
 
     }
   }
-  return [0, 0];
+  return 0;
+}
+
+export async function getTokenHolderCount(address:string, network: number) {
+
+  // const LIMIT_COUNT = 10000;
+  // let holderCount = 0;
+  // try{
+  //   for(let index = 0; index < LIMIT_COUNT; index ++) {
+  //     const response = await getTokenHolder(address, network, LIMIT_COUNT, index * LIMIT_COUNT);
+  //     if (response != constant.NOT_FOUND_TOKEN) {
+  //         if (response.length == 0)
+  //           break;
+  //         response.forEach((value:any) => {
+  //           if (value.receiver.smartContract.contractType == null)
+  //             holderCount ++;
+  //         })
+  //     }
+  //   }
+  //   return holderCount;
+  // } catch {
+
+  // }
+  // return 0;
+
+  const response = await getTransferCount(address, network);
+  if (response != constant.NOT_FOUND_TOKEN) {
+    try{
+      const transfercnt = response[0].count;
+      return transfercnt;
+    }catch {
+
+    }
+  }
+  return 0;  
 }
 
 export async function getTokenInfoFromTokenName() {
@@ -326,7 +360,6 @@ export async function getLPTokenList(address: string, network: number, tokenside
     "https://etherscan.io/token/" :
     "https://bscscan.com/token/";
   response = await getLPPairs(address, network);
-  console.log('response', response);
   if (response != constant.NOT_FOUND_TOKEN && response != null) {
     response.forEach((value:any) => {
         lpTokenList.push({
