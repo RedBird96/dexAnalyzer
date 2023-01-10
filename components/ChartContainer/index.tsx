@@ -428,7 +428,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       if (priceData == undefined || priceData.length == 0)
         return;
       if (showOrder) {
-        const res = await getLPTransactionListFromWallet(address, tokenData.contractAddress, tokenData.network, resolution);
+        const res = await getLPTransactionListFromWallet(address, tokenData.contractAddress, tokenData.network, resolution, tokenData.decimals);
         let Arr:any[] = [];
         if ( res != constant.NOT_FOUND_TOKEN && res.length > 0) {
           let id = 0;
@@ -467,7 +467,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       if (priceData == undefined || priceData.length == 0)
         return;
       if (showOrder) {
-        const res = await getLPTransactionListFromWallet(address, tokenData.contractAddress, tokenData.network, resolution);
+        const res = await getLPTransactionListFromWallet(address, tokenData.contractAddress, tokenData.network, resolution, tokenData.decimals);
         let Arr:any[] = [];
         if ( res != constant.NOT_FOUND_TOKEN && res.length > 0) {
           let id = 0;

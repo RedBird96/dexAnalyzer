@@ -231,6 +231,7 @@ export default function TokenList({
             marketCap:obj["marketCap"],
             network:obj["network"],
             price:obj["price"],
+            decimals:obj["decimals"],
             totalSupply:obj["totalSupply"],
             pinSetting:obj["pinSetting"],
             website:obj["website"],

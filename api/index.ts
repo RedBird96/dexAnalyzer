@@ -457,39 +457,102 @@ export async function getMultiTokenPricefromllama(tokenList:ERC20Token[]){
   }  
 }
 
-export async function getLPTransactionListFromWallet(address:string, tokenAddress: string, network: number, resolution:number) {
+export async function getLPTransactionListFromWallet(
+  address:string, 
+  tokenAddress: string, 
+  network: number, 
+  resolution:number,
+  decimal: number
+) {
  
-  const res = await getBuySellTransactions(address, network == constant.ETHEREUM_NETWORK ? constant.UNISWAP_ROUTER.v2 : constant.PANCAKESWAP_ROUTER.v2 ,network, tokenAddress);
-
-  if (res == constant.NOT_FOUND_TOKEN || res ==  null) 
-    return constant.NOT_FOUND_TOKEN;
   let array:any[] = [];
-  if (res.length != 0 ) {
-    res.forEach((value:any) => {
-      const time = new Date(value["timeInterval"].second + " UTC");
+  let client;
+  if (network == constant.BINANCE_NETOWRK)
+    client =  new EtherscanClient(BSC_MAINNET_CONNECTION);
+  else
+    client =  new EtherscanClient(ETH_MAINNET_CONNECTION);
+  const res = await client.call(Action.account_tokentx, {
+    contractaddress:tokenAddress,
+    address:address,
+    page:1,
+    offset:0,
+    startblock:0,
+    endblock:'lastest',
+    sort:'desc'
+  });
+  
+  try {
+    const response = res.result;
+    if (response == undefined || response.length == 0)
+      return constant.NOT_FOUND_TOKEN;
+    
+    response.forEach((value:any) => {
+      let amount = value["value"];
+      if (amount == 0)
+        return;
+        
+      const time = new Date(parseInt(value["timeStamp"]) * 1000);
       const cuTime = makeTemplateDate(time, resolution);
-      if (value["buyCurrency"].address == tokenAddress) {
+      amount = amount / Math.pow(10, decimal);
+      if (value["from"].toLowerCase() == address.toLowerCase()) {
         array.push({
           intervalTime:cuTime.getTime(),
           time:time.getTime(),
           buy_sell:"sell",
-          amount:value["baseAmount"]
-        })
+          amount:amount
+        })          
       } else {
         array.push({
           intervalTime:cuTime.getTime(),
           time:time.getTime(),
           buy_sell:"buy",
-          amount:value["baseAmount"]
+          amount:amount
         })
       }
-    });
+    })
+    
+  }catch{
+
   }
-  
-  array = array.sort((value1:any, value2:any) => {
-    return value1.time - value2.time
-  })
+
   return array;
+
+  // let array:any[] = [];
+  // console.log('call transaction')
+  // const res = await getBuySellTransactions(address, network == constant.ETHEREUM_NETWORK ? constant.UNISWAP_ROUTER.v2 : constant.PANCAKESWAP_ROUTER.v2 ,network, tokenAddress);
+
+  // console.log('getBuySellTransactions')
+
+  // if (res == constant.NOT_FOUND_TOKEN || res ==  null) 
+  //   return constant.NOT_FOUND_TOKEN;
+  // if (res.length != 0 ) {
+  //   res.forEach((value:any) => {
+  //     if (value["taker"].address.toLowerCase() == address.toLowerCase() || value["maker"].address.toLowerCase() == address.toLowerCase()) {
+  //       const time = new Date(value["timeInterval"].second + " UTC");
+  //       const cuTime = makeTemplateDate(time, resolution);
+  //       if (value["buyCurrency"].address == tokenAddress) {
+  //         array.push({
+  //           intervalTime:cuTime.getTime(),
+  //           time:time.getTime(),
+  //           buy_sell:"sell",
+  //           amount:value["baseAmount"]
+  //         })
+  //       } else {
+  //         array.push({
+  //           intervalTime:cuTime.getTime(),
+  //           time:time.getTime(),
+  //           buy_sell:"buy",
+  //           amount:value["baseAmount"]
+  //         })
+  //       }
+  //     }
+  //   });
+  // }
+  
+  // array = array.sort((value1:any, value2:any) => {
+  //   return value1.time - value2.time
+  // })
+  // return array;
 }
 
 export async function getTokenBalance(tokenAddress:string, walletAdderss:string, network:number) {
