@@ -1,12 +1,32 @@
 import { Box, useColorModeValue } from "@chakra-ui/react";
 import MenuBar from "../../MenuBar";
 import { PlayChess } from "../../../assests/icon";
-import { PlayMode } from "../../../utils/type";
+import { ERC20Token, PlayMode } from "../../../utils/type";
+import { useTokenInfo } from "../../../hooks";
+import { useCallback, useMemo } from "react";
 
 export default function ChessBody() {
 
   const resizeBgColor = useColorModeValue("#FFFFFF", "#1C1C1C");
-  
+  const {setTokenData} = useTokenInfo();
+
+  const initToken = useMemo(() =>{
+    console.log('set zero tokenData');
+    setTokenData({
+      name:"",
+      symbol:"",
+      contractAddress:"",
+      price: 1,
+      marketCap: "0",
+      totalSupply: 0,
+      holdersCount: 0,
+      balance: 0,
+      usdBalance: 0,
+      decimals: 6,
+      image: "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png"
+    } as ERC20Token);
+  }, [])
+      
   return (
     <Box style={{
       display: "flex", 

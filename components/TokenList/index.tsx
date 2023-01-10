@@ -253,36 +253,19 @@ export default function TokenList({
       }
     });
     setListTokens(cookieToken); 
-  }, []);
 
-  useEffect(() => {
-
-    if (network == "" && address == "") {
-      setTokenData({
-        name:"",
-        symbol:"",
-        contractAddress:"",
-        price: 1,
-        marketCap: "0",
-        totalSupply: 0,
-        holdersCount: 0,
-        balance: 0,
-        usdBalance: 0,
-        decimals: 6,
-        image: "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png"
-      } as ERC20Token);
+    const network_number = network == "eth" ? constant.ETHEREUM_NETWORK : constant.BINANCE_NETOWRK;
+    const findRes = cookieToken.find((value) => {
+      if (value.contractAddress == address && value.network == network_number)
+        return true;
+    });
+    if (findRes == undefined ) {
+      setSearchQuery(address);
+      searchToken();
     } else {
-      const network_number = network == "eth" ? constant.ETHEREUM_NETWORK : constant.BINANCE_NETOWRK;
-      const findRes = listTokens.find((value) => {
-        if (value.contractAddress == address && value.network == network_number)
-          return true;
-      });
-      if (findRes == undefined ) {
-        setSearchQuery(address);
-        searchToken();
-      }
+      setActiveTokenHandler(findRes);
     }
-  },[network, address])
+  }, []);
 
   const TokenActionHandler = (token:ERC20Token, add:boolean) => {
     let filterTokens = listTokens;
@@ -355,6 +338,7 @@ export default function TokenList({
     //   ));
     // }
   }
+  
   return (
     <Box className={listClass}>
       <Box className = {style.tokenSearch}>

@@ -467,7 +467,7 @@ export async function getLPTransactionListFromWallet(address:string, tokenAddres
  
   const res = await getBuySellTransactions(address, network == constant.ETHEREUM_NETWORK ? constant.UNISWAP_ROUTER.v2 : constant.PANCAKESWAP_ROUTER.v2 ,network, tokenAddress);
 
-  if (res == constant.NOT_FOUND_TOKEN) 
+  if (res == constant.NOT_FOUND_TOKEN || res ==  null) 
     return constant.NOT_FOUND_TOKEN;
   let array:any[] = [];
   if (res.length != 0 ) {
