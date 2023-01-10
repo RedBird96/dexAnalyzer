@@ -1,5 +1,3 @@
-import { gql, request } from 'graphql-request'
-import { Block } from '../utils/type'
 import * as constant from '../utils/constant'
 import * as endpoint from '../utils/endpoints'
 
@@ -344,7 +342,8 @@ export const getHoldTokenList = async (
 
 
 export const getBuySellTransactions = async (
-  address: string, 
+  address: string,
+  routerAddress: string, 
   network: number,
   tokenAddress: string
 ) => {
@@ -353,7 +352,7 @@ export const getBuySellTransactions = async (
   {
     ethereum(network: ${network == constant.ETHEREUM_NETWORK ? "ethereum" : "bsc"}) {
       dexTrades(
-        taker: {is: "${address}"}
+        taker: {in: ["${address}","${routerAddress}"]}
         baseCurrency: {is: "${tokenAddress}"}
       ) {
         transaction {

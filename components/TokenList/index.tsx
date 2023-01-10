@@ -257,7 +257,6 @@ export default function TokenList({
 
   useEffect(() => {
 
-    console.log('here', network, address);
     if (network == "" && address == "") {
       setTokenData({
         name:"",
@@ -274,12 +273,10 @@ export default function TokenList({
       } as ERC20Token);
     } else {
       const network_number = network == "eth" ? constant.ETHEREUM_NETWORK : constant.BINANCE_NETOWRK;
-      console.log('find Token');
       const findRes = listTokens.find((value) => {
         if (value.contractAddress == address && value.network == network_number)
           return true;
       });
-      console.log('findRes', findRes);
       if (findRes == undefined ) {
         setSearchQuery(address);
         searchToken();

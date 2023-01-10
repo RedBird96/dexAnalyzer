@@ -12,8 +12,7 @@ import {
   getHoldTokenList, 
   getTransferCount, 
   getLPPairs, 
-  getBuySellTransactions, 
-  getTokenHolder
+  getBuySellTransactions
 } from "./bitquery_graphql";
 import * as constant from '../utils/constant'
 import * as endpoint from '../utils/endpoints'
@@ -466,7 +465,7 @@ export async function getMultiTokenPricefromllama(tokenList:ERC20Token[]){
 
 export async function getLPTransactionListFromWallet(address:string, tokenAddress: string, network: number, resolution:number) {
  
-  const res = await getBuySellTransactions(address, network, tokenAddress);
+  const res = await getBuySellTransactions(address, network == constant.ETHEREUM_NETWORK ? constant.UNISWAP_ROUTER.v2 : constant.PANCAKESWAP_ROUTER.v2 ,network, tokenAddress);
 
   if (res == constant.NOT_FOUND_TOKEN) 
     return constant.NOT_FOUND_TOKEN;
