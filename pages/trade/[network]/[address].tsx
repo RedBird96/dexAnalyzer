@@ -6,7 +6,6 @@ const TradeContext = () => {
 
   const param = useRouter();
   let {network = "", address = ""} = param.query;
-
   return(
     <>
       <TradeLayout 

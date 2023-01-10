@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, KeyboardEvent } from 'react'
+import React, { useEffect, useState, useCallback, KeyboardEvent, useMemo } from 'react'
 import { Box, Input, useColorModeValue, useColorMode, InputGroup, InputLeftAddon, InputLeftElement, InputRightElement } from "@chakra-ui/react"
 import {
   useAddress,
@@ -211,61 +211,64 @@ export default function TokenList({
   }, [debouncedActiveToken])
 
   useEffect(() => {
-
     // const cookieString = getCookie("PinnedToken");
-    const cookieString = localStorage.getItem("PinnedToken");
-    const tokenString = cookieString?.split(";");
-    let cookieToken:ERC20Token[] = [];
-    tokenString?.forEach((jsonToken, index)=>{
-      if (jsonToken.length < 2)
-        return;
-      try{
-        const obj = JSON.parse(jsonToken);
-        const token = {
-          name:obj["name"],
-          symbol:obj["symbol"],
-          balance:obj["balance"],
-          contractAddress:obj["contractAddress"],
-          holdersCount:obj["holdersCount"],
-          image:obj["image"],
-          marketCap:obj["marketCap"],
-          network:obj["network"],
-          price:obj["price"],
-          totalSupply:obj["totalSupply"],
-          pinSetting:obj["pinSetting"],
-          website:obj["website"],
-          twitter:obj["twitter"],
-          facebook:obj["facebook"],
-          discord:obj["discord"],
-          github:obj["github"],
-          telegram:obj["telegram"],
-          instagra:obj["instagra"],
-          medium:obj["medium"],
-          reddit:obj["reddit"],
-          contractCodeURL:obj["contractCodeURL"],
-          contractBalanceWalletURL:obj["contractBalanceWalletURL"],
-          contractBalanceURL:obj["contractBalanceURL"],
-          contractPage:obj["contractPage"]
-        } as ERC20Token;
-        cookieToken.push(token);
-      } catch(e){
+    const initAndLoad = async() => {
+      const cookieString = localStorage.getItem("PinnedToken");
+      const tokenString = cookieString?.split(";");
+      let cookieToken:ERC20Token[] = [];
+      tokenString?.forEach((jsonToken, index)=>{
+        if (jsonToken.length < 2)
+          return;
+        try{
+          const obj = JSON.parse(jsonToken);
+          const token = {
+            name:obj["name"],
+            symbol:obj["symbol"],
+            balance:obj["balance"],
+            contractAddress:obj["contractAddress"],
+            holdersCount:obj["holdersCount"],
+            image:obj["image"],
+            marketCap:obj["marketCap"],
+            network:obj["network"],
+            price:obj["price"],
+            totalSupply:obj["totalSupply"],
+            pinSetting:obj["pinSetting"],
+            website:obj["website"],
+            twitter:obj["twitter"],
+            facebook:obj["facebook"],
+            discord:obj["discord"],
+            github:obj["github"],
+            telegram:obj["telegram"],
+            instagra:obj["instagra"],
+            medium:obj["medium"],
+            reddit:obj["reddit"],
+            contractCodeURL:obj["contractCodeURL"],
+            contractBalanceWalletURL:obj["contractBalanceWalletURL"],
+            contractBalanceURL:obj["contractBalanceURL"],
+            contractPage:obj["contractPage"]
+          } as ERC20Token;
+          cookieToken.push(token);
+        } catch(e){
 
+        }
+      });
+
+      const network_number = network == "eth" ? constant.ETHEREUM_NETWORK : constant.BINANCE_NETOWRK;
+      const findRes = cookieToken.find((value) => {
+        if (value.contractAddress.toLowerCase() == address.toLowerCase() && value.network == network_number)
+          return true;
+      });
+      if (findRes == undefined && network.length != 0 && address.length != 0) {
+        setSearchQuery(address);
+        await searchToken();
+      } else {
+        setActiveTokenHandler(findRes);
       }
-    });
-    setListTokens(cookieToken); 
 
-    const network_number = network == "eth" ? constant.ETHEREUM_NETWORK : constant.BINANCE_NETOWRK;
-    const findRes = cookieToken.find((value) => {
-      if (value.contractAddress == address && value.network == network_number)
-        return true;
-    });
-    if (findRes == undefined ) {
-      setSearchQuery(address);
-      searchToken();
-    } else {
-      setActiveTokenHandler(findRes);
+      setListTokens(cookieToken); 
     }
-  }, []);
+    initAndLoad();
+  }, [network, address]);
 
   const TokenActionHandler = (token:ERC20Token, add:boolean) => {
     let filterTokens = listTokens;
