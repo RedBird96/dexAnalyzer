@@ -41,7 +41,7 @@ export default function TokenList({
 
   const [showListToken, setShowListToken] = useState<Boolean>();
   const [activeToken, setActiveToken] = useState<ERC20Token>();
-  const debouncedActiveToken = useDebounce<ERC20Token>(activeToken, 500);
+  const debouncedActiveToken = useDebounce<ERC20Token>(activeToken, 100);
   const [foundToken, setFoundToken] = useState<ERC20Token[]>([]);
   const [listTokens, setListTokens] = useState<ERC20Token[]>([]);
   const [searchStatus, setSearchStatus] = useState<SearchStatus>(SearchStatus.notsearch);
