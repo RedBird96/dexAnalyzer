@@ -359,7 +359,6 @@ export default function SwapTrade() {
   
   useEffect(() => {
     getPrice(); 
-    getPriceImpact();
   }, [debouncedFromTokenValue, debouncedToTokenValue, lpTokenPrice, lpTokenAddress.token0_reserve, lpTokenAddress.token1_reserve])
 
   const getPrice = async() => {
@@ -431,28 +430,29 @@ export default function SwapTrade() {
         setZero();
       }
     }
+    await getPriceImpact();
   }
 
   const getPriceImpact = async() => {
     let newToken0_reserve:number = 0;
     let newToken1_reserve:number = 0;
-    if (inputToken.address == lpTokenAddress.quoteCurrency_contractAddress) { //buy
-      if (lpTokenAddress.token0_contractAddress == lpTokenAddress.baseCurrency_contractAddress) {
-        newToken0_reserve = lpTokenAddress.token0_reserve - toNumber(debouncedFromTokenValue);
-        newToken1_reserve = lpTokenAddress.token1_reserve + toNumber(debouncedToTokenValue);
-      } else {
-        newToken0_reserve = lpTokenAddress.token0_reserve + toNumber(debouncedFromTokenValue);
-        newToken1_reserve = lpTokenAddress.token1_reserve - toNumber(debouncedToTokenValue);
-      }
-    } else if (inputToken.address == lpTokenAddress.baseCurrency_contractAddress) { //sell
+    if (inputToken.address == lpTokenAddress.baseCurrency_contractAddress) { //sell
       if (lpTokenAddress.token0_contractAddress == lpTokenAddress.baseCurrency_contractAddress) {
         newToken0_reserve = lpTokenAddress.token0_reserve + toNumber(debouncedFromTokenValue);
         newToken1_reserve = lpTokenAddress.token1_reserve - toNumber(debouncedToTokenValue);
       } else {
-        newToken0_reserve = lpTokenAddress.token0_reserve - toNumber(debouncedFromTokenValue);
-        newToken1_reserve = lpTokenAddress.token1_reserve + toNumber(debouncedToTokenValue);
+        newToken0_reserve = lpTokenAddress.token0_reserve - toNumber(debouncedToTokenValue);
+        newToken1_reserve = lpTokenAddress.token1_reserve + toNumber(debouncedFromTokenValue);
       }
-    }
+    } else { //buy
+      if (lpTokenAddress.token0_contractAddress == lpTokenAddress.baseCurrency_contractAddress) {
+        newToken0_reserve = lpTokenAddress.token0_reserve - toNumber(debouncedToTokenValue);
+        newToken1_reserve = lpTokenAddress.token1_reserve + toNumber(debouncedFromTokenValue);
+      } else {
+        newToken0_reserve = lpTokenAddress.token0_reserve + toNumber(debouncedFromTokenValue);
+        newToken1_reserve = lpTokenAddress.token1_reserve - toNumber(debouncedToTokenValue);
+      }
+    } 
     const currentPrice = lpTokenAddress.token0_reserve / lpTokenAddress.token1_reserve;
     const updatePrice = newToken0_reserve / newToken1_reserve;
     let priceImp = Math.abs(updatePrice / currentPrice * 100 - 100);
