@@ -30,7 +30,7 @@ import Bep20Abi from '../../../config/BEP20ABI.json'
 import Erc20Abi from '../../../config/ERC20ABI.json'
 import { MaxUint256 } from '@ethersproject/constants';
 import { getAmountIn, getAmountOut } from '../../../utils/router';
-import usePriceImpact from '../../../hooks/usePriceImpact';
+import { toNumber } from 'lodash';
 
 enum BTN_LABEL {
   LOADING,
@@ -63,7 +63,6 @@ export default function SwapTrade() {
   const [maxToToken, setMaxToToken] = useState<number>(0);
   const [miniValue, setMiniValue] = useState(0);
   const [executing, setExecuting] = useState<boolean>(false);
-  const priceImpact = usePriceImpact();
   const [fromToken, setFromToken] = useState<ERC20Token>(
     {
       name: "",
@@ -85,6 +84,7 @@ export default function SwapTrade() {
 
   const { fetchPairReserves } = useInitialize();
   
+  const [priceImpact, setPriceImpact] = useState<number>(0.00);
   const [pricebase, setPriceBase] = useState<number>(0);
   const [pricequote, setPriceQuote] = useState<number>(0);
   const [label, setLabel] = useState<BTN_LABEL>(BTN_LABEL.LOADING);
@@ -359,6 +359,7 @@ export default function SwapTrade() {
   
   useEffect(() => {
     getPrice(); 
+    getPriceImpact();
   }, [debouncedFromTokenValue, debouncedToTokenValue, lpTokenPrice, lpTokenAddress.token0_reserve, lpTokenAddress.token1_reserve])
 
   const getPrice = async() => {
@@ -430,6 +431,36 @@ export default function SwapTrade() {
         setZero();
       }
     }
+  }
+
+  const getPriceImpact = async() => {
+    let newToken0_reserve:number = 0;
+    let newToken1_reserve:number = 0;
+    if (inputToken.address == lpTokenAddress.quoteCurrency_contractAddress) { //buy
+      if (lpTokenAddress.token0_contractAddress == lpTokenAddress.baseCurrency_contractAddress) {
+        newToken0_reserve = lpTokenAddress.token0_reserve - toNumber(debouncedFromTokenValue);
+        newToken1_reserve = lpTokenAddress.token1_reserve + toNumber(debouncedToTokenValue);
+      } else {
+        newToken0_reserve = lpTokenAddress.token0_reserve + toNumber(debouncedFromTokenValue);
+        newToken1_reserve = lpTokenAddress.token1_reserve - toNumber(debouncedToTokenValue);
+      }
+    } else if (inputToken.address == lpTokenAddress.baseCurrency_contractAddress) { //sell
+      if (lpTokenAddress.token0_contractAddress == lpTokenAddress.baseCurrency_contractAddress) {
+        newToken0_reserve = lpTokenAddress.token0_reserve + toNumber(debouncedFromTokenValue);
+        newToken1_reserve = lpTokenAddress.token1_reserve - toNumber(debouncedToTokenValue);
+      } else {
+        newToken0_reserve = lpTokenAddress.token0_reserve - toNumber(debouncedFromTokenValue);
+        newToken1_reserve = lpTokenAddress.token1_reserve + toNumber(debouncedToTokenValue);
+      }
+    }
+    const currentPrice = lpTokenAddress.token0_reserve / lpTokenAddress.token1_reserve;
+    const updatePrice = newToken0_reserve / newToken1_reserve;
+    let priceImp = Math.abs(updatePrice / currentPrice * 100 - 100);
+    if (priceImp.toFixed(2) == "0.00")
+      priceImp = 0.01;
+    if (fromTokenValue == 0)
+      priceImp = 0.00;
+    setPriceImpact(priceImp);
   }
 
   const switchSwapTokens = async () => {
