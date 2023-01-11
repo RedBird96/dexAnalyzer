@@ -45,6 +45,8 @@ export function LpTokenPriceProvider({children}:any) {
     decimals: 18,
     image: "",
     network: constant.BINANCE_NETOWRK,
+    baseCurrency_name:"BNB",
+    quoteCurrency_name:"USDT",
     token0_name: "BNB",
     token1_name: "USDT",
     token0_reserve: 0,

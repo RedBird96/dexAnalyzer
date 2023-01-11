@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Box, useColorModeValue } from "@chakra-ui/react"
+import { Box, Collapse, Drawer, DrawerBody, DrawerContent, DrawerOverlay, Flex, useColorModeValue, useDisclosure } from "@chakra-ui/react"
 import dynamic from 'next/dynamic'
 import TokenList from "../TokenList"
 import TokenInfo from "../TokenInfo"
@@ -10,6 +10,9 @@ import style from './TokenBody.module.css'
 import { ResizerLight} from '../../assests/icon'
 import { useTokenInfo } from '../../hooks'
 import { PlayMode } from '../../utils/type';
+import useSize from '../../hooks/useSize'
+import { SCREEN2XL_SIZE, SCREENMD_SIZE } from '../../utils/constant'
+import SwapTrade from '../WalletInfo/SwapTrade'
 
 const ChartContainer = dynamic(() => import("../ChartContainer"), { ssr: false })
 
@@ -28,34 +31,20 @@ export default function TokenBody({
   const [height, setHeight] = useState(320);
   const [chartheight, setChartHeight] = useState(0);
   const resizeBgColor = useColorModeValue("#FFFFFF", "#1C1C1C");
-  const hasWindow = typeof window !== 'undefined';
-  const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
-  
-  function getWindowDimensions() {
-    const width = hasWindow ? window.innerWidth : null;
-    const height = hasWindow ? window.innerHeight : null;
-    return {
-      width,
-      height,
-    };
-  }
+  const windowDimensions = useSize();
+  const borderColorMode = useColorModeValue("#E2E8F0","#2B2A2A");
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [showTrade, setShowTrade] = useState(false);
+  const firstField = React.useRef()
 
   useEffect(() => {
-    if (hasWindow) {
-      const handleResize = () => {
-        setWindowDimensions(getWindowDimensions());
-      }
-
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
+    if (isOpen && windowDimensions.width > SCREEN2XL_SIZE) {
+      onClose();
     }
-  }, []);
-
-  useEffect(() => {
     if (tokenData !=undefined && tokenData.contractAddress != ""){
-      setChartHeight(sidebarRef.current.clientHeight - 320 < 750 ? 750 : sidebarRef.current.clientHeight - 320);
+      setChartHeight(windowDimensions.height - 540);
     }
-  }, [windowDimensions, tokenData])
+  }, [windowDimensions, tokenData, showTrade])
 
   const startResizing = React.useCallback((_mouseDownEvent: any) => {
     setIsResizing(true);
@@ -79,8 +68,12 @@ export default function TokenBody({
         setChartHeight(sidebarRef.current.clientHeight - resizeHeight);
       }
     },
-    [isResizing]
+    [isResizing, showTrade]
   );
+
+  const handleShowTrade = (triggerTradeShow: boolean) => {
+    setShowTrade(triggerTradeShow);
+  }
 
   React.useEffect(() => {
     window.addEventListener("mousemove", resize);
@@ -95,31 +88,81 @@ export default function TokenBody({
     <main 
       className={style.tokenBody} 
     >
-      <Box style={{
-        display: "flex", 
-        flexDirection: "row", 
-        width: "21.7%"
-        }}>
-        <MenuBar
-          selectMode={PlayMode.Trade}
-        />
+      
+      <MenuBar
+        selectMode={PlayMode.Trade}
+        onOpen = {onOpen}
+      />
+      <Box 
+        borderRight={"1px"}
+        borderRightColor = {borderColorMode}
+        minW={{'2xl':470}}
+        display={{base:'none', '2xl':'block'}}
+      >
         <TokenList
           network = {network}
           address = {address}
         />
       </Box>
-      <nav>
-        <hr aria-orientation='vertical' style={{width:"1px", color:"#313131"}}></hr>
-      </nav>
+
+      <Drawer
+          isOpen={isOpen}
+          placement = 'left'
+          onClose={onClose}
+          initialFocusRef={firstField}
+          isFullHeight = {false}
+        >
+          <DrawerOverlay/>
+          <DrawerContent minW={{sm:470}} style={{
+            position: 'fixed',
+            top: '4rem'
+          }}>
+            <DrawerBody p = {0}>
+              <TokenList
+                network = {network}
+                address = {address}
+              />
+            </DrawerBody>
+          </DrawerContent>
+        </Drawer>      
       {
         tokenData != undefined && tokenData.contractAddress != "" ? 
         <Box style={{
           display: "flex", 
           flexDirection: "column", 
-          width: "56.5%",
+          width: "100%",
           height:"100%"
         }}>
-          <TokenInfo/>  
+          <TokenInfo
+            triggerShowTrade = {handleShowTrade}
+          />  
+          {
+            windowDimensions.width < SCREENMD_SIZE && 
+            <Flex  
+              as={Collapse} 
+              in = {showTrade} 
+              animateOpacity 
+              backgroundColor={resizeBgColor}
+              display = {"flex"}
+              justifyContent = {"center"}
+              userSelect = "none"
+              minH={320}
+              style={{
+                justifyContent:"center"
+              }}
+            >
+              <Box
+                display={"flex"}
+                justifyContent={"center"}
+                paddingTop = {"1rem"}
+              >
+                <SwapTrade
+                  mobileVersion={true}
+                />
+              </Box>
+            
+            </Flex>
+          }
           <Box 
           id="tradeMain"
           style={{
@@ -139,9 +182,10 @@ export default function TokenBody({
             <Box 
               position="relative"
               display="flex"
+              flexDirection={"column"}
               height={height}
               maxHeight={"50rem"}
-              minHeight={"20rem"}
+              minHeight={"10rem"}
               flexShrink={"0"}
               width={"100%"}
               ref = {transactionRef}
@@ -157,9 +201,6 @@ export default function TokenBody({
                 backgroundColor={resizeBgColor}
                 onMouseDown={startResizing}
               >
-                <nav>
-                  <hr aria-orientation='vertical' style={{width:"100%", height:"1px", color:"#313131"}}></hr>
-                </nav>
                 <Box
                   display="flex"
                   width={"100%"}
@@ -171,6 +212,8 @@ export default function TokenBody({
                   style={{
                     zIndex:99
                   }}
+                  borderTop={"1px"}
+                  borderTopColor = {borderColorMode}
                 >
                   <ResizerLight/>
                 </Box>
@@ -182,7 +225,7 @@ export default function TokenBody({
           <Box style={{
             display: "flex", 
             flexDirection: "column", 
-            width: "56.5%",
+            width: "100%",
             height:"100%",
             justifyContent:"center",
             alignItems:"center",
@@ -192,14 +235,15 @@ export default function TokenBody({
           </Box>
       }
       
-      <nav>
-        <hr aria-orientation='vertical' style={{width:"1px", color:"#313131"}}></hr>
-      </nav>
-      <Box style={{
-        display: "flex", 
-        width: "21.8%"
-      }}>
-      <WalletInfo/>
+      <Box 
+      borderLeft={"1px"}
+      borderLeftColor = {borderColorMode}
+      minW = {{xl:560}}
+      display = {{base:'none', xl:'block'}}
+      >
+        <WalletInfo
+          tradeVisible = {true}
+        />
       </Box>       
     </main>
   );

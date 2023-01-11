@@ -18,6 +18,8 @@ import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
 import * as constant from '../../utils/constant'
 import { TokenSide, TransactionType } from '../../utils/type'
 import { appendPastTransactions } from './module'
+import useSize from '../../hooks/useSize'
+import { SCREENMD_SIZE } from '../../utils/constant'
 
 
 export default function TokenTransaction() {
@@ -33,11 +35,12 @@ export default function TokenTransaction() {
   const {coinPrice} = useStableCoinPrice();
   const [quotePrice, setquotePrice] = useState(1);
   const [bottomHandle, setBottomHandle] = useState<Boolean>(false);
+  const [isMobileVersion, setMobileVersion] = useState<boolean>(false);
   const [txTransaction, setTXTransaction] = useState<TransactionType[]>([]);
   const infoborderColorMode = useColorModeValue("#E2E8F0","#505050");
   const LINK_BSCNETWORK = "https://bscscan.com/tx/";
   const LINK_ETHNETWORK = "https://etherscan.io/tx/";
-
+  const windowDimensions = useSize();
   const handleScroll = async (e:any) => {
     const bottom = e.target.scrollHeight - e.target.scrollTop <= (e.target.clientHeight + 20);
     if (bottom && !bottomHandle) { 
@@ -59,6 +62,14 @@ export default function TokenTransaction() {
   }, [transactionData])
 
   useEffect(() => {
+    if (windowDimensions.width < SCREENMD_SIZE) {
+      setMobileVersion(true);
+    } else {
+      setMobileVersion(false);
+    }
+  }, [windowDimensions])
+  
+  useEffect(() => {
     setTXTransaction([]);
     setquotePrice(1);
   }, [lpTokenAddress.contractAddress])
@@ -66,7 +77,7 @@ export default function TokenTransaction() {
 
 
   return (
-    <Box className={transactionClass}>
+    <Box className={transactionClass} width = {isMobileVersion ? windowDimensions.width - 86 : "100%"}>
       <TableContainer overflowY={"auto"} overflowX={"auto"} height={"100%"} css={{
         '&::-webkit-scrollbar': {
           width: '10px',

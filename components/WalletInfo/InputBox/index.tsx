@@ -76,6 +76,7 @@ export default function InputBox({
       borderRadius={"5px"}
       padding = {"0.2rem"}
       justifyContent = {"center"}
+      alignItems = {"center"}
     >
       <Box
         style={{
@@ -113,7 +114,7 @@ export default function InputBox({
       </Box>
       <Divider orientation="vertical" style= {{
               borderColor:borderColor,
-              height:"90%"
+              height:"2rem"
             }}></Divider>
       <Box
         style={{

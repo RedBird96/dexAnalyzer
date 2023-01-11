@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react'
-import { Box, useColorMode, useColorModeValue  } from "@chakra-ui/react"
+import React, {useState, useEffect, useMemo} from 'react'
+import { Box, Button, Divider, Drawer, DrawerBody, DrawerContent, DrawerOverlay, useBreakpoint, useBreakpointValue, useColorMode, useColorModeValue, useDisclosure  } from "@chakra-ui/react"
 import {
   WebSite,
   FaceBook,
@@ -12,7 +12,8 @@ import {
   Reddit,
   CopyAddressIconDark,
   CopyAddressIconLight,
-  CoyAddressComfirm
+  CoyAddressComfirm,
+  TokenDetailsDark
 } from "../../assests/icon"
 import {
   useTokenInfo,
@@ -23,7 +24,8 @@ import {
 import { 
   convertBalanceCurrency,
   numberWithCommasTwoDecimals,
-  numberWithCommasNoDecimals
+  numberWithCommasNoDecimals,
+  makeShortTokenName
 } from '../../utils'
 import {
   getLPTokenReserve,
@@ -39,27 +41,44 @@ import LpTokenInfo from './LpTokenInfo'
 import { LPTokenPair, TokenSide } from '../../utils/type'
 import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
 import { useAddress } from '@thirdweb-dev/react'
+import SocialListBox from './SocialListBox'
+import useSize from '../../hooks/useSize'
+import { SCREENMD_SIZE } from '../../utils/constant'
+import TokenDetails from './TokenDetails'
+import TokenBalance from './TokenBalance'
 
 
-export default function TokenInfo() {
+export default function TokenInfo({
+  triggerShowTrade
+}:{
+  triggerShowTrade: (x?:boolean) => void
+}
+
+) {
 
   const colorMode = useColorMode();
-  const {tokenData, setTokenData} = useTokenInfo();
-  const {transactionData, setTransactionData} = useLPTransaction();
+  const {tokenData} = useTokenInfo();
   const {walletTokens} = useWalletTokenBalance();
   const {lpTokenPrice, lpTokenAddress ,setLPTokenAddress} = useLPTokenPrice();
   const [tokenPriceshow, setTokenPriceShow] = useState<number>(0.0);
   
+  const [isMobileVersion, setMobileVersion] = useState<boolean>(false);
   const [lpTokenList, setLPTokenList] = useState<LPTokenPair[]>([]);
   const [lpTokenPinList, setLPTokenPinList] = useState<LPTokenPair[]>([]);
   const [balance, setBalance] = useState<number>(0);
   const [balanceUSD, setBalanceUSD] = useState<number>(0);
   const priceColor = useColorModeValue("#00B112","#00C514");
+  const drawerbgColor = useColorModeValue("#FEFEFE", "#1C1C1C");
 
   const [copyStatus, setCopyStatus] = useState<boolean>(false);
   const [burnAmount, setBurnAmount] = useState<number>(0);
   const [holdersCount, setHoldersCount] = useState<number>(0);
   const [transactionCount, setTransactionCount] = useState<number>(0);
+  const windowDimensions = useSize();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen : isToggleOpen , onToggle} = useDisclosure();
+  const firstField = React.useRef()
+  
   const {coinPrice} = useStableCoinPrice();
   const infoClass = useColorModeValue(
     style.tokenInfo + " " + style.tokenInfoLight,
@@ -268,6 +287,10 @@ export default function TokenInfo() {
     }, 2000)
   }
 
+  const tradeShow = useMemo(() => {
+    triggerShowTrade(isToggleOpen);
+  }, [isToggleOpen])
+  
   useEffect(() => {
     addPinLPToken();
     setLPTokenListInfo();
@@ -279,6 +302,15 @@ export default function TokenInfo() {
     getLastLpTokenList();
   }, [])
  
+  useEffect(() => {
+    if (windowDimensions.width < SCREENMD_SIZE) {
+      setMobileVersion(true);
+    } else {
+      setMobileVersion(false);
+    }
+  }, [windowDimensions])
+
+  
   useEffect(() => {
 
     const setTokneBalanceAndPrice = async() => {
@@ -305,17 +337,17 @@ export default function TokenInfo() {
 
     setTokneBalanceAndPrice();
   }, [walletTokens, tokenData, lpTokenPrice])
-
+  
   return (
     <Box className={infoClass}>
-      <Box className={style.tokenSocialInfo}>
-        <Box display={"flex"} flexDirection={"row"} width={"83%"} alignItems={"center"} justifyContent={"space-between"}>
-          <Box display={"flex"} flexDirection={"row"} width={"59%"} alignItems={"center"}>
+      <Box className={style.tokenSocialInfo} borderBottom={"1px"} borderBottomColor = {infoborderColorMode}>
+        <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "95%" :"83%"} alignItems={"center"} justifyContent={"space-between"}>
+          <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "100%" : "59%"} alignItems={"center"}>
             <img src={tokenData.image} width={"50rem"}/>
             <Box display={"flex"} flexDirection={"column"} paddingLeft={"1rem"} alignItems={"flex-start"}>
               <Box display={"flex"} flexDirection={"row"}>
-                <p className={style.tokenName}>{tokenData.symbol}</p>
-                <p className={style.tokenName} style={{color:"#767676"}}>&nbsp;({lpTokenAddress.symbol})</p>
+                <p className={style.tokenName}>{isMobileVersion ? makeShortTokenName(tokenData.symbol, 4) : tokenData.symbol}</p>
+                <p className={style.tokenName} style={{color:"#767676"}}>&nbsp;({isMobileVersion ? `${makeShortTokenName(lpTokenAddress.baseCurrency_name, 4)}/${makeShortTokenName(lpTokenAddress.quoteCurrency_name, 4)}` :lpTokenAddress.symbol})</p>
                 <p className={style.tokenPrice} style={{color:priceColor}}>{convertBalanceCurrency( tokenPriceshow, 9)}</p>
               </Box>
               <Box 
@@ -345,147 +377,109 @@ export default function TokenInfo() {
               </Box>            
             </Box>
           </Box>
+          {
+            !isMobileVersion && 
+            <SocialListBox
+              token={tokenData}
+            />
+          }
+        </Box>
+        
+        {
+          !isMobileVersion &&
+          <div className={style.border} style={{borderColor:infoborderColorMode}}/>
+        }
+        {
+          !isMobileVersion ?
           <Box
             display={"flex"}
             flexDirection={"row"}
             alignItems={"center"}
+            width={"25%"}
           >
-            {
-              tokenData.website != "" && tokenData.website != undefined && 
-              <a 
-                className={style.socialUrl} 
-                href={tokenData.website} 
-                style={{marginRight:"0.5rem"}} 
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                <WebSite className={style.socialUrl}/>
-              </a>            
-            }
-            {
-              tokenData.facebook != "" && tokenData.facebook != undefined &&  
-              <a 
-                className={style.socialUrl} 
-                href={tokenData.facebook} 
-                style={{marginRight:"0.5rem"}} 
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                <FaceBook className={style.socialUrl}/>
-              </a>
-            }
-            {
-              tokenData.twitter != "" && tokenData.twitter != undefined && 
-              <a 
-                className={style.socialUrl} 
-                href={tokenData.twitter} 
-                style={{marginRight:"0.5rem"}} 
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                <Twitter className={style.socialUrl}/>
-              </a>
-            }
-            {
-                tokenData.medium != "" && tokenData.medium != undefined && 
-                <a 
-                className={style.socialUrl} 
-                href={tokenData.medium} 
-                style={{marginRight:"0.5rem"}} 
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                <Medium className={style.socialUrl}/>
-              </a>                
-            }
-            {
-                tokenData.instagra != "" && tokenData.instagra != undefined && 
-                <a 
-                className={style.socialUrl} 
-                href={tokenData.instagra} 
-                style={{marginRight:"0.5rem"}} 
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                <Instagram className={style.socialUrl}/>
-              </a>                
-            }          
-            {
-                tokenData.telegram != "" && tokenData.telegram != undefined && 
-                <a 
-                className={style.socialUrl} 
-                href={tokenData.telegram} 
-                style={{marginRight:"0.5rem"}} 
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                <Telegram className={style.socialUrl}/>
-              </a>                
-            }                   
-            {
-                tokenData.discord != "" && tokenData.discord != undefined && 
-                <a 
-                className={style.socialUrl} 
-                href={tokenData.discord} 
-                style={{marginRight:"0.5rem"}} 
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                <Discord className={style.socialUrl}/>
-              </a>                
-            }          
-            {
-                tokenData.reddit != "" && tokenData.reddit != undefined && 
-                <a 
-                className={style.socialUrl} 
-                href={tokenData.reddit} 
-                style={{marginRight:"0.5rem"}} 
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                <Reddit className={style.socialUrl}/>
-              </a>                
-            }               
-            {
-                tokenData.github != "" && tokenData.github != undefined &&
-                <a 
-                className={style.socialUrl} 
-                href={tokenData.github} 
-                style={{marginRight:"0.7rem"}} 
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                <Github className={style.socialUrl}/>
-              </a>                
-            }                      
-          </Box>
-        </Box>
-        <div className={style.border} style={{borderColor:infoborderColorMode}}/>
-        <Box
-         display={"flex"}
-         flexDirection={"row"}
-         alignItems={"center"}
-         width={"25%"}
-        >
-          <Box
-            display={"flex"}
-            flexDirection={"column"}         
+            <Box
+              display={"flex"}
+              flexDirection={"column"}         
+            >
+              <p className={style.holder} style={{color:textColor}}>Total Supply</p>
+              <p className={style.tokenTotalSupply} color={whiteBlackMode}>{tokenData.totalSupply != null ? 
+                numberWithCommasNoDecimals(tokenData.totalSupply) :
+                0}</p>
+            </Box>
+          </Box>:
+          <Box  
+           display={"flex"}
+           width={"2rem"}
+           cursor={"pointer"}
+           onClick={onOpen}
           >
-            <p className={style.holder} style={{color:textColor}}>Total Supply</p>
-            <p className={style.tokenTotalSupply} color={whiteBlackMode}>{tokenData.totalSupply != null ? 
-              numberWithCommasNoDecimals(tokenData.totalSupply) :
-              0}</p>
+            <TokenDetailsDark/>
+            <Drawer
+              isOpen={isOpen}
+              placement = 'right'
+              onClose={onClose}
+              initialFocusRef={firstField}
+              isFullHeight = {false}
+            >
+              <DrawerOverlay/>
+              <DrawerContent minW={{sm:400}} maxH={{sm:200}} style={{
+                position: 'fixed',
+                top: '4rem'
+              }}>
+                <DrawerBody p = {0} bg = {drawerbgColor}>
+                  <Box
+                    width={"100%"}
+                    height = {"100%"}
+                    display = {"flex"}
+                    flexDirection = {"column"}
+                    justifyContent = {"center"}
+                    padding = {"1rem"}
+                  >
+                    <Box
+                      display={"flex"}
+                      flexDirection={"column"}
+                    >
+                      <p className={style.holder} style={{color:textColor}}>Total Supply</p>
+                      <p className={style.tokenTotalSupply} color={whiteBlackMode}>{tokenData.totalSupply != null ? 
+                        numberWithCommasNoDecimals(tokenData.totalSupply) :
+                        0}</p>
+                    </Box>
+                    <Divider/>
+                    <TokenDetails
+                      holdersCount = {holdersCount}
+                      transactionCount = {transactionCount}
+                      tokenData = {tokenData}
+                      width = {"100%"}
+                    />
+                    <Divider/>
+                    <TokenBalance
+                      balance = {balance}
+                      balanceUSD = {balanceUSD}
+                      tokenData = {tokenData}
+                      width = {"100%"}
+                    />       
+                    <Divider/>
+                    <Box
+                      display={"flex"}
+                      marginTop = {"0.2rem"}
+                    >
+                      <SocialListBox
+                        token={tokenData}
+                      />
+                    </Box>
+                  </Box>
+                </DrawerBody>
+              </DrawerContent>
+            </Drawer>   
           </Box>
-        </Box>
+        }
       </Box>
-      <nav>
-        <hr aria-orientation='horizontal'></hr>
-      </nav>
-      <Box className={style.tokenMarktetInfo} alignItems={"center"}>
-        <Box display={"flex"} flexDirection={"row"} width={"83%"} height={"100%"} alignItems={"center"}>
-          <Box display={"flex"} flexDirection={"column"} width={"28%"} paddingLeft={"4rem"}>
+      
+      <Box className={style.tokenMarktetInfo} alignItems={"center"} borderBottom={"1px"} borderBottomColor = {infoborderColorMode}>
+        <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "95%" :"83%"} height={"100%"} alignItems={"center"}>
+          <Box display={"flex"} flexDirection={"column"} width={isMobileVersion ? "40%" : "28%"} paddingLeft={"4rem"}>
             <p className={style.marketCap} style={{color:textColor}} >Market Cap</p>
-            <p className={style.tokenMarketCap} style={{color:priceColor}}>{convertBalanceCurrency((tokenData.totalSupply-burnAmount) * tokenPriceshow, 0)}</p>
+            <p className={style.tokenMarketCap} style={{color:priceColor}}>{isMobileVersion ? makeShortTokenName(convertBalanceCurrency((tokenData.totalSupply-burnAmount) * tokenPriceshow, 0), 10) :convertBalanceCurrency((tokenData.totalSupply-burnAmount) * tokenPriceshow, 0)}</p>
           </Box>
           <div style={{
             height:"90%",
@@ -495,7 +489,7 @@ export default function TokenInfo() {
           <Box 
             display={"flex"} 
             flexDirection={"column"} 
-            width={"40%"} 
+            width={isMobileVersion ? "60%" : "40%"} 
             position={"relative"} 
             height={"100%"}
             top={"0.4rem"}
@@ -548,100 +542,49 @@ export default function TokenInfo() {
             borderWidth:"1px",
             borderColor:infoborderColorMode,
           }}/>
-          <Box display={"flex"} flexDirection={"column"} width={"39%"}>
-              <p className={style.marketCap} style={{color:textColor}}>Balance</p>
-              <Box _hover={{"textDecoration":"underline"}} cursor="pointer">
-              <a style = {{display:"flex", flexDirection:"row", alignItems:"center"}}
-                  href={tokenData.contractBalanceWalletURL + address}
-                  target="_blank"
-                  rel="noreferrer noopener" >
-              
-                <p
-                  className={style.itemvalue} 
-                  style={{marginRight:"1rem"}} 
-                  color={whiteBlackMode} 
-                >
-                  {numberWithCommasTwoDecimals(balance)}
-                </p>
-                <p className={style.itemvalue}  style={{color:priceColor}} >({convertBalanceCurrency(balanceUSD, 2)})</p>
-              </a>
-              </Box>
-          </Box>          
+          {
+            !isMobileVersion &&
+            <TokenBalance
+              balance = {balance}
+              balanceUSD = {balanceUSD}
+              tokenData = {tokenData}
+              width = {"39%"}
+            />       
+          }
         </Box>
-        <div className={style.border} style={{borderColor:infoborderColorMode}}/>
-        <Box display={"flex"} flexDirection={"row"} width={"25%"} alignItems={"center"}>
-          <Box display={"flex"} flexDirection={"row"} width={"100%"} paddingLeft={"0.1rem"}>
-            <Box display={"flex"} flexDirection={"column"} width={"50%"}>
-              <p className={style.holder} style={{color:textColor}}>Holders</p>
-              <Box _hover={{"textDecoration":"underline"}} cursor="pointer" >
-                <a 
-                  className={style.itemvalue} 
-                  color={whiteBlackMode} 
-                  href={tokenData.contractBalanceURL} 
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  {holdersCount}
-                </a>
-              </Box>
-            </Box>
-            <Box>
-              <p className={style.holder} style={{color:textColor}}>Transactions</p>
-              <Box _hover={{"textDecoration":"underline"}} cursor="pointer" >
-                <a 
-                  className={style.itemvalue} 
-                  color={whiteBlackMode} 
-                  href={tokenData.contractPage} 
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  {transactionCount}
-                </a>
-              </Box>
-            </Box>              
-          </Box>        
-        </Box>
+        {
+          !isMobileVersion &&
+          <div style={{
+            marginRight:"1rem",
+            height:"90%",
+            borderWidth:"1px",
+            borderColor:infoborderColorMode,
+          }}/>
+        }
+        {
+          !isMobileVersion ?
+            <TokenDetails
+              holdersCount = {holdersCount}
+              transactionCount = {transactionCount}
+              tokenData = {tokenData}
+              width = {"25%"}
+            />
+          :
+          <Box
+            width = {"6rem"}
+            display={"flex"}
+            alignItems={"center"}
+            justifyItems={"center"}
+            marginRight={"0.5rem"}
+          >
+            <Button
+              onClick={onToggle}
+              _hover= {{bg:isToggleOpen ? "#0085FF" : "transparent"}}
+              backgroundColor = {isToggleOpen ? "#0085FF" : "transparent"}
+            >TRADE</Button>
+          </Box>
+        }
       </Box>
-      <nav>
-        <hr aria-orientation='horizontal'></hr>
-      </nav>
-      {/* <Box 
-        display={"flex"}
-        flexDirection={"row"}
-        padding={"0.5rem 0rem 0.5rem 1.5rem"}
-        width={"100%"}
-        height={"2.4rem"}
-      >
-        <Box
-          display={"flex"}
-          width={"83%"}
-          alignItems={"center"}
-          paddingLeft={"4rem"}
-        >
-          <Switch className={style.switch}>Show Trade</Switch>
-        </Box>
-        <div style={{
-          height:"90%",
-          borderWidth:"1px",
-          borderColor:infoborderColorMode,
-          marginRight:"1rem"
-        }}/>
-        <Box
-          display={"flex"}
-          flexDirection={"row"}
-          alignItems={"center"}   
-          width={"25%"}
-        >
-          <Box className={style.itemvalue} width={"50%"}>
-            <p style={{marginRight:"0.5rem", color:textColor}}>Buy</p>
-            <p color={whiteBlackMode}> 5%</p>
-          </Box>
-          <Box className={style.itemvalue} width={"50%"}>
-            <p style={{marginRight:"0.5rem", color:textColor}}>Sell</p>
-            <p color={whiteBlackMode}> 5%</p>
-          </Box>
-        </Box>
-      </Box> */}
     </Box>
   );
 }

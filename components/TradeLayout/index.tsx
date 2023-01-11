@@ -16,7 +16,6 @@ function TradeLayout({
   return (
     <Box display="flex" flexDirection="column" height="100vh">
       <Header/>
-      <nav><hr aria-orientation='horizontal'/></nav>
       <Box className={colorMode == "light" ? style.mainBodylight : style.mainBodyblack} >
         <TokenBody
           network={network}

@@ -56,9 +56,15 @@ export function makeShortAddress(address: string, limitLen = 7): string {
 }
 
 export function makeShortTokenName(name: string, len: number): string {
-  if (name.length > len)
-    return name.substring(0, len) + "..";
-  return name;
+  try{
+    if (name.length > len)
+      return name.substring(0, len) + "..";
+    return name;
+  } catch(e)
+  {
+
+  }
+  return '';
 }
 
 export function makeShortTxHash(txHash:string): string {

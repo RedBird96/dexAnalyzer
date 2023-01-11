@@ -51,5 +51,9 @@ export const theme = extendTheme({
   },
   lineHeights: {
     4: '1.5rem',
+  },
+  breakpoints: {
+    xl: '1700px',
+    '2xl': '2200px'
   }
 });

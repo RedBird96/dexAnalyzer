@@ -3,21 +3,31 @@ import { Box, useColorModeValue } from "@chakra-ui/react"
 import style from './MenuBar.module.css'
 import {GameMenuBar, TopMenuBar} from '../../assests/icon'
 import {TradeMenuBar} from '../../assests/icon'
-import { usePlayMode } from '../../hooks/usePlayMode'
 import { PlayMode } from '../../utils/type'
 import Link from 'next/link'
+import { SCREEN2XL_SIZE } from '../../utils/constant'
 
 export default function MenuBar({
-  selectMode
+  selectMode,
+  onOpen
 }:{
-  selectMode: PlayMode
+  selectMode: PlayMode,
+  onOpen: () => void
 }) {
-  const {showMode, setShowMode} = usePlayMode();
+
   const menuClass = useColorModeValue(
     style.menuBar + " " + style.menuBarLight,
     style.menuBar + " " + style.menuBarDark
   );
   const chartSelectColor = useColorModeValue("#0067C6", "#2F2F2F");
+
+  const onMenuClick = () => {
+    const hasWindow = typeof window !== 'undefined';
+    const width = hasWindow ? window.innerWidth : null;
+    if (width < SCREEN2XL_SIZE && selectMode == PlayMode.Trade)
+      onOpen();
+  }
+
   return (
     <Box className={menuClass}>
       <Box style={{
@@ -28,8 +38,11 @@ export default function MenuBar({
         cursor: "pointer",
         flexDirection: "column",
         width:"100%",
-        alignItems:"center"
-      }}>
+        alignItems:"center",
+      }}
+      _hover={{bg:chartSelectColor}}
+      onClick = {onMenuClick}
+      >
         <TopMenuBar className={"text-1x"}/>
       </Box>
       <Box style={{

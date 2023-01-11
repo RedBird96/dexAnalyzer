@@ -39,7 +39,13 @@ import {
 } from '../../hooks'
 import SwapTrade from './SwapTrade'
 
-export default function WalletInfo() {
+export default function WalletInfo({
+  tradeVisible
+}:{
+  tradeVisible: boolean
+}
+
+) {
   const titleClass = useColorModeValue(
     style.walletTitle + " " + style.walletTitleLight, 
     style.walletTitle + " " + style.walletTitleDark
@@ -60,25 +66,23 @@ export default function WalletInfo() {
   const searchColor = useColorModeValue("#FFFFFF", "#323232");
   const searchBorderColor = useColorModeValue("#CFCFCF", "#323232");
   const notSelectBtnColor = useColorModeValue("#E0E0E0","#1C1C1C");
-  const tokenColor = useColorModeValue("#1C1C1C","#FFFFFF");
   const refreshBtnBgColor = useColorModeValue("#FFFFFF","#1C1C1C");
   const refreshBtnBorderColor = useColorModeValue("#CFCFCF","#5c5c5c");
   const hoverColor = useColorModeValue("#005CE5","#3A3A29");
-  const headerColor = useColorModeValue("#FFFFFF", "#262626");
   const priceColor = useColorModeValue("#00B112","#00C514");
+  const borderColorMode = useColorModeValue("#E2E8F0","#2B2A2A");
   const tableBodyBorder = useColorModeValue(style.walletTokenBodyBorderLight,style.walletTokenBodyBorderDark);
   const tableHeadBorder = useColorModeValue(style.walletTokenHeadBorderLight,style.walletTokenHeadBorderDark);
   const address = useAddress();
   const network = useNetwork();
   const walletRef = useRef(null);
   
-  const [widgetOption, setWidgetOption] = useState<Boolean>(true);
+  const [widgetOption, setWidgetOption] = useState<Boolean>(tradeVisible);
   const [borderWidth, setBorderWidth] = useState(0);
   const [searchContext, setSearchContext] = useState("");
   const [walletBalance, setWalletBalance] = useState(0);
   const [tokensInfo, setTokensInfo] = useState<ERC20Token[]>([]);
   const [initTokensInfo, setInitTokensInfo] = useState<ERC20Token[]>([]);
-  const {lpTokenAddress, setLPTokenAddress} = useLPTokenPrice();
 
   const handleSearchChange = (e: { target: { value: string; }; }) => {
     const { value } = e.target;
@@ -235,46 +239,52 @@ export default function WalletInfo() {
           width:"89%"
         }}
       >
-        <Button
-          style={{
-            marginTop:"1.3rem",
-            fontSize:"1rem",
-            fontFamily:"Inter",
-            fontWeight:"500",
-            color:widgetOption == false ? widgetfontColor : "#FFFFFF"
-          }}
-          _hover={{
-            backgroundColor:widgetOption == false ? notSelectBtnColor : selectBtnColor
-          }}
-          width={"50%"}
-          borderRadius={"1rem 0rem 0rem 1rem"}
-          height={"2.5rem"}
-          backgroundColor={widgetOption == false ? notSelectBtnColor : selectBtnColor}
-          onClick={()=>setWidgetOption(true)}
-        >
-          TRADE
-        </Button>
-        <Button
-          style={{
-            marginTop:"1.3rem",
-            fontSize:"1rem",
-            fontFamily:"Inter",
-            fontWeight:"500",
-            color:widgetOption == false ? "#FFFFFF" : widgetfontColor
-          }}
-          _hover={{
-            backgroundColor:widgetOption == false ? selectBtnColor : notSelectBtnColor
-          }}
-          width={"50%"}
-          height={"2.5rem"}
-          borderRadius={"0rem 1rem 1rem 0rem"}
-          backgroundColor={widgetOption == false ? selectBtnColor : notSelectBtnColor}
-          color={"#FFFFFF"}
-          onClick={()=>setWidgetOption(false)}
-        >
-          WALLET
-        </Button>
+        { tradeVisible &&
+          <Button
+            style={{
+              marginTop:"1.3rem",
+              fontSize:"1rem",
+              fontFamily:"Inter",
+              fontWeight:"500",
+              color:widgetOption == false ? widgetfontColor : "#FFFFFF"
+            }}
+            _hover={{
+              backgroundColor:widgetOption == false ? notSelectBtnColor : selectBtnColor
+            }}
+            width={"50%"}
+            borderRadius={"1rem 0rem 0rem 1rem"}
+            height={"2.5rem"}
+            backgroundColor={widgetOption == false ? notSelectBtnColor : selectBtnColor}
+            onClick={()=>setWidgetOption(true)}
+          >
+            TRADE
+          </Button>
+        }
+        {
+          tradeVisible &&
+          <Button
+            style={{
+              marginTop:"1.3rem",
+              fontSize:"1rem",
+              fontFamily:"Inter",
+              fontWeight:"500",
+              color:widgetOption == false ? "#FFFFFF" : widgetfontColor
+            }}
+            _hover={{
+              backgroundColor:widgetOption == false ? selectBtnColor : notSelectBtnColor
+            }}
+            width={"50%"}
+            height={"2.5rem"}
+            borderRadius={"0rem 1rem 1rem 0rem"}
+            backgroundColor={widgetOption == false ? selectBtnColor : notSelectBtnColor}
+            color={"#FFFFFF"}
+            onClick={()=>setWidgetOption(false)}
+          >
+            WALLET
+          </Button>
+        }
       </Box>
+      
       {
         widgetOption ?
         <Box 
@@ -282,9 +292,10 @@ export default function WalletInfo() {
           // backgroundColor = {refreshBtnBgColor}
         > 
           {
-            tokenData != undefined && tokenData.contractAddress != "" ?
-            <SwapTrade></SwapTrade> :
-            <></>
+            tokenData != undefined && tokenData.contractAddress != "" &&
+            <SwapTrade
+              mobileVersion = {false}
+            />
           }
           
         </Box> :
@@ -421,8 +432,7 @@ export default function WalletInfo() {
         </Box>
       }
       
-      <nav><hr aria-orientation='horizontal' style={{width:borderWidth}}></hr></nav>
-      <Box width={"100%"} height={"100%"} background={refreshBtnBgColor}>
+      <Box width={"100%"} height={"100%"} background={refreshBtnBgColor} borderTop={"1px"} borderTopColor = {borderColorMode}>
 
       </Box>
     </Box>

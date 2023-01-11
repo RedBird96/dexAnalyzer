@@ -1,7 +1,7 @@
 .menuBar{
   display:flex;
   flex-direction: column;
-  width: 15.5%;
+  min-width: 5.4rem;
   height: 100%;
   align-items:center;
 }

@@ -42,7 +42,11 @@ enum BTN_LABEL {
   PROCESSING,
 }
 
-export default function SwapTrade() {
+export default function SwapTrade({
+  mobileVersion
+}:{
+  mobileVersion: boolean
+}) {
 
   const {lpTokenPrice} = useLPTokenPrice();
   const address = useAddress();
@@ -528,6 +532,7 @@ export default function SwapTrade() {
   return (
     <Box 
       className={style.tradeMain}
+      width = {mobileVersion ? "35rem" : "93%"}
     >
       <Box 
         className={style.tradeInputSection}
@@ -596,6 +601,7 @@ export default function SwapTrade() {
       </Box>
       <Box 
         className={style.detailsSection}
+        flexDirection = {mobileVersion ? "row" : "column"}
       >
         <Box className={style.detailSlippage}>
           <p className={style.headerText} style = {{
@@ -660,40 +666,79 @@ export default function SwapTrade() {
             </Box>
           </Box>
         </Box>
-        <Box 
-          className={style.detailComment} 
-          background={mainbg}
-        >
-          <Box style = {{
-            display:"flex",
-            flexDirection:"row"
-          }}>
-            <p className = {style.commentText} style= {{ color :"#696969"}}>Minimum Received:</p>
-            <p className = {style.commentText}>{miniValue}&nbsp;{toToken.symbol}</p>
+        {
+          !mobileVersion ?
+          <Box 
+            className={style.detailComment} 
+            background={mainbg}
+          >
+            <Box style = {{
+              display:"flex",
+              flexDirection:"row"
+            }}>
+              <p className = {style.commentText} style= {{ color :"#696969"}}>Minimum Received:</p>
+              <p className = {style.commentText}>{miniValue}&nbsp;{toToken.symbol}</p>
+            </Box>
+            <Box style = {{
+              display:"flex",
+              flexDirection:"row"
+            }}>
+              <p className = {style.commentText} style= {{ color :"#696969"}}>Price Impact:</p>
+              <p className = {style.commentText}>{label == BTN_LABEL.LOADING ? "0%" : "<" + priceImpact.toFixed(2) + "%"}</p>
+            </Box>
+            <Box style = {{
+              display:"flex",
+              flexDirection:"row"
+            }}>
+              <p className = {style.commentText} style= {{ color :"#696969"}}>Price:</p>
+              <p className = {style.commentText}>{pricequote.toFixed(5)}&nbsp;{lpTokenAddress.baseCurrency_name+"/"+lpTokenAddress.quoteCurrency_name}</p>
+            </Box>
+            <Box style = {{
+              display:"flex",
+              flexDirection:"row"
+            }}>
+              <p className = {style.commentText} style= {{ color :"#696969"}}>Price:</p>
+              <p className = {style.commentText}>{pricebase.toFixed(5)}&nbsp;{lpTokenAddress.quoteCurrency_name+"/"+lpTokenAddress.baseCurrency_name}</p>
+            </Box>
+          </Box> :
+          <Box
+            display = {"flex"}
+            justifyContent = {"center"}
+            minWidth = {"20rem"}
+            paddingTop = {"2rem"}
+          >
+            <Button 
+              width={"100%"}
+              borderRadius = {"0.5rem"}
+              height = {"35px"}
+              background = {tokenData.network == constant.BINANCE_NETOWRK ? "#F0B90B" : "#FB118E"}
+              _hover = {{
+                bg: tokenData.network == constant.BINANCE_NETOWRK ? "#F0B90B" : "#FB118E"
+              }}
+              color = {tokenData.network == constant.BINANCE_NETOWRK ? "black" : "white"}
+              onClick = {label == BTN_LABEL.SWAP ? handleConfirm : handleOther}
+              isDisabled = {!showConnect || label == BTN_LABEL.LOADING || label == BTN_LABEL.INSUFFICENT || executing || (label == BTN_LABEL.SWAP && fromTokenValue == 0)}
+            >
+              {
+                executing === true ? "PROCESSING..." :
+                label == BTN_LABEL.LOADING ?
+                "LOADING...":
+                label == BTN_LABEL.CONNECT ?
+                "CONNECT WALLET" :
+                label == BTN_LABEL.SWITCHNETWORK ?
+                "SWITCH NETWORK":
+                label == BTN_LABEL.APPROVE ?
+                "APPROVE" :
+                label == BTN_LABEL.INSUFFICENT ?
+                "INSUFFICIENT FUND":
+                "SWAP"
+              }
+            </Button>
           </Box>
-          <Box style = {{
-            display:"flex",
-            flexDirection:"row"
-          }}>
-            <p className = {style.commentText} style= {{ color :"#696969"}}>Price Impact:</p>
-            <p className = {style.commentText}>{label == BTN_LABEL.LOADING ? "0%" : "<" + priceImpact.toFixed(2) + "%"}</p>
-          </Box>
-          <Box style = {{
-            display:"flex",
-            flexDirection:"row"
-          }}>
-            <p className = {style.commentText} style= {{ color :"#696969"}}>Price:</p>
-            <p className = {style.commentText}>{pricequote.toFixed(5)}&nbsp;{lpTokenAddress.baseCurrency_name+"/"+lpTokenAddress.quoteCurrency_name}</p>
-          </Box>
-          <Box style = {{
-            display:"flex",
-            flexDirection:"row"
-          }}>
-            <p className = {style.commentText} style= {{ color :"#696969"}}>Price:</p>
-            <p className = {style.commentText}>{pricebase.toFixed(5)}&nbsp;{lpTokenAddress.quoteCurrency_name+"/"+lpTokenAddress.baseCurrency_name}</p>
-          </Box>
-        </Box>
+        }
       </Box>
+      {
+      !mobileVersion &&
       <Button 
         className={style.buttonSection}
         background = {tokenData.network == constant.BINANCE_NETOWRK ? "#F0B90B" : "#FB118E"}
@@ -719,6 +764,7 @@ export default function SwapTrade() {
           "SWAP"
         }
       </Button>
+      }
     </Box>
   )
 }

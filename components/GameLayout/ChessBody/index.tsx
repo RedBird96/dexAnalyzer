@@ -40,6 +40,7 @@ export default function ChessBody() {
         }}>
         <MenuBar
           selectMode={PlayMode.Game}
+          onOpen = {null}
         />
         <Box
           margin={"3rem"}

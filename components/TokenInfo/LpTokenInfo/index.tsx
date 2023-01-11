@@ -10,13 +10,15 @@ import {
 } from '../../../hooks'
 import { 
   convertBalanceCurrency,
+  makeShortTokenName,
   numberWithCommasTwoDecimals
 } from '../../../utils'
 import { LPTokenPair, TokenSide } from '../../../utils/type'
 import style from '../TokenInfo.module.css'
 import { getTokenPricefromllama } from '../../../api'
-import { NOT_FOUND_TOKEN } from '../../../utils/constant'
+import { NOT_FOUND_TOKEN, SCREENMD_SIZE } from '../../../utils/constant'
 import { useStableCoinPrice } from '../../../hooks/useStableCoinPrice'
+import useSize from '../../../hooks/useSize'
 
 export default function LpTokenInfo({
   lpToken,
@@ -47,9 +49,19 @@ export default function LpTokenInfo({
   const whiteBlackMode = useColorModeValue('#FFFFFF', '#000000');
   const infoborderColorMode = useColorModeValue("#E2E8F0","#2B2A2A");
   const [clickDex, setClickDex] = useState<number>(0);
+  const [isMobileVersion, setMobileVersion] = useState<boolean>(false);
+  const windowDimensions = useSize();
 
   if (showArrow)
     hoverColor = "transparent";
+
+  useEffect(() => {
+    if (windowDimensions.width < SCREENMD_SIZE) {
+      setMobileVersion(true);
+    } else {
+      setMobileVersion(false);
+    }
+  }, [windowDimensions])
 
   useEffect(() => {
     const setFunc = async() => {
@@ -124,7 +136,7 @@ export default function LpTokenInfo({
         _hover={{bg:hoverColor}} 
         onClick={()=> {setLPTokenHandler(lpToken)}}
       >
-        <p className={style.marketCap} style={{color:textColor}}>{lpToken.symbol}&nbsp;(LP)</p>
+        <p className={style.marketCap} style={{color:textColor}}>{isMobileVersion ? `${makeShortTokenName(lpToken.baseCurrency_name, 4)}/${makeShortTokenName(lpToken.quoteCurrency_name, 4)}` :lpToken.symbol}&nbsp;(LP)</p>
         <Box _hover={{"textDecoration":"underline"}} 
               cursor="pointer"
         >
@@ -139,7 +151,7 @@ export default function LpTokenInfo({
               style={{marginRight:"0.2rem"}}  
               color={whiteBlackMode}
             >
-              {numberWithCommasTwoDecimals(reserve, 2)} 
+              {isMobileVersion ? makeShortTokenName(numberWithCommasTwoDecimals(reserve, 2), 11): numberWithCommasTwoDecimals(reserve, 2)} 
             </p>
             <p
               className={style.itemvalue} 
@@ -152,7 +164,7 @@ export default function LpTokenInfo({
               className={style.itemvalue} 
               style={{color:"#00B112"}}
             >
-              ({convertBalanceCurrency(reserveUSD, 0)})
+              ({isMobileVersion ? makeShortTokenName(convertBalanceCurrency(reserveUSD, 0), 8) : convertBalanceCurrency(reserveUSD, 0)})
             </p>
           </a>
         </Box>
@@ -175,7 +187,7 @@ export default function LpTokenInfo({
           borderWidth:isLast?"0":"thin",
           borderColor:infoborderColorMode,
         }}/> :
-        <></>
+        <div></div>
       }
     </Box>
     )

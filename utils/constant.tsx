@@ -1,6 +1,11 @@
 import { Token } from "./type";
 import BigNumber from 'bignumber.js';
 
+export const SCREEN2XL_SIZE = 2200;
+export const SCREENNXL_SIZE = 1700;
+export const SCREENMD_SIZE = 1200;
+export const SCREENSM_SIZE = 600;
+
 export const NOT_FOUND_TOKEN = "No results found";
 
 export const ETHEREUM_NETWORK = 1;

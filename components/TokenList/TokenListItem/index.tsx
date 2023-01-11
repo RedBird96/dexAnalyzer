@@ -64,7 +64,7 @@ const TokenListItem = ({
         onMouseLeave={() => setShowCrossIcon(false)}      
       >
         <Box display={"flex"} flexDirection={"row"} alignItems={"center"} width={"90%"} justifyContent={"space-between"}>
-          <Link href={`/trade/${tokenData.network == constant.ETHEREUM_NETWORK ? "eth" : "bsc"}/${tokenData.contractAddress}`}    >
+          <Link style={{width:"80%"}} href={`/trade/${tokenData.network == constant.ETHEREUM_NETWORK ? "eth" : "bsc"}/${tokenData.contractAddress}`}    >
             <Box 
               style={{display:"flex", flexDirection:"row", alignItems:"center", width:"80%"}}
               onClick={setActiveToken}
