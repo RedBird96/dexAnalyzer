@@ -35,12 +35,12 @@ export default function TokenList({
   
   const searchColor = useColorModeValue("#FFFFFF", "#323232");
   const searchBorderColor = useColorModeValue("#CFCFCF", "#323232");
-  const {setTokenData} = useTokenInfo();
+  const {tokenData,setTokenData} = useTokenInfo();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const debouncedQuery = useDebounce(searchQuery.replace(/\s/g, ''), 200);
 
   const [showListToken, setShowListToken] = useState<Boolean>();
-  const [activeToken, setActiveToken] = useState<ERC20Token>();
+  const [activeToken, setActiveToken] = useState<ERC20Token>(tokenData);
   const debouncedActiveToken = useDebounce<ERC20Token>(activeToken, 100);
   const [foundToken, setFoundToken] = useState<ERC20Token[]>([]);
   const [listTokens, setListTokens] = useState<ERC20Token[]>([]);
