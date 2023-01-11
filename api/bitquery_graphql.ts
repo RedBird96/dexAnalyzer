@@ -361,6 +361,12 @@ export const getBuySellTransactions = async (
         timeInterval {
           second
         }
+        taker {
+          address
+        }
+        maker {
+          address
+        }
         baseCurrency {
           symbol
           address
