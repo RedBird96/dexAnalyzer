@@ -1,10 +1,6 @@
 import React, { useEffect, useState, useCallback, KeyboardEvent, useMemo } from 'react'
 import { Box, Input, useColorModeValue, useColorMode, InputGroup, InputLeftAddon, InputLeftElement, InputRightElement } from "@chakra-ui/react"
 import {
-  useAddress,
-  useNetwork,
-} from '@thirdweb-dev/react'
-import {
   getTokenLogoURL,
   getTokenSymbol,
   getTokenSocialInfofromCoingeckoAPI,
@@ -19,8 +15,6 @@ import * as constant from '../../utils/constant'
 import TokenListItem from './TokenListItem'
 import style from './TokenList.module.css'
 import { SearchCross, SearchIcon } from '../../assests/icon'
-import { add } from 'lodash'
-
 export default function TokenList({
   network,
   address

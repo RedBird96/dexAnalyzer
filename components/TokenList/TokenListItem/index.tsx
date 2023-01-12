@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react'
+import Image from 'next/image'
 import { 
   BNBIcon, 
   ETHIcon,
@@ -15,6 +16,10 @@ import {makeShortAddress, makeShortTokenName} from '../../../utils'
 import { ERC20Token } from '../../../utils/type'
 import * as constant from '../../../utils/constant'
 import Link from 'next/link'
+import bnbIcon from '../../../assests/icon/bnbIcon.png'
+import ethIcon from '../../../assests/icon/ethIcon.png'
+import pin from '../../../assests/icon/pin.png'
+import unpin from '../../../assests/icon/unpin.png'
 
 const TokenListItem = ({
   tokenData,
@@ -89,14 +94,19 @@ const TokenListItem = ({
           >
             {
               tokenData?.network == constant.ETHEREUM_NETWORK ?
-              <ETHIcon/> :
-              <BNBIcon/>
+              <Image src={ethIcon.src} width={"20"} height={"15"} alt=""/> :
+              <Image src = {bnbIcon.src} width={"20"} height={"15"} alt=""/>
             }
             <Box onClick={setPinIcon}>
             {
               colorMode.colorMode == "light" ? 
-              tokenData?.pinSetting == false ? <UnPinLightIcon/> : <PinLightIcon/> : 
-              tokenData?.pinSetting == false ? <UnPinIcon/> : <PinIcon/>
+              tokenData?.pinSetting == false ? 
+                <UnPinLightIcon/> : 
+                <PinLightIcon/>
+              : 
+              tokenData?.pinSetting == false ? 
+                <Image src = {unpin.src} width={"20"} height={"15"} alt=""/> : 
+                <Image src = {pin.src} width={"20"} height={"15"} alt=""/>
             }    
             </Box>   
             {

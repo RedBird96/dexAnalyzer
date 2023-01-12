@@ -10,6 +10,7 @@ import {
   useColorModeValue, 
   useDisclosure}
 from "@chakra-ui/react"
+import Image from 'next/image'
 import {
   useMetamask,
   ConnectWallet
@@ -19,6 +20,8 @@ import style from './Header.module.css'
 import useSize from '../../hooks/useSize'
 import { SCREENMD_SIZE } from '../../utils/constant'
 import WalletInfo from '../WalletInfo'
+import walletDark from '../../assests/icon/wallet_dark.png'
+import walletLight from '../../assests/icon/wallet_light.png'
 
 export default function Header() {
   const menuClass = useColorModeValue(
@@ -49,8 +52,14 @@ export default function Header() {
             <Box 
               cursor={"pointer"}
               onClick={onOpen}
+              paddingLeft={"0.5rem"}
             >
-              <WalletIcon/>
+              {
+                colorMode == "dark" ? 
+                <Image src={walletDark.src} width={"35"} height={"35"} alt=""/> :
+                <Image src={walletLight.src} width={"35"} height={"35"} alt=""/>
+              }
+              
             </Box>
           }
           <Box className={style.connectBtn}>
