@@ -40,7 +40,6 @@ export default function TokenBody({
     if (isOpen && windowDimensions.width > SCREEN2XL_SIZE) {
       onClose();
     }
-    console.log('windowDimensions.height', windowDimensions.height);
     if (tokenData !=undefined && tokenData.contractAddress != ""){
       if (windowDimensions.width < SCREENSM_SIZE)
         setChartHeight(windowDimensions.height - 525);
@@ -65,7 +64,6 @@ export default function TokenBody({
     (mouseMoveEvent:MouseEventInit ) => {
       if (isResizing) {
         let resizeHeight = windowDimensions.height - mouseMoveEvent.clientY;
-        console.log('resizeHeight', resizeHeight);
         if (resizeHeight < 320) {
           resizeHeight = 320;
         } else if (resizeHeight > 800){
@@ -87,7 +85,6 @@ export default function TokenBody({
     };
   }, [resize, stopResizing]);
 
-  console.log('chartheight', chartheight);
   return (
     <main 
       className={style.tokenBody} 
@@ -121,7 +118,7 @@ export default function TokenBody({
         isFullHeight = {false}
       >
         <DrawerOverlay/>
-        <DrawerContent minW={{sm:470}} >
+        <DrawerContent>
           <DrawerBody p = {0}>
             <Box
               display={"flex"}
@@ -133,17 +130,10 @@ export default function TokenBody({
                 selectMode={PlayMode.Trade}
                 onOpen = {onOpen}
               />
-              <Box 
-                borderRight={"1px"}
-                borderRightColor = {borderColorMode}
-                minW={{'2xl':470}}
-                display={{base:'none', '2xl':'block'}}
-              >
-                <TokenList
-                  network = {network}
-                  address = {address}
-                />
-            </Box>
+              <TokenList
+                network = {network}
+                address = {address}
+              />
             </Box>
           </DrawerBody>
         </DrawerContent>

@@ -1,10 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import Image from 'next/image'
 import { 
-  BNBIcon, 
-  ETHIcon,
-  PinIcon,
-  UnPinIcon,
   PinLightIcon,
   UnPinLightIcon,
   SearchCross,
@@ -20,6 +16,7 @@ import bnbIcon from '../../../assests/icon/bnbIcon.png'
 import ethIcon from '../../../assests/icon/ethIcon.png'
 import pin from '../../../assests/icon/pin.png'
 import unpin from '../../../assests/icon/unpin.png'
+import useSize from '../../../hooks/useSize'
 
 const TokenListItem = ({
   tokenData,
@@ -44,6 +41,7 @@ const TokenListItem = ({
   const itemBackcolor = useColorModeValue("#E9F4FF", "#2F2F2F");
   const [isHover, setIsHover] = useState<Boolean>(false);
   const [isActive, setIsActive] = useState<Boolean>(false);
+  const windowDimensions = useSize();
   const [showCrossIcon, setShowCrossIcon] = useState<Boolean>(false);
   useEffect(() => {
       setIsActive(activeToken == tokenData);
@@ -74,10 +72,10 @@ const TokenListItem = ({
               style={{display:"flex", flexDirection:"row", alignItems:"center", width:"80%"}}
               onClick={setActiveToken}
             >
-              <img src={tokenData?.image} width={"40rem"}/>
+              <img src={tokenData?.image} width={windowDimensions.width < constant.SCREENSM_SIZE ? "30rem" : "40rem"}/>
               <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
                 <Box display={"flex"} flexDirection={"row"} >
-                  <p className={style.tokenName} style={{color:isActive || isHover ? "#FFFFFF" : nameColor}}>{makeShortTokenName(tokenData?.name, 13)}</p>
+                  <p className={style.tokenName} style={{color:isActive || isHover ? "#FFFFFF" : nameColor}}>{makeShortTokenName(tokenData?.name, windowDimensions.width < constant.SCREENSM_SIZE ? 7 : 13)}</p>
                   <p className={style.tokenName} style={{color:isActive || isHover ? textColorActive : textColor}}>&nbsp;({makeShortTokenName(tokenData?.symbol, 5)})</p>
                 </Box>
                 <p className={style.tokenAddress} style ={{color:isActive || isHover ? addressColorActive : addressColor}}>{makeShortAddress(tokenData?.contractAddress!)}</p>
@@ -94,8 +92,8 @@ const TokenListItem = ({
           >
             {
               tokenData?.network == constant.ETHEREUM_NETWORK ?
-              <Image src={ethIcon.src} width={"20"} height={"15"} alt=""/> :
-              <Image src = {bnbIcon.src} width={"20"} height={"15"} alt=""/>
+              <Image src={ethIcon.src} width={windowDimensions.width < constant.SCREENSM_SIZE ? "15": "20"} height={"15"} alt=""/> :
+              <Image src = {bnbIcon.src} width={windowDimensions.width < constant.SCREENSM_SIZE ? "15": "20"} height={"15"} alt=""/>
             }
             <Box onClick={setPinIcon}>
             {
@@ -105,8 +103,8 @@ const TokenListItem = ({
                 <PinLightIcon/>
               : 
               tokenData?.pinSetting == false ? 
-                <Image src = {unpin.src} width={"20"} height={"15"} alt=""/> : 
-                <Image src = {pin.src} width={"20"} height={"15"} alt=""/>
+                <Image src = {unpin.src} width={windowDimensions.width < constant.SCREENSM_SIZE ? "15": "20"} height={"15"} alt=""/> : 
+                <Image src = {pin.src} width={windowDimensions.width < constant.SCREENSM_SIZE ? "15": "20"} height={"15"} alt=""/>
             }    
             </Box>   
             {

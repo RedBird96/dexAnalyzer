@@ -1,11 +1,12 @@
 import React from 'react'
 import { Box, useColorModeValue } from "@chakra-ui/react"
 import style from './MenuBar.module.css'
-import {GameMenuBar, TopMenuBar} from '../../assests/icon'
-import {TradeMenuBar} from '../../assests/icon'
+import {GameMenuBar, GameMenuBarMini, TopMenuBar, TopMenuBarMini} from '../../assests/icon'
+import {TradeMenuBar, TradeMenuBarMini} from '../../assests/icon'
 import { PlayMode } from '../../utils/type'
 import Link from 'next/link'
 import { SCREEN2XL_SIZE, SCREENSM_SIZE } from '../../utils/constant'
+import useSize from '../../hooks/useSize'
 
 export default function MenuBar({
   selectMode,
@@ -15,6 +16,7 @@ export default function MenuBar({
   onOpen: () => void
 }) {
 
+  const windowDimensions = useSize();
   const menuClass = useColorModeValue(
     style.menuBar + " " + style.menuBarLight,
     style.menuBar + " " + style.menuBarDark
@@ -43,12 +45,15 @@ export default function MenuBar({
       _hover={{bg:chartSelectColor}}
       onClick = {onMenuClick}
       >
-        <TopMenuBar className={"text-1x"}/>
+        {
+          windowDimensions.width < SCREENSM_SIZE ? <TopMenuBarMini/> : <TopMenuBar/>
+        }
+        
       </Box>
       <Box style={{
         display: "flex", 
         justifyContent:"center", 
-        height:"5rem", 
+        height: windowDimensions.width < SCREENSM_SIZE ? "3.5rem" : "5rem", 
         alignContent:"center",
         cursor: "pointer",
         flexDirection: "column",
@@ -59,13 +64,15 @@ export default function MenuBar({
         background = {selectMode === PlayMode.Trade ? chartSelectColor : "transparent"}
       >
         <Link href = {'/trade'}>
-          <TradeMenuBar/>
+          {
+            windowDimensions.width < SCREENSM_SIZE ? <TradeMenuBarMini/> : <TradeMenuBar/>
+          }
         </Link>
       </Box>
       <Box style={{
         display: "flex", 
         justifyContent:"center", 
-        height:"5rem", 
+        height: windowDimensions.width < SCREENSM_SIZE ? "3.5rem" : "5rem", 
         alignContent:"center",
         cursor: "pointer",
         flexDirection: "column",
@@ -76,7 +83,10 @@ export default function MenuBar({
         background = {selectMode === PlayMode.Game ? chartSelectColor : "transparent"}
       >
         <Link href = {'/game'}>
-          <GameMenuBar/>
+          {
+            windowDimensions.width < SCREENSM_SIZE ? <GameMenuBarMini/> : <GameMenuBar/>
+          }
+          
         </Link>   
       </Box>   
       
