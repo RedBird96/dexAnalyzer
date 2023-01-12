@@ -42,7 +42,10 @@ export default function TokenBody({
     }
     console.log('windowDimensions.height', windowDimensions.height);
     if (tokenData !=undefined && tokenData.contractAddress != ""){
-      setChartHeight(windowDimensions.height - 540);
+      if (windowDimensions.width < SCREENSM_SIZE)
+        setChartHeight(windowDimensions.height - 525);
+      else
+        setChartHeight(windowDimensions.height - 540);
     }
   }, [windowDimensions, tokenData])
 
@@ -62,6 +65,7 @@ export default function TokenBody({
     (mouseMoveEvent:MouseEventInit ) => {
       if (isResizing) {
         let resizeHeight = windowDimensions.height - mouseMoveEvent.clientY;
+        console.log('resizeHeight', resizeHeight);
         if (resizeHeight < 320) {
           resizeHeight = 320;
         } else if (resizeHeight > 800){
@@ -83,6 +87,7 @@ export default function TokenBody({
     };
   }, [resize, stopResizing]);
 
+  console.log('chartheight', chartheight);
   return (
     <main 
       className={style.tokenBody} 
