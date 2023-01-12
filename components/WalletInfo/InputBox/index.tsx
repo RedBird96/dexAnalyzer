@@ -19,6 +19,8 @@ import { makeShortTokenName } from "../../../utils";
 import * as constant from '../../../utils/constant'
 import { useDebounce, useLPTokenPrice } from "../../../hooks";
 import { getTokenBalance } from "../../../api";
+import useSize from "../../../hooks/useSize";
+import { SCREENSM_SIZE } from "../../../utils/constant";
 
 export default function InputBox({
   showMax,
@@ -35,6 +37,7 @@ export default function InputBox({
   const address = useAddress();
   const colorMode = useColorMode();
   const inputRef = useRef(null);
+  const windowDimensions = useSize();
   const borderColor = useColorModeValue("#C3C3C3", "#2E2E2E");
   const bgColor = useColorModeValue("#efefef", "#121212");
   const [inputValue, setInputValue] = useState<string>("0");
@@ -86,7 +89,7 @@ export default function InputBox({
         marginRight = {"0.5rem"}
         ref = {inputRef}
       >
-        <InputGroup>
+        <InputGroup size={windowDimensions.width < SCREENSM_SIZE ? "xs" : "md"}>
           <Input
             borderColor ={bgColor}
             placeholder = "0.0"
@@ -106,8 +109,12 @@ export default function InputBox({
           </Input>
           {
             showMax && 
-            <InputRightElement >
-              <p style={{cursor:"pointer", color:"#696969"}} onClick={setMaxInputValue}>Max</p>
+            <InputRightElement>
+              <p style={{
+                cursor:"pointer", 
+                color:"#696969", 
+                fontSize:windowDimensions.width < constant.SCREENSM_SIZE ? "0.8rem" : "1rem"
+                }} onClick={setMaxInputValue}>Max</p>
             </InputRightElement>
           }
         </InputGroup>

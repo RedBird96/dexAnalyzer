@@ -455,7 +455,7 @@ export default function TokenInfo({
                 isFullHeight = {false}
               >
                 <DrawerOverlay/>
-                <DrawerContent minW={{sm:400}} height={"10rem"} >
+                <DrawerContent minW={{sm:400}} height={"12rem"} >
                   <DrawerBody p = {0} bg = {drawerbgColor}>
                     <Box
                       width={"100%"}
@@ -545,7 +545,7 @@ export default function TokenInfo({
       </Box>
       
       <Box className={style.tokenMarktetInfo} alignItems={"center"} borderBottom={"1px"} borderBottomColor = {infoborderColorMode}>
-        <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "95%" :"83%"} height={"100%"} alignItems={"center"}>
+        <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "100%" :"83%"} height={"100%"} alignItems={"center"}>
           <Box display={"flex"} flexDirection={"column"} width={isMobileVersion ? "40%" : "28%"} paddingLeft={isMobileVersion ? "0rem" : "4rem"}>
             <p className={style.marketCap} style={{color:textColor}} >Market Cap</p>
             <p className={style.tokenMarketCap} style={{color:priceColor}}>{isMobileVersion ? makeShortTokenName(convertBalanceCurrency((tokenData.totalSupply-burnAmount) * tokenPriceshow, 0), 12) :convertBalanceCurrency((tokenData.totalSupply-burnAmount) * tokenPriceshow, 0)}</p>

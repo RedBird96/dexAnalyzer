@@ -538,13 +538,13 @@ export default function SwapTrade({
         className={style.tradeInputSection}
       >
         <Box className={style.inputBlock}>
-          <Box className={style.headerText} style = {{marginBottom:"1rem"}}>
+          <Box className={style.headerText} style = {{marginBottom:mobileVersion ? "0.5rem" : "1rem"}}>
             <p style={{
               color:"#a7a7a7", 
-              fontSize:"0.8rem"
+              fontSize: mobileVersion ? "0.7rem" : "0.8rem"
             }}>From</p>
             <p style={{
-              fontSize:"0.8rem",
+              fontSize:mobileVersion ? "0.7rem" : "0.8rem",
               color:textColor
             }}>
               Balance: {maxFromToken.toFixed(5)}
@@ -579,13 +579,13 @@ export default function SwapTrade({
           </Circle>
         </Box>
         <Box className={style.inputBlock}>
-          <Box className={style.headerText} style = {{marginBottom:"1rem"}}>
+          <Box className={style.headerText} style = {{marginBottom:mobileVersion ? "0.5rem" : "1rem"}}>
             <p style={{
               color:"#a7a7a7", 
-              fontSize:"0.8rem"
+              fontSize:mobileVersion ? "0.7rem" : "0.8rem"
             }}>To</p>
             <p style={{
-              fontSize:"0.8rem",
+              fontSize:mobileVersion ? "0.7rem" : "0.8rem",
               color:textColor
             }}>
               Balance: {maxToToken.toFixed(5)}
@@ -601,13 +601,16 @@ export default function SwapTrade({
       </Box>
       <Box 
         className={style.detailsSection}
-        flexDirection = {mobileVersion ? "row" : "column"}
       >
-        <Box className={style.detailSlippage}>
+        <Box className={style.detailSlippage}
+          flexDirection = {mobileVersion ? "row" : "column"}
+          alignItems={mobileVersion ? "end" : "start"}
+        >
           <p className={style.headerText} style = {{
             marginBottom:"1rem", 
             color:"#a7a7a7", 
-            fontSize:"0.8rem"
+            fontSize:"0.8rem",
+            marginRight:"0.5rem"
           }}>Slippage</p>
           <Box 
             display={"flex"}
@@ -650,7 +653,7 @@ export default function SwapTrade({
               orientation="vertical" 
               style= {{
                 borderColor:borderColor,
-                height:"90%"
+                height:"1.3rem"
             }}/>
             <Box
               display = {"flex"}
@@ -705,7 +708,6 @@ export default function SwapTrade({
             display = {"flex"}
             justifyContent = {"center"}
             minWidth = {"5rem"}
-            paddingTop = {"2rem"}
           >
             <Button 
               width={"100%"}

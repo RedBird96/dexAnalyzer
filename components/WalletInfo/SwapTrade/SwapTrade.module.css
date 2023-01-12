@@ -27,7 +27,6 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-
   margin-bottom: 1rem;
 }
 
@@ -70,4 +69,23 @@
   font-size: 0.9rem;
   line-height: 0.2rem;
   justify-content: space-between;
+}
+
+
+
+@media only screen and (max-width: 600px) {
+  .inputBlock{
+    display:flex;
+    flex-direction: column;
+    width:100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .detailSlippage{
+    display: flex;
+    flex-direction: column;
+    width:100%;
+    margin-top: 0.6rem;
+    margin-bottom: 1rem;
+  }  
 }
