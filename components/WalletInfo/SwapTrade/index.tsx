@@ -532,7 +532,7 @@ export default function SwapTrade({
   return (
     <Box 
       className={style.tradeMain}
-      width = {mobileVersion ? "35rem" : "93%"}
+      width = {mobileVersion ? "25rem" : "93%"}
     >
       <Box 
         className={style.tradeInputSection}
@@ -704,7 +704,7 @@ export default function SwapTrade({
           <Box
             display = {"flex"}
             justifyContent = {"center"}
-            minWidth = {"20rem"}
+            minWidth = {"5rem"}
             paddingTop = {"2rem"}
           >
             <Button 

@@ -4,11 +4,14 @@ import { PlayChess } from "../../../assests/icon";
 import { ERC20Token, PlayMode } from "../../../utils/type";
 import { useTokenInfo } from "../../../hooks";
 import { useMemo } from "react";
+import useSize from "../../../hooks/useSize";
+import { SCREENSM_SIZE } from "../../../utils/constant";
 
 export default function ChessBody() {
 
   const resizeBgColor = useColorModeValue("#FFFFFF", "#1C1C1C");
   const {setTokenData} = useTokenInfo();
+  const windowDimensions = useSize();
 
   const initToken = useMemo(() =>{
     setTokenData({
@@ -43,7 +46,7 @@ export default function ChessBody() {
           onOpen = {null}
         />
         <Box
-          margin={"3rem"}
+          margin={windowDimensions.width < SCREENSM_SIZE ? "1rem" : "3rem"}
         >
           <PlayChess/>
         </Box>

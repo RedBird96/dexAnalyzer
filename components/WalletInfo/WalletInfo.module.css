@@ -105,17 +105,6 @@
   font-size: calc(0.2rem + 0.5vw);
 }
 
-/*
-// table.walletTokenData {
-//   th {
-//     border-color: white;
-//   }
-//   td {
-//     border-color: white;
-//   }
-// }
-*/
-
 tbody.walletTokenBodyBorderDark th {
   border-color: #303030;
 }
@@ -134,4 +123,26 @@ thead.walletTokenHeadBorderLight th {
   box-shadow: inset 0 0 0 #CFCFCF, inset 0 -1px 0 #CFCFCF;
   border-bottom: none !important;
   border-color: #CFCFCF;
+}
+
+
+
+@media only screen and (max-width: 600px) {
+ 
+  .myWallet {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 0.8rem;
+    margin-right: 0.9rem;
+  }
+
+  .myBalance {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 0.8rem;
+    color: #00C514;
+  }
+
 }

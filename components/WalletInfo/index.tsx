@@ -13,11 +13,14 @@ import {
   TableContainer,
   InputGroup,
   InputLeftElement,
-  InputRightElement
+  InputRightElement,
+  useColorMode,
+  Flex
 } from "@chakra-ui/react"
 import {
   useNetwork,
   useAddress,
+  ConnectWallet,
 } from '@thirdweb-dev/react'
 import {
   getContractInfoFromWalletAddress
@@ -38,6 +41,7 @@ import {
   useWalletTokenBalance 
 } from '../../hooks'
 import SwapTrade from './SwapTrade'
+import useSize from '../../hooks/useSize'
 
 export default function WalletInfo({
   tradeVisible
@@ -64,6 +68,7 @@ export default function WalletInfo({
   const widgetfontColor = useColorModeValue("#000000", "#FFFFFF");
   const selectBtnColor ="#0085FF";// useColorModeValue("#0070D7","#494949");
   const searchColor = useColorModeValue("#FFFFFF", "#323232");
+  const walletbackgroundColor = useColorModeValue("#FBFBFB", "#121212");
   const searchBorderColor = useColorModeValue("#CFCFCF", "#323232");
   const notSelectBtnColor = useColorModeValue("#E0E0E0","#1C1C1C");
   const refreshBtnBgColor = useColorModeValue("#FFFFFF","#1C1C1C");
@@ -76,6 +81,8 @@ export default function WalletInfo({
   const address = useAddress();
   const network = useNetwork();
   const walletRef = useRef(null);
+  const windowDimensions = useSize();
+  const { colorMode } = useColorMode();
   
   const [widgetOption, setWidgetOption] = useState<Boolean>(tradeVisible);
   const [borderWidth, setBorderWidth] = useState(0);
@@ -207,6 +214,21 @@ export default function WalletInfo({
   }, [address, network[0].data.chain?.id, tokenData]);
   return (
     <Box className={walletClass} ref = {walletRef}>
+      {
+        windowDimensions.width < constant.SCREENSM_SIZE &&
+          <Flex 
+            backgroundColor={walletbackgroundColor} 
+            width={"100%"} 
+            paddingTop={"1rem"} 
+            paddingRight={"1rem"}
+            justifyContent={"flex-end"}
+          >
+              <ConnectWallet
+                colorMode={colorMode}
+                accentColor='#0085FF'
+              />
+          </Flex>
+      }
       <Box className={titleClass}>
         <Box style={{
           display:"flex", 

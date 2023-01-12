@@ -77,7 +77,7 @@ export default function TokenTransaction() {
 
 
   return (
-    <Box className={transactionClass} width = {isMobileVersion ? windowDimensions.width - 86 : "100%"}>
+    <Box className={transactionClass} width = {"100%"}>
       <TableContainer overflowY={"auto"} overflowX={"auto"} height={"100%"} css={{
         '&::-webkit-scrollbar': {
           width: '10px',

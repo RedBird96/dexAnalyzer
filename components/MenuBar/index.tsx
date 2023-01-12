@@ -5,7 +5,7 @@ import {GameMenuBar, TopMenuBar} from '../../assests/icon'
 import {TradeMenuBar} from '../../assests/icon'
 import { PlayMode } from '../../utils/type'
 import Link from 'next/link'
-import { SCREEN2XL_SIZE } from '../../utils/constant'
+import { SCREEN2XL_SIZE, SCREENSM_SIZE } from '../../utils/constant'
 
 export default function MenuBar({
   selectMode,

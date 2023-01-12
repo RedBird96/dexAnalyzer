@@ -136,7 +136,7 @@ export default function LpTokenInfo({
         _hover={{bg:hoverColor}} 
         onClick={()=> {setLPTokenHandler(lpToken)}}
       >
-        <p className={style.marketCap} style={{color:textColor}}>{isMobileVersion ? `${makeShortTokenName(lpToken.baseCurrency_name, 4)}/${makeShortTokenName(lpToken.quoteCurrency_name, 4)}` :lpToken.symbol}&nbsp;(LP)</p>
+        <p className={style.marketCap} style={{color:textColor}}>{isMobileVersion ? `${makeShortTokenName(lpToken.baseCurrency_name, 6)}/${makeShortTokenName(lpToken.quoteCurrency_name, 6)}` :lpToken.symbol}&nbsp;(LP)</p>
         <Box _hover={{"textDecoration":"underline"}} 
               cursor="pointer"
         >
@@ -151,7 +151,7 @@ export default function LpTokenInfo({
               style={{marginRight:"0.2rem"}}  
               color={whiteBlackMode}
             >
-              {isMobileVersion ? makeShortTokenName(numberWithCommasTwoDecimals(reserve, 2), 11): numberWithCommasTwoDecimals(reserve, 2)} 
+              {isMobileVersion ? makeShortTokenName(numberWithCommasTwoDecimals(reserve, 2), 13): numberWithCommasTwoDecimals(reserve, 2)} 
             </p>
             <p
               className={style.itemvalue} 

@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useMemo} from 'react'
-import { Box, Button, Divider, Drawer, DrawerBody, DrawerContent, DrawerOverlay, useBreakpoint, useBreakpointValue, useColorMode, useColorModeValue, useDisclosure  } from "@chakra-ui/react"
+import { Box, Button, Divider, Drawer, DrawerBody, DrawerContent, DrawerOverlay, VStack, useBreakpoint, useBreakpointValue, useColorMode, useColorModeValue, useDisclosure  } from "@chakra-ui/react"
 import {
   WebSite,
   FaceBook,
@@ -13,7 +13,9 @@ import {
   CopyAddressIconDark,
   CopyAddressIconLight,
   CoyAddressComfirm,
-  TokenDetailsDark
+  TokenDetailsDark,
+  DownArrowDark,
+  DownArrowLight
 } from "../../assests/icon"
 import {
   useTokenInfo,
@@ -43,15 +45,16 @@ import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
 import { useAddress } from '@thirdweb-dev/react'
 import SocialListBox from './SocialListBox'
 import useSize from '../../hooks/useSize'
-import { SCREENMD_SIZE } from '../../utils/constant'
+import { SCREENMD_SIZE, SCREENSM_SIZE } from '../../utils/constant'
 import TokenDetails from './TokenDetails'
 import TokenBalance from './TokenBalance'
+import SwapTrade from '../WalletInfo/SwapTrade'
 
 
 export default function TokenInfo({
-  triggerShowTrade
+  triggerSidebar
 }:{
-  triggerShowTrade: (x?:boolean) => void
+  triggerSidebar: (x?:any) => void
 }
 
 ) {
@@ -76,7 +79,8 @@ export default function TokenInfo({
   const [transactionCount, setTransactionCount] = useState<number>(0);
   const windowDimensions = useSize();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isOpen : isToggleOpen , onToggle} = useDisclosure();
+  const { isOpen: isSidebarOpen, onOpen: SidebarOpen, onClose: SidebarClose } = useDisclosure();
+  const { isOpen : isToggleOpen, onOpen: ToggleOpen, onClose: ToggleClose , onToggle} = useDisclosure();
   const firstField = React.useRef()
   
   const {coinPrice} = useStableCoinPrice();
@@ -287,10 +291,6 @@ export default function TokenInfo({
     }, 2000)
   }
 
-  const tradeShow = useMemo(() => {
-    triggerShowTrade(isToggleOpen);
-  }, [isToggleOpen])
-  
   useEffect(() => {
     addPinLPToken();
     setLPTokenListInfo();
@@ -302,6 +302,9 @@ export default function TokenInfo({
     getLastLpTokenList();
   }, [])
  
+  useEffect(() => {
+    triggerSidebar(isSidebarOpen);
+  }, [isSidebarOpen])
   useEffect(() => {
     if (windowDimensions.width < SCREENMD_SIZE) {
       setMobileVersion(true);
@@ -341,15 +344,38 @@ export default function TokenInfo({
   return (
     <Box className={infoClass}>
       <Box className={style.tokenSocialInfo} borderBottom={"1px"} borderBottomColor = {infoborderColorMode}>
-        <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "95%" :"83%"} alignItems={"center"} justifyContent={"space-between"}>
+        {
+          isMobileVersion &&
+          <Box
+            cursor={"pointer"} 
+            style={{transform:`rotate(90deg)`}}
+            onClick={SidebarOpen}
+            marginLeft={"0.3rem"}
+            marginRight={"0.2rem"}
+          >
+            {colorMode.colorMode == "dark" ?
+              <DownArrowDark/> :
+              <DownArrowLight/> 
+            }
+          </Box>
+        }        
+        <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "95%" :"83%"} alignItems={"center"} justifyContent={"space-between"} paddingLeft={isMobileVersion ? "0rem" : "1.5rem"}>
           <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "100%" : "59%"} alignItems={"center"}>
-            <img src={tokenData.image} width={"50rem"}/>
+            <img src={tokenData.image} width={isMobileVersion ? "35rem" : "50rem"}/>
             <Box display={"flex"} flexDirection={"column"} paddingLeft={"1rem"} alignItems={"flex-start"}>
               <Box display={"flex"} flexDirection={"row"}>
                 <p className={style.tokenName}>{isMobileVersion ? makeShortTokenName(tokenData.symbol, 4) : tokenData.symbol}</p>
                 <p className={style.tokenName} style={{color:"#767676"}}>&nbsp;({isMobileVersion ? `${makeShortTokenName(lpTokenAddress.baseCurrency_name, 4)}/${makeShortTokenName(lpTokenAddress.quoteCurrency_name, 4)}` :lpTokenAddress.symbol})</p>
-                <p className={style.tokenPrice} style={{color:priceColor}}>{convertBalanceCurrency( tokenPriceshow, 9)}</p>
+                {
+                  !isMobileVersion && 
+                  <p className={style.tokenPrice} style={{color:priceColor}}>{convertBalanceCurrency( tokenPriceshow, 9)}</p>
+                }
               </Box>
+              {
+                isMobileVersion && 
+                <p className={style.tokenPrice} style={{color:priceColor}}>{convertBalanceCurrency( tokenPriceshow, 9)}</p>
+              }
+              
               <Box 
                 display={"flex"} 
                 flexDirection={"row"} 
@@ -407,79 +433,122 @@ export default function TokenInfo({
                 0}</p>
             </Box>
           </Box>:
-          <Box  
-           display={"flex"}
-           width={"2rem"}
-           cursor={"pointer"}
-           onClick={onOpen}
+          <VStack
+            alignItems={"flex-end"}
+            paddingRight={"0.2rem"}
+            height={"100%"}
           >
-            <TokenDetailsDark/>
-            <Drawer
-              isOpen={isOpen}
-              placement = 'right'
-              onClose={onClose}
-              initialFocusRef={firstField}
-              isFullHeight = {false}
+            <Box  
+            display={"flex"}
+            width={"2rem"}
+            cursor={"pointer"}
+            onClick={onOpen}
+            height={"50%"}
+            paddingTop={"0.5rem"}
             >
-              <DrawerOverlay/>
-              <DrawerContent minW={{sm:400}} maxH={{sm:200}} style={{
-                position: 'fixed',
-                top: '4rem'
-              }}>
-                <DrawerBody p = {0} bg = {drawerbgColor}>
-                  <Box
-                    width={"100%"}
-                    height = {"100%"}
-                    display = {"flex"}
-                    flexDirection = {"column"}
-                    justifyContent = {"center"}
-                    padding = {"1rem"}
-                  >
+              <TokenDetailsDark/>
+              <Drawer
+                isOpen={isOpen}
+                placement = 'right'
+                onClose={onClose}
+                initialFocusRef={firstField}
+                isFullHeight = {false}
+              >
+                <DrawerOverlay/>
+                <DrawerContent minW={{sm:400}} height={"10rem"} >
+                  <DrawerBody p = {0} bg = {drawerbgColor}>
                     <Box
-                      display={"flex"}
-                      flexDirection={"column"}
+                      width={"100%"}
+                      height = {"100%"}
+                      display = {"flex"}
+                      flexDirection = {"column"}
+                      justifyContent = {"center"}
+                      padding = {"1rem"}
                     >
-                      <p className={style.holder} style={{color:textColor}}>Total Supply</p>
-                      <p className={style.tokenTotalSupply} color={whiteBlackMode}>{tokenData.totalSupply != null ? 
-                        numberWithCommasNoDecimals(tokenData.totalSupply) :
-                        0}</p>
-                    </Box>
-                    <Divider/>
-                    <TokenDetails
-                      holdersCount = {holdersCount}
-                      transactionCount = {transactionCount}
-                      tokenData = {tokenData}
-                      width = {"100%"}
-                    />
-                    <Divider/>
-                    <TokenBalance
-                      balance = {balance}
-                      balanceUSD = {balanceUSD}
-                      tokenData = {tokenData}
-                      width = {"100%"}
-                    />       
-                    <Divider/>
-                    <Box
-                      display={"flex"}
-                      marginTop = {"0.2rem"}
-                    >
-                      <SocialListBox
-                        token={tokenData}
+                      <Box
+                        display={"flex"}
+                        flexDirection={"column"}
+                      >
+                        <p className={style.holder} style={{color:textColor}}>Total Supply</p>
+                        <p className={style.tokenTotalSupply} color={whiteBlackMode}>{tokenData.totalSupply != null ? 
+                          numberWithCommasNoDecimals(tokenData.totalSupply) :
+                          0}</p>
+                      </Box>
+                      <Divider/>
+                      <TokenDetails
+                        holdersCount = {holdersCount}
+                        transactionCount = {transactionCount}
+                        tokenData = {tokenData}
+                        width = {"100%"}
                       />
+                      <Divider/>
+                      <TokenBalance
+                        balance = {balance}
+                        balanceUSD = {balanceUSD}
+                        tokenData = {tokenData}
+                        width = {"100%"}
+                      />       
+                      <Divider/>
+                      <Box
+                        display={"flex"}
+                        marginTop = {"0.2rem"}
+                      >
+                        <SocialListBox
+                          token={tokenData}
+                        />
+                      </Box>
                     </Box>
+                  </DrawerBody>
+                </DrawerContent>
+              </Drawer>   
+            </Box>
+            <Box
+              display={"flex"}
+              alignItems={"center"}
+              justifyItems={"center"}
+              height={"50%"}
+            >
+              <Button
+                onClick={onToggle}
+                _hover= {{bg:isToggleOpen ? "#0085FF" : "transparent"}}
+                backgroundColor = {isToggleOpen ? "#0085FF" : "transparent"}
+                fontSize={"0.8rem"}
+              >
+                TRADE
+              </Button>
+              <Drawer
+                isOpen={isToggleOpen}
+                placement = 'bottom'
+                onClose={ToggleClose}
+                initialFocusRef={firstField}
+                isFullHeight = {false}
+              >
+                <DrawerOverlay/>
+                <DrawerContent height={"22rem"} >
+                  <DrawerBody p = {0} bg = {drawerbgColor}>
+                  <Box
+                    display={"flex"}
+                    justifyContent={"center"}
+                    paddingTop = {"1rem"}
+                  >
+                    <SwapTrade
+                      mobileVersion={true}
+                    />
                   </Box>
-                </DrawerBody>
-              </DrawerContent>
-            </Drawer>   
-          </Box>
+                  </DrawerBody>
+                </DrawerContent>
+              </Drawer>
+            </Box>
+            
+          </VStack>
         }
       </Box>
       
       <Box className={style.tokenMarktetInfo} alignItems={"center"} borderBottom={"1px"} borderBottomColor = {infoborderColorMode}>
         <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "95%" :"83%"} height={"100%"} alignItems={"center"}>
-          <Box display={"flex"} flexDirection={"column"} width={isMobileVersion ? "40%" : "28%"} paddingLeft={"4rem"}>
+          <Box display={"flex"} flexDirection={"column"} width={isMobileVersion ? "40%" : "28%"} paddingLeft={isMobileVersion ? "0rem" : "4rem"}>
             <p className={style.marketCap} style={{color:textColor}} >Market Cap</p>
-            <p className={style.tokenMarketCap} style={{color:priceColor}}>{isMobileVersion ? makeShortTokenName(convertBalanceCurrency((tokenData.totalSupply-burnAmount) * tokenPriceshow, 0), 10) :convertBalanceCurrency((tokenData.totalSupply-burnAmount) * tokenPriceshow, 0)}</p>
+            <p className={style.tokenMarketCap} style={{color:priceColor}}>{isMobileVersion ? makeShortTokenName(convertBalanceCurrency((tokenData.totalSupply-burnAmount) * tokenPriceshow, 0), 12) :convertBalanceCurrency((tokenData.totalSupply-burnAmount) * tokenPriceshow, 0)}</p>
           </Box>
           <div style={{
             height:"90%",
@@ -535,21 +604,23 @@ export default function TokenInfo({
                 })
               }
             </Box>
-          </Box>          
-          <div style={{
-            marginRight:"1rem",
-            height:"90%",
-            borderWidth:"1px",
-            borderColor:infoborderColorMode,
-          }}/>
+          </Box>        
           {
-            !isMobileVersion &&
-            <TokenBalance
-              balance = {balance}
-              balanceUSD = {balanceUSD}
-              tokenData = {tokenData}
-              width = {"39%"}
-            />       
+            !isMobileVersion &&  
+            <>
+              <div style={{
+                marginRight:"1rem",
+                height:"90%",
+                borderWidth:"1px",
+                borderColor:infoborderColorMode,
+              }}/>
+              <TokenBalance
+                balance = {balance}
+                balanceUSD = {balanceUSD}
+                tokenData = {tokenData}
+                width = {"39%"}
+              />
+            </>       
           }
         </Box>
         {
@@ -562,27 +633,14 @@ export default function TokenInfo({
           }}/>
         }
         {
-          !isMobileVersion ?
+          !isMobileVersion  &&
             <TokenDetails
               holdersCount = {holdersCount}
               transactionCount = {transactionCount}
               tokenData = {tokenData}
               width = {"25%"}
             />
-          :
-          <Box
-            width = {"6rem"}
-            display={"flex"}
-            alignItems={"center"}
-            justifyItems={"center"}
-            marginRight={"0.5rem"}
-          >
-            <Button
-              onClick={onToggle}
-              _hover= {{bg:isToggleOpen ? "#0085FF" : "transparent"}}
-              backgroundColor = {isToggleOpen ? "#0085FF" : "transparent"}
-            >TRADE</Button>
-          </Box>
+
         }
       </Box>
     </Box>
