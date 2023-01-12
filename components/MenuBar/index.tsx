@@ -26,7 +26,7 @@ export default function MenuBar({
   const onMenuClick = () => {
     const hasWindow = typeof window !== 'undefined';
     const width = hasWindow ? window.innerWidth : null;
-    if (width < SCREEN2XL_SIZE && selectMode == PlayMode.Trade)
+    if ( width < SCREEN2XL_SIZE && selectMode == PlayMode.Trade && onOpen != null)
       onOpen();
   }
 

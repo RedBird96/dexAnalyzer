@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Box, Drawer, DrawerBody, DrawerContent, DrawerOverlay, useColorModeValue, useDisclosure } from "@chakra-ui/react"
+import { Box, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerOverlay, useColorModeValue, useDisclosure } from "@chakra-ui/react"
 import dynamic from 'next/dynamic'
 import TokenList from "../TokenList"
 import TokenInfo from "../TokenInfo"
@@ -33,7 +33,6 @@ export default function TokenBody({
   const resizeBgColor = useColorModeValue("#FFFFFF", "#1C1C1C");
   const borderColorMode = useColorModeValue("#E2E8F0","#2B2A2A");
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [showSidebar, setShowSideBar] = useState(false);
   const firstField = React.useRef()
 
   useEffect(() => {
@@ -55,10 +54,6 @@ export default function TokenBody({
   const stopResizing = React.useCallback(() => {
     setIsResizing(false);
   }, []);
-
-  const handleShowTrade = (triggerTradeShow: boolean) => {
-    setShowSideBar(triggerTradeShow);
-  }  
 
   const resize = React.useCallback(
     (mouseMoveEvent:MouseEventInit ) => {
@@ -111,35 +106,6 @@ export default function TokenBody({
       }
 
       <Drawer
-        isOpen={showSidebar}
-        placement = 'left'
-        onClose={onClose}
-        initialFocusRef={firstField}
-        isFullHeight = {false}
-      >
-        <DrawerOverlay/>
-        <DrawerContent>
-          <DrawerBody p = {0}>
-            <Box
-              display={"flex"}
-              flexDirection={"row"}
-              width={"100%"}
-              height={"100%"}
-            >
-              <MenuBar
-                selectMode={PlayMode.Trade}
-                onOpen = {onOpen}
-              />
-              <TokenList
-                network = {network}
-                address = {address}
-              />
-            </Box>
-          </DrawerBody>
-        </DrawerContent>
-      </Drawer>      
-
-      <Drawer
         isOpen={isOpen}
         placement = 'left'
         onClose={onClose}
@@ -165,9 +131,7 @@ export default function TokenBody({
           width: "100%",
           height:"100%"
         }}>
-          <TokenInfo
-            triggerSidebar = {handleShowTrade}
-          />
+          <TokenInfo/>
           <Box 
           id="tradeMain"
           style={{

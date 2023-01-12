@@ -40,7 +40,7 @@ import {
 import style from './TokenInfo.module.css'
 import * as constant from '../../utils/constant'
 import LpTokenInfo from './LpTokenInfo'
-import { LPTokenPair, TokenSide } from '../../utils/type'
+import { LPTokenPair, PlayMode, TokenSide } from '../../utils/type'
 import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
 import { useAddress } from '@thirdweb-dev/react'
 import SocialListBox from './SocialListBox'
@@ -49,15 +49,11 @@ import { SCREENMD_SIZE, SCREENSM_SIZE } from '../../utils/constant'
 import TokenDetails from './TokenDetails'
 import TokenBalance from './TokenBalance'
 import SwapTrade from '../WalletInfo/SwapTrade'
+import TokenList from '../TokenList'
+import MenuBar from '../MenuBar'
 
 
-export default function TokenInfo({
-  triggerSidebar
-}:{
-  triggerSidebar: (x?:any) => void
-}
-
-) {
+export default function TokenInfo() {
 
   const colorMode = useColorMode();
   const {tokenData} = useTokenInfo();
@@ -303,9 +299,6 @@ export default function TokenInfo({
   }, [])
  
   useEffect(() => {
-    triggerSidebar(isSidebarOpen);
-  }, [isSidebarOpen])
-  useEffect(() => {
     if (windowDimensions.width < SCREENMD_SIZE) {
       setMobileVersion(true);
     } else {
@@ -357,6 +350,35 @@ export default function TokenInfo({
               <DownArrowDark/> :
               <DownArrowLight/> 
             }
+
+            <Drawer
+              isOpen={isSidebarOpen}
+              placement = 'left'
+              onClose={SidebarClose}
+              initialFocusRef={firstField}
+              isFullHeight = {false}
+            >
+              <DrawerOverlay/>
+              <DrawerContent>
+                <DrawerBody p = {0}>
+                  <Box
+                    display={"flex"}
+                    flexDirection={"row"}
+                    width={"100%"}
+                    height={"100%"}
+                  >
+                    <MenuBar
+                      selectMode={PlayMode.Trade}
+                      onOpen = {null}
+                    />
+                    <TokenList
+                      network = {tokenData.network == constant.ETHEREUM_NETWORK ? "eth" : "bsc"}
+                      address = {tokenData.contractAddress}
+                    />
+                  </Box>
+                </DrawerBody>
+              </DrawerContent>
+            </Drawer>                  
           </Box>
         }        
         <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "95%" :"83%"} alignItems={"center"} justifyContent={"space-between"} paddingLeft={isMobileVersion ? "0rem" : "1.5rem"}>
