@@ -37,6 +37,7 @@ export default function Header() {
     style.header + " " + style.headerDark
   );
 
+  const resizeBgColor = useColorModeValue("#FFFFFF", "#1C1C1C");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { colorMode, toggleColorMode  } = useColorMode();
   const {tokenData} = useTokenInfo();
@@ -111,7 +112,7 @@ export default function Header() {
                         isFullHeight = {false}
                       >
                         <DrawerOverlay/>
-                        <DrawerContent>
+                        <DrawerContent backgroundColor={resizeBgColor}>
                           <DrawerHeader>
                           <Box display={"flex"} flexDirection={"row"} alignItems={"center"} height={"2rem"} marginLeft={"-1rem"}>
                             <SiteLogoMini/>
