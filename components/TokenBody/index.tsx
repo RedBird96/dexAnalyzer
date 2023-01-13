@@ -11,7 +11,7 @@ import { ResizerLight} from '../../assests/icon'
 import { useTokenInfo } from '../../hooks'
 import { PlayMode } from '../../utils/type';
 import useSize from '../../hooks/useSize'
-import { SCREEN2XL_SIZE, SCREENSM_SIZE } from '../../utils/constant'
+import { SCREEN2XL_SIZE, SCREENNXL_SIZE, SCREENSM_SIZE } from '../../utils/constant'
 
 const ChartContainer = dynamic(() => import("../ChartContainer"), { ssr: false })
 
@@ -40,14 +40,15 @@ export default function TokenBody({
       onClose();
     }
     if (tokenData !=undefined && tokenData.contractAddress != ""){
-      if (windowDimensions.width < SCREENSM_SIZE)
-        setChartHeight(windowDimensions.height - 525);
+      if (windowDimensions.width < SCREENNXL_SIZE)
+        setChartHeight(windowDimensions.height - 510);
       else
         setChartHeight(windowDimensions.height - 540);
     }
   }, [windowDimensions, tokenData])
 
   const startResizing = React.useCallback((_mouseDownEvent: any) => {
+    console.log('start resize');
     setIsResizing(true);
   }, []);
 
@@ -74,9 +75,13 @@ export default function TokenBody({
   React.useEffect(() => {
     window.addEventListener("mousemove", resize);
     window.addEventListener("mouseup", stopResizing);
+    window.addEventListener("touchmove", resize);
+    window.addEventListener("touchend", stopResizing);
     return () => {
       window.removeEventListener("mousemove", resize);
       window.removeEventListener("mouseup", stopResizing);
+      window.removeEventListener("touchmove", resize);
+      window.removeEventListener("touchend", stopResizing);
     };
   }, [resize, stopResizing]);
 
@@ -169,6 +174,7 @@ export default function TokenBody({
                 width={"100%"}
                 backgroundColor={resizeBgColor}
                 onMouseDown={startResizing}
+                onPointerDown={startResizing}
               >
                 <Box
                   display="flex"

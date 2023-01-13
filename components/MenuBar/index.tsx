@@ -5,7 +5,7 @@ import {GameMenuBar, GameMenuBarMini, TopMenuBar, TopMenuBarMini} from '../../as
 import {TradeMenuBar, TradeMenuBarMini} from '../../assests/icon'
 import { PlayMode } from '../../utils/type'
 import Link from 'next/link'
-import { SCREEN2XL_SIZE, SCREENSM_SIZE } from '../../utils/constant'
+import { SCREEN2XL_SIZE, SCREENNXL_SIZE, SCREENSM_SIZE } from '../../utils/constant'
 import useSize from '../../hooks/useSize'
 
 export default function MenuBar({
@@ -35,7 +35,7 @@ export default function MenuBar({
       <Box style={{
         display: "flex", 
         justifyContent:"center", 
-        height:"4.8rem", 
+        height: windowDimensions.width > SCREENNXL_SIZE ? "4.8rem" : "63px", 
         alignContent:"center",
         cursor: "pointer",
         flexDirection: "column",
@@ -53,7 +53,7 @@ export default function MenuBar({
       <Box style={{
         display: "flex", 
         justifyContent:"center", 
-        height: windowDimensions.width < SCREENSM_SIZE ? "3.5rem" : "5rem", 
+        height: windowDimensions.width < SCREENSM_SIZE ? "3.5rem" : windowDimensions.width < SCREENNXL_SIZE ? "65px" : "5rem", 
         alignContent:"center",
         cursor: "pointer",
         flexDirection: "column",
@@ -72,7 +72,7 @@ export default function MenuBar({
       <Box style={{
         display: "flex", 
         justifyContent:"center", 
-        height: windowDimensions.width < SCREENSM_SIZE ? "3.5rem" : "5rem", 
+        height: windowDimensions.width < SCREENSM_SIZE ? "3.5rem" : windowDimensions.width < SCREENNXL_SIZE ? "65px" : "5rem", 
         alignContent:"center",
         cursor: "pointer",
         flexDirection: "column",

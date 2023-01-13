@@ -30,7 +30,7 @@
 }
 
 .socialUrl {
-  
+  width: 30px;
   cursor: pointer;
 }
 
@@ -217,11 +217,104 @@
     flex-direction: row;
   }  
   
-.tokenPrice {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 500;
-  font-size: 1rem;
-  margin-left: 0rem !important;
+  .tokenPrice {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 1rem;
+    margin-left: 0rem !important;
+  }
+
+
+  .tokenTotalSupply {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 0.7rem;
+  }  
 }
+
+
+@media only screen and (max-width: 1700px) {
+
+  .tokenName {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 1.2rem;
+  }
+
+  .tokenAddress {
+    font-family: 'Inter';
+    font-style: normal;
+    font-size: 0.5rem;
+    line-height:1.5rem;
+    color: #A7A7A7;  
+    margin-right:0.3rem;
+  }
+
+  .marketCap {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 0.8rem;
+  }
+  
+  .tokenMarketCap {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 0.7rem;
+    line-height: 1.5rem;
+  }  
+
+  .itemvalue {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 0.7rem;
+    line-height: 1.8rem;
+    display: flex;
+    flex-direction: row;
+  }  
+  
+  .tokenPrice {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 1.2rem;
+    margin-left: 0rem !important;
+  }
+
+
+  .socialUrl {
+    width: 25px;
+    cursor: pointer;
+  }  
+
+  .tokenSocialInfo {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height:4rem;
+  }  
+
+
+  .tokenMarktetInfo {
+    width: 100%;
+    height: 100%;
+    height: 4rem;
+    display: flex;
+    flex-direction: row;
+    padding:0.5rem 0rem 0.5rem 1.5rem;
+  }  
+
+  
+  .tokenTotalSupply {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 0.7rem;
+  }
 }

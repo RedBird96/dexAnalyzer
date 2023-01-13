@@ -45,7 +45,7 @@ import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
 import { useAddress } from '@thirdweb-dev/react'
 import SocialListBox from './SocialListBox'
 import useSize from '../../hooks/useSize'
-import { SCREENMD_SIZE, SCREENSM_SIZE } from '../../utils/constant'
+import { SCREENMD_SIZE, SCREENNXL_SIZE, SCREENSM_SIZE } from '../../utils/constant'
 import TokenDetails from './TokenDetails'
 import TokenBalance from './TokenBalance'
 import SwapTrade from '../WalletInfo/SwapTrade'
@@ -381,13 +381,15 @@ export default function TokenInfo() {
             </Drawer>                  
           </Box>
         }        
-        <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "95%" :"83%"} alignItems={"center"} justifyContent={"space-between"} paddingLeft={isMobileVersion ? "0rem" : "1.5rem"}>
+        <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "95%" : windowDimensions.width < SCREENNXL_SIZE ? "85%" : "83%"} alignItems={"center"} justifyContent={"space-between"} paddingLeft={isMobileVersion ? "0rem" : "1.5rem"}>
           <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "100%" : "59%"} alignItems={"center"}>
-            <img src={tokenData.image} width={isMobileVersion ? "35rem" : "50rem"}/>
+            <img src={tokenData.image} width={
+              windowDimensions.width > SCREENNXL_SIZE ? "50rem" : windowDimensions.width > SCREENMD_SIZE ? "40rem" : "35rem"
+            }/>
             <Box display={"flex"} flexDirection={"column"} paddingLeft={"1rem"} alignItems={"flex-start"}>
-              <Box display={"flex"} flexDirection={"row"}>
+              <Box display={"flex"} flexDirection={"row"} paddingTop = {windowDimensions.width > SCREENNXL_SIZE ? "0px" : "3px"}>
                 <p className={style.tokenName}>{isMobileVersion ? makeShortTokenName(tokenData.symbol, 4) : tokenData.symbol}</p>
-                <p className={style.tokenName} style={{color:"#767676"}}>&nbsp;({isMobileVersion ? `${makeShortTokenName(lpTokenAddress.baseCurrency_name, 4)}/${makeShortTokenName(lpTokenAddress.quoteCurrency_name, 4)}` :lpTokenAddress.symbol})</p>
+                <p className={style.tokenName} style={{color:"#767676"}}>&nbsp;({isMobileVersion ? `${makeShortTokenName(lpTokenAddress.baseCurrency_name, 4)}/${makeShortTokenName(lpTokenAddress.quoteCurrency_name, 4)} ` :lpTokenAddress.symbol})&nbsp;&nbsp;</p>
                 {
                   !isMobileVersion && 
                   <p className={style.tokenPrice} style={{color:priceColor}}>{convertBalanceCurrency( tokenPriceshow, 9)}</p>
@@ -567,8 +569,8 @@ export default function TokenInfo() {
       </Box>
       
       <Box className={style.tokenMarktetInfo} alignItems={"center"} borderBottom={"1px"} borderBottomColor = {infoborderColorMode}>
-        <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "100%" :"83%"} height={"100%"} alignItems={"center"}>
-          <Box display={"flex"} flexDirection={"column"} width={isMobileVersion ? "40%" : "28%"} paddingLeft={isMobileVersion ? "0rem" : "4rem"}>
+        <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "100%" : "83%"} height={"100%"} alignItems={"center"}>
+          <Box display={"flex"} flexDirection={"column"} width={isMobileVersion ? "40%" : "28%"} paddingLeft={isMobileVersion ? "0rem" : windowDimensions.width < SCREENNXL_SIZE ? "3.5rem" : "4rem"}>
             <p className={style.marketCap} style={{color:textColor}} >Market Cap</p>
             <p className={style.tokenMarketCap} style={{color:priceColor}}>{isMobileVersion ? makeShortTokenName(convertBalanceCurrency((tokenData.totalSupply-burnAmount) * tokenPriceshow, 0), 12) :convertBalanceCurrency((tokenData.totalSupply-burnAmount) * tokenPriceshow, 0)}</p>
           </Box>
@@ -583,7 +585,7 @@ export default function TokenInfo() {
             width={isMobileVersion ? "60%" : "40%"} 
             position={"relative"} 
             height={"100%"}
-            top={"0.4rem"}
+            top={windowDimensions.width > SCREENNXL_SIZE ? "0.4rem" : "0rem"}
           >
             <LpTokenInfo 
               lpToken={lpTokenAddress} 
@@ -599,7 +601,7 @@ export default function TokenInfo() {
                 maxHeight:"15rem", 
                 display:"none", 
                 position:"absolute", 
-                top:"3.9rem", 
+                top:windowDimensions.width > SCREENNXL_SIZE ? "3.9rem" : "3.5rem", 
                 width:"100%", 
                 flexDirection:"column",
                 overflowY:"auto",
