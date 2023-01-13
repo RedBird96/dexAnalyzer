@@ -12,10 +12,11 @@ import {makeShortAddress, makeShortTokenName} from '../../../utils'
 import { ERC20Token } from '../../../utils/type'
 import * as constant from '../../../utils/constant'
 import Link from 'next/link'
-import bnbIcon from '../../../assests/icon/bnbIcon.png'
-import ethIcon from '../../../assests/icon/ethIcon.png'
 import pin from '../../../assests/icon/pin.png'
 import unpin from '../../../assests/icon/unpin.png'
+import pinlight from '../../../assests/icon/pin_light.png'
+import whitepinlight from '../../../assests/icon/whitepin_light.png'
+import unpinlight from '../../../assests/icon/unpin_light.png'
 import useSize from '../../../hooks/useSize'
 
 const TokenListItem = ({
@@ -72,7 +73,7 @@ const TokenListItem = ({
               style={{display:"flex", flexDirection:"row", alignItems:"center", width:"80%"}}
               onClick={setActiveToken}
             >
-              <img src={tokenData?.image} width={windowDimensions.width < constant.SCREENSM_SIZE ? "30rem" : "40rem"}/>
+              <img src={tokenData?.image} width={windowDimensions.width < constant.SCREENNXL_SIZE ? "30rem" : "40rem"}/>
               <Box display={"flex"} flexDirection={"column"} textAlign={"start"} marginLeft={"1rem"}>
                 <Box display={"flex"} flexDirection={"row"} >
                   <p className={style.tokenName} style={{color:isActive || isHover ? "#FFFFFF" : nameColor}}>{makeShortTokenName(tokenData?.name, windowDimensions.width < constant.SCREENSM_SIZE ? 7 : 13)}</p>
@@ -92,19 +93,21 @@ const TokenListItem = ({
           >
             {
               tokenData?.network == constant.ETHEREUM_NETWORK ?
-              <Image src={ethIcon.src} width={windowDimensions.width < constant.SCREENSM_SIZE ? "15": "20"} height={"15"} alt=""/> :
-              <Image src = {bnbIcon.src} width={windowDimensions.width < constant.SCREENSM_SIZE ? "15": "20"} height={"15"} alt=""/>
+              <img src = {"https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png"} width={windowDimensions.width < constant.SCREENNXL_SIZE ? "15": "20"}/>:
+              <img src = {"https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png"} width={windowDimensions.width < constant.SCREENNXL_SIZE ? "15": "20"}/>
             }
             <Box onClick={setPinIcon}>
             {
               colorMode.colorMode == "light" ? 
               tokenData?.pinSetting == false ? 
-                <UnPinLightIcon/> : 
-                <PinLightIcon/>
+              <Image src = {unpinlight.src} width={windowDimensions.width < constant.SCREENNXL_SIZE ? "15": "20"} height={"15"} alt=""/> : 
+              isActive ?
+              <Image src = {whitepinlight.src} width={windowDimensions.width < constant.SCREENNXL_SIZE ? "15": "20"} height={"15"} alt=""/>:
+              <Image src = {pinlight.src} width={windowDimensions.width < constant.SCREENNXL_SIZE ? "15": "20"} height={"15"} alt=""/>
               : 
               tokenData?.pinSetting == false ? 
-                <Image src = {unpin.src} width={windowDimensions.width < constant.SCREENSM_SIZE ? "15": "20"} height={"15"} alt=""/> : 
-                <Image src = {pin.src} width={windowDimensions.width < constant.SCREENSM_SIZE ? "15": "20"} height={"15"} alt=""/>
+                <Image src = {unpin.src} width={windowDimensions.width < constant.SCREENNXL_SIZE ? "15": "20"} height={"15"} alt=""/> : 
+                <Image src = {pin.src} width={windowDimensions.width < constant.SCREENNXL_SIZE ? "15": "20"} height={"15"} alt=""/>
             }    
             </Box>   
             {

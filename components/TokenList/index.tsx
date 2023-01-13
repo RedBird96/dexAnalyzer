@@ -14,7 +14,9 @@ import {ERC20Token, SearchStatus} from '../../utils/type'
 import * as constant from '../../utils/constant'
 import TokenListItem from './TokenListItem'
 import style from './TokenList.module.css'
-import { SearchCross, SearchIcon } from '../../assests/icon'
+import { SearchCross, SearchIcon, SearchIconMini } from '../../assests/icon'
+import { SCREENNXL_SIZE } from '../../utils/constant'
+import useSize from '../../hooks/useSize'
 export default function TokenList({
   network,
   address
@@ -32,6 +34,7 @@ export default function TokenList({
   const {tokenData,setTokenData} = useTokenInfo();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const debouncedQuery = useDebounce(searchQuery.replace(/\s/g, ''), 200);
+  const windowDimensions = useSize();
 
   const [showListToken, setShowListToken] = useState<Boolean>();
   const [activeToken, setActiveToken] = useState<ERC20Token>(tokenData);
@@ -342,20 +345,25 @@ export default function TokenList({
       <Box className = {style.tokenSearch}>
         <InputGroup>
           <InputLeftElement
-            paddingTop = '7px'
+            paddingTop = {windowDimensions.width < SCREENNXL_SIZE ? '0px' : '7px'}
             paddingLeft= '5px'
             pointerEvents='none'
           >
-            <SearchIcon/>
+            {
+              windowDimensions.width < SCREENNXL_SIZE ?
+              <SearchIconMini/>:
+              <SearchIcon/>
+            }
+            
           </InputLeftElement>
           <Input 
             id='SearchId'
             placeholder='Search token address'
-            _placeholder={{fontsize:'1rem', fontcolor:"#E34B62"}}
+            _placeholder={{fontsize:windowDimensions.width < SCREENNXL_SIZE ? '0.5rem' :'1rem', fontcolor:"#E34B62"}}
             onChange={handleSearchChange} 
             onKeyDown={handleEnter}
             borderRadius={'2rem'}
-            height='2.5rem'
+            height={windowDimensions.width < SCREENNXL_SIZE ? '2rem' : '2.5rem'}
             background={searchColor}
             borderColor={searchBorderColor}
             value={searchQuery}

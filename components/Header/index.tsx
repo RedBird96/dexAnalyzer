@@ -120,6 +120,7 @@ export default function Header() {
                 <DrawerBody p = {0} bg = {drawerbgColor}>
                   <WalletInfo
                     tradeVisible = {false}
+                    hoverMenu = {true}
                   />
                 </DrawerBody>
               </DrawerContent>

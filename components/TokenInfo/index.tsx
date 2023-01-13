@@ -54,6 +54,7 @@ import TokenBalance from './TokenBalance'
 import SwapTrade from '../WalletInfo/SwapTrade'
 import TokenList from '../TokenList'
 import MenuBar from '../MenuBar'
+import WalletInfo from '../WalletInfo'
 
 
 export default function TokenInfo() {
@@ -79,6 +80,7 @@ export default function TokenInfo() {
   const windowDimensions = useSize();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isSidebarOpen, onOpen: SidebarOpen, onClose: SidebarClose } = useDisclosure();
+  const { isOpen : isMobileToggleOpen, onOpen: MobileToggleOpen, onClose: MobileToggleClose , onToggle: onMobileToggle} = useDisclosure();
   const { isOpen : isToggleOpen, onOpen: ToggleOpen, onClose: ToggleClose , onToggle} = useDisclosure();
   const firstField = React.useRef()
   
@@ -306,6 +308,7 @@ export default function TokenInfo() {
       setMobileVersion(true);
     } else {
       setMobileVersion(false);
+      ToggleClose();
     }
   }, [windowDimensions])
 
@@ -453,6 +456,7 @@ export default function TokenInfo() {
             width={"25%"}
           >
             <Box
+              width = {"60%"}
               display={"flex"}
               flexDirection={"column"}         
             >
@@ -461,6 +465,44 @@ export default function TokenInfo() {
                 numberWithCommasNoDecimals(tokenData.totalSupply) :
                 0}</p>
             </Box>
+            {
+              windowDimensions.width < SCREENNXL_SIZE && 
+              <Button
+                onClick={onToggle}
+                _hover= {{bg:"#0085FF"}}
+                backgroundColor = "#0085FF"
+                color="#FFFFFF"
+                fontSize={"0.8rem"}     
+                height={"1.8rem"}       
+              >
+                Trade
+              </Button>
+            }
+            
+            <Drawer
+              isOpen={isToggleOpen}
+              placement = 'right'
+              onClose={ToggleClose}
+              initialFocusRef={firstField}
+              isFullHeight = {false}
+            >
+              <DrawerOverlay/>
+              <DrawerContent minW={{sm:455}}>
+                <DrawerBody p = {0}>
+                  <Box
+                    display={"flex"}
+                    flexDirection={"row"}
+                    width={"100%"}
+                    height={"100%"}
+                  >
+                    <WalletInfo
+                     tradeVisible={true}
+                     hoverMenu = {true}
+                    />
+                  </Box>
+                </DrawerBody>
+              </DrawerContent>
+            </Drawer>            
           </Box>:
           <VStack
             alignItems={"flex-end"}
@@ -538,17 +580,17 @@ export default function TokenInfo() {
               height={"50%"}
             >
               <Button
-                onClick={onToggle}
-                _hover= {{bg:isToggleOpen ? "#0085FF" : "transparent"}}
-                backgroundColor = {isToggleOpen ? "#0085FF" : "transparent"}
+                onClick={onMobileToggle}
+                _hover= {{bg:isMobileToggleOpen ? "#0085FF" : "transparent"}}
+                backgroundColor = {isMobileToggleOpen ? "#0085FF" : "transparent"}
                 fontSize={"0.8rem"}
               >
                 TRADE
               </Button>
               <Drawer
-                isOpen={isToggleOpen}
+                isOpen={isMobileToggleOpen}
                 placement = 'bottom'
-                onClose={ToggleClose}
+                onClose={MobileToggleClose}
                 initialFocusRef={firstField}
                 isFullHeight = {false}
               >

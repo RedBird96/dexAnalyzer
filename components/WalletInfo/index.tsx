@@ -1,16 +1,10 @@
 import React, {useEffect, useRef, useState} from 'react'
+import Image from 'next/image'
 import { 
   Box, 
   Button, 
   Input,
-  Table,
-  Thead,
-  Tr,
-  Th,
-  Tbody,
   useColorModeValue,
-  calc,
-  TableContainer,
   InputGroup,
   InputLeftElement,
   InputRightElement,
@@ -42,11 +36,14 @@ import {
 } from '../../hooks'
 import SwapTrade from './SwapTrade'
 import useSize from '../../hooks/useSize'
+import refreshIcon from '../../assests/icon/refresh.png'
 
 export default function WalletInfo({
-  tradeVisible
+  tradeVisible,
+  hoverMenu
 }:{
   tradeVisible: boolean
+  hoverMenu: boolean
 }
 
 ) {
@@ -247,7 +244,7 @@ export default function WalletInfo({
             backgroundColor={refreshBtnBgColor}
             onClick={getTokensFromWallet}
           >
-            <Refresh/>
+            <Image src={refreshIcon.src} width={20} height={20} alt={''}></Image>
             <p style={{marginLeft:"5px", fontSize:"0.8rem"}}>Refresh</p>
           </Button>
         </Box>
@@ -454,9 +451,11 @@ export default function WalletInfo({
         </Box>
       }
       
-      <Box width={"100%"} height={"100%"} background={refreshBtnBgColor} borderTop={"1px"} borderTopColor = {borderColorMode}>
+      { !hoverMenu &&
+        <Box width={"100%"} height={"100%"} background={refreshBtnBgColor} borderTop={"1px"} borderTopColor = {borderColorMode}>
 
-      </Box>
+        </Box>
+      }
     </Box>
   );
 }

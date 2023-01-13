@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Box, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerOverlay, useColorModeValue, useDisclosure } from "@chakra-ui/react"
+import { Box, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerHeader, DrawerOverlay, useColorModeValue, useDisclosure } from "@chakra-ui/react"
 import dynamic from 'next/dynamic'
 import TokenList from "../TokenList"
 import TokenInfo from "../TokenInfo"
@@ -7,7 +7,7 @@ import MenuBar from "../MenuBar"
 import TokenTransaction from "../TokenTransaction"
 import WalletInfo from "../WalletInfo"
 import style from './TokenBody.module.css'
-import { ResizerLight} from '../../assests/icon'
+import { ResizerLight, SiteLogo, SiteLogoMini} from '../../assests/icon'
 import { useTokenInfo } from '../../hooks'
 import { PlayMode } from '../../utils/type';
 import useSize from '../../hooks/useSize'
@@ -28,7 +28,7 @@ export default function TokenBody({
   const [isResizing, setIsResizing] = useState(false);
   const {tokenData} = useTokenInfo();
   const windowDimensions = useSize();
-  const [height, setHeight] = useState(320);
+  const [height, setHeight] = useState(110);
   const [chartheight, setChartHeight] = useState(0);
   const resizeBgColor = useColorModeValue("#FFFFFF", "#1C1C1C");
   const borderColorMode = useColorModeValue("#E2E8F0","#2B2A2A");
@@ -41,14 +41,13 @@ export default function TokenBody({
     }
     if (tokenData !=undefined && tokenData.contractAddress != ""){
       if (windowDimensions.width < SCREENNXL_SIZE)
-        setChartHeight(windowDimensions.height - 510);
+        setChartHeight(windowDimensions.height - 290);
       else
-        setChartHeight(windowDimensions.height - 540);
+        setChartHeight(windowDimensions.height - 320);
     }
   }, [windowDimensions, tokenData])
 
   const startResizing = React.useCallback((_mouseDownEvent: any) => {
-    console.log('start resize');
     setIsResizing(true);
   }, []);
 
@@ -60,8 +59,8 @@ export default function TokenBody({
     (mouseMoveEvent:MouseEventInit ) => {
       if (isResizing) {
         let resizeHeight = windowDimensions.height - mouseMoveEvent.clientY;
-        if (resizeHeight < 320) {
-          resizeHeight = 320;
+        if (resizeHeight < 100) {
+          resizeHeight = 100;
         } else if (resizeHeight > 800){
           resizeHeight = 800;
         }
@@ -118,7 +117,13 @@ export default function TokenBody({
         isFullHeight = {false}
       >
         <DrawerOverlay/>
-        <DrawerContent minW={{sm:470}} >
+        <DrawerContent minW={{sm:380}}  backgroundColor={resizeBgColor}>
+          <DrawerHeader paddingLeft={"10px"}>
+            <Box display={"flex"} flexDirection={"row"} alignItems={"center"} height={"2rem"}>
+              <SiteLogoMini/>
+              <p className={style.logo}>BlockPortal</p>
+            </Box>
+          </DrawerHeader>
           <DrawerBody p = {0}>
             <TokenList
               network = {network}
@@ -159,7 +164,7 @@ export default function TokenBody({
               flexDirection={"column"}
               height={height}
               maxHeight={"50rem"}
-              minHeight={windowDimensions.width < SCREENSM_SIZE ? "5rem" : "10rem"}
+              minHeight={windowDimensions.width < SCREENNXL_SIZE ? "5rem" : "10rem"}
               flexShrink={"0"}
               width={"100%"}
               ref = {transactionRef}
@@ -219,6 +224,7 @@ export default function TokenBody({
       >
         <WalletInfo
           tradeVisible = {true}
+          hoverMenu = {false}
         />
       </Box>       
     </main>
