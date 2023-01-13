@@ -53,3 +53,14 @@
   font-weight: 100;
   font-size: 0.8rem;
 }
+
+
+@media only screen and (max-width: 600px) {
+
+  .tokenSearch {
+    width: 90% !important;
+    display:flex;
+    align-items: center;
+    height: 63px;
+  }
+}

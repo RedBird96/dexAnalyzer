@@ -160,7 +160,7 @@ export default function LpTokenInfo({
               {reserveCurrency}
             </p>
             {
-              windowDimensions.width > 450 &&
+              windowDimensions.width > 375 &&
               <p
                 className={style.itemvalue} 
                 style={{color:"#00B112"}}

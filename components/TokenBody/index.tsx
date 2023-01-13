@@ -93,7 +93,7 @@ export default function TokenBody({
         <>
           <MenuBar
             selectMode={PlayMode.Trade}
-            onOpen = {onOpen}
+            onOpen = {() => {if (windowDimensions.width > SCREENSM_SIZE) {onOpen()}}}
           />
           <Box 
             borderRight={"1px"}
@@ -212,7 +212,17 @@ export default function TokenBody({
             backgroundColor: resizeBgColor,
             fontSize : windowDimensions.width < SCREENSM_SIZE ? "0.8rem" : "1rem"
           }}>
-              Please search or select a token
+            {
+              windowDimensions.width < SCREENSM_SIZE ?
+              <TokenList
+                network = {network}
+                address = {address}
+              /> :
+              <p>
+                Please search or select a token
+              </p>
+            }
+              
           </Box>
       }
       

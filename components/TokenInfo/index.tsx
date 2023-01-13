@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useMemo, useRef} from 'react'
-import { Box, Button, Divider, Drawer, DrawerBody, DrawerContent, DrawerOverlay, VStack, useBreakpoint, useBreakpointValue, useColorMode, useColorModeValue, useDisclosure  } from "@chakra-ui/react"
+import { Box, Button, Divider, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, VStack, useBreakpoint, useBreakpointValue, useColorMode, useColorModeValue, useDisclosure  } from "@chakra-ui/react"
 import {
   CopyAddressIconDark,
   CopyAddressIconLight,
@@ -9,7 +9,8 @@ import {
   DownArrowLight,
   CoyAddressComfirmMini,
   CopyAddressIconMiniDark,
-  CopyAddressIconMiniLight
+  CopyAddressIconMiniLight,
+  MoreInfoIcon
 } from "../../assests/icon"
 import {
   useTokenInfo,
@@ -305,7 +306,6 @@ export default function TokenInfo() {
       ToggleClose();
     }
   }, [windowDimensions])
-
   
   useEffect(() => {
 
@@ -337,63 +337,25 @@ export default function TokenInfo() {
   return (
     <Box className={infoClass}>
       <Box className={style.tokenSocialInfo} borderBottom={"1px"} borderBottomColor = {infoborderColorMode}>
-        {
-          isMobileVersion &&
-          <Box
-            paddingLeft={"1rem"}
-          >
-            <Box
-              cursor={"pointer"} 
-              style={{transform:`rotate(90deg)`}}
-              onClick={SidebarOpen}
-              marginLeft={"0.3rem"}
-              marginRight={"0.2rem"}
-            >
-              {colorMode.colorMode == "dark" ?
-                <DownArrowDark/> :
-                <DownArrowLight/> 
-              }
-
-              <Drawer
-                isOpen={isSidebarOpen}
-                placement = 'left'
-                onClose={SidebarClose}
-                initialFocusRef={firstField}
-                isFullHeight = {false}
-              >
-                <DrawerOverlay/>
-                <DrawerContent>
-                  <DrawerBody p = {0}>
-                    <Box
-                      display={"flex"}
-                      flexDirection={"row"}
-                      width={"100%"}
-                      height={"100%"}
-                    >
-                      <MenuBar
-                        selectMode={PlayMode.Trade}
-                        onOpen = {null}
-                      />
-                      <TokenList
-                        network = {tokenData.network == constant.ETHEREUM_NETWORK ? "eth" : "bsc"}
-                        address = {tokenData.contractAddress}
-                      />
-                    </Box>
-                  </DrawerBody>
-                </DrawerContent>
-              </Drawer>                  
-            </Box>
-          </Box>
-        }        
-        <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "95%" : "85%"} alignItems={"center"} justifyContent={"space-between"} paddingLeft={isMobileVersion ? "0.8rem" : "1.5rem"}>
+        <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "95%" : "85%"} alignItems={"center"} justifyContent={"space-between"} paddingLeft={"1.5rem"}>
           <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "100%" : "59%"} alignItems={"center"}>
-            <img src={tokenData.image} width={
-              windowDimensions.width > SCREENNXL_SIZE ? "50rem" : windowDimensions.width > SCREENMD_SIZE ? "40rem" : "50rem"
-            }/>
-            <Box display={"flex"} flexDirection={"column"} paddingLeft={"1rem"} alignItems={"flex-start"} width={"100%"}>
-              <Box display={"flex"} flexDirection={"row"} paddingTop = {windowDimensions.width > SCREENNXL_SIZE ? "0px" : "5px"}>
+            <Box
+              display={"flex"}
+              flexDirection={"row"}
+              alignItems={"start"}
+              width={windowDimensions.width < SCREENSM_SIZE ? "3rem" : "50px"}
+              height={windowDimensions.width < SCREENSM_SIZE ? "4rem" : "50px"}
+            >
+              <img src={tokenData.image} />
+            </Box>
+            <Box display={"flex"} flexDirection={"column"} paddingLeft={"0.5rem"} alignItems={"flex-start"} width={"100%"}>
+              <Box display={"flex"} flexDirection={"row"} paddingTop = {windowDimensions.width > SCREENNXL_SIZE ? "0px" : "13px"}>
                 <p className={style.tokenName}>{isMobileVersion ? makeShortTokenName(tokenData.symbol, 4) : tokenData.symbol}</p>
-                <p className={style.tokenName} style={{color:"#767676"}}>&nbsp;({isMobileVersion ? `${makeShortTokenName(lpTokenAddress.baseCurrency_name, 4)}/${makeShortTokenName(lpTokenAddress.quoteCurrency_name, 4)}` :lpTokenAddress.symbol})&nbsp;&nbsp;</p>
+                <p className={style.tokenName} 
+                   style={{color:"#767676", fontSize:windowDimensions.width < SCREENSM_SIZE ? "12px" : "1.2rem"}}
+                >
+                  &nbsp;({isMobileVersion ? `${makeShortTokenName(lpTokenAddress.baseCurrency_name, 4)}/${makeShortTokenName(lpTokenAddress.quoteCurrency_name, 4)}` :lpTokenAddress.symbol})&nbsp;&nbsp;
+                </p>
                 {
                   !isMobileVersion && 
                   <p className={style.tokenPrice} style={{color:priceColor}}>{convertBalanceCurrency( tokenPriceshow, 9)}</p>
@@ -444,8 +406,6 @@ export default function TokenInfo() {
                     flexDirection={"column"}
                   >
                     
-                    <p className={style.tokenPrice} style={{color:priceColor}}>{tokenPriceshow < 1 ? convertBalanceCurrency( tokenPriceshow, 9) : convertBalanceCurrency( tokenPriceshow, 2)}</p>
-                    
                     <Box 
                       display={"flex"} 
                       flexDirection={"row"} 
@@ -472,19 +432,107 @@ export default function TokenInfo() {
                       </Box>
                       
                     </Box>  
+                    <p 
+                      className={style.tokenPrice} 
+                      style={{color:priceColor}}
+                    >
+                      {tokenPriceshow < 1 ? convertBalanceCurrency( tokenPriceshow, 9) : convertBalanceCurrency( tokenPriceshow, 2)}
+                    </p>
+                    
                   </Box>
                   <Box
                     display={"flex"}
+                    flexDirection={"column"}
                     alignItems={"center"}
                     justifyItems={"center"}
-                    marginRight={"1rem"}
+                    width = {"6rem"}
+                    marginTop={"-2.2rem"}
                   >
+                    <Button
+                      width={"100%"}
+                      height ={"1.5rem"}
+                      marginBottom={"0.5rem"}
+                      fontSize={"0.8rem"}
+                      onClick = {onOpen}
+                      paddingInlineStart={"0.5rem"}
+                      paddingInlineEnd={"0.5rem"}
+                    >
+                      <Box
+                        display={"flex"}
+                        flexDirection={"row"}
+                        width={"100%"}
+                        alignItems={"center"}
+                        justifyContent={"space-around"}
+                        fontSize={"0.7rem"}
+                        color={"#5C5C5C"}
+                      >
+                        <p>
+                          More Info
+                        </p>
+                        <MoreInfoIcon/>
+                      </Box>
+                    </Button>
+                    <Drawer
+                      isOpen={isOpen}
+                      placement = 'right'
+                      onClose={onClose}
+                      initialFocusRef={firstField}
+                      isFullHeight = {false}
+                    >
+                      <DrawerOverlay/>
+                      <DrawerContent minW={{sm:400}} height={"12.5rem"} >
+                        <DrawerBody p = {0} bg = {drawerbgColor}>
+                          <Box
+                            width={"100%"}
+                            height = {"100%"}
+                            display = {"flex"}
+                            flexDirection = {"column"}
+                            justifyContent = {"center"}
+                            padding = {"1rem"}
+                          >
+                            <Box
+                              display={"flex"}
+                              flexDirection={"column"}
+                            >
+                              <p className={style.holder} style={{color:textColor}}>Total Supply</p>
+                              <p className={style.tokenTotalSupply} color={whiteBlackMode}>{tokenData.totalSupply != null ? 
+                                numberWithCommasNoDecimals(tokenData.totalSupply) :
+                                0}</p>
+                            </Box>
+                            <Divider/>
+                            <TokenDetails
+                              holdersCount = {holdersCount}
+                              transactionCount = {transactionCount}
+                              tokenData = {tokenData}
+                              width = {"100%"}
+                            />
+                            <Divider/>
+                            <TokenBalance
+                              balance = {balance}
+                              balanceUSD = {balanceUSD}
+                              tokenData = {tokenData}
+                              width = {"100%"}
+                            />       
+                            <Divider/>
+                            <Box
+                              display={"flex"}
+                              marginTop = {"0.2rem"}
+                            >
+                              <SocialListBox
+                                token={tokenData}
+                              />
+                            </Box>
+                          </Box>
+                        </DrawerBody>
+                      </DrawerContent>
+                    </Drawer>                       
                     <Button
                       onClick={onMobileToggle}
                       _hover= {{bg:"#0085FF"}}
                       backgroundColor = "#0085FF"
                       color={"#FFFFFF"}
                       fontSize={"0.8rem"}
+                      width={"100%"}
                     >
                       TRADE
                     </Button>
@@ -604,7 +652,7 @@ export default function TokenInfo() {
             flexDirection={"column"} 
             width={!isMobileVersion && "28%"} 
             paddingLeft={isMobileVersion ? "0rem" : windowDimensions.width < SCREENNXL_SIZE ? "3.5rem" : "4rem"} 
-            paddingRight={isMobileVersion && "10px"} 
+            paddingRight={isMobileVersion && "2.5rem"} 
             minWidth={isMobileVersion && "5%"}
             float={"right"}
           >
@@ -682,15 +730,16 @@ export default function TokenInfo() {
                 tokenData = {tokenData}
                 width = {"39%"}
               />
+              
+              <div style={{
+                marginRight:"1rem",
+                height:"90%",
+                borderWidth:"1px",
+                borderColor:infoborderColorMode,
+              }}/>
             </>   
           }
         </Box>
-        <div style={{
-          marginRight:"1rem",
-          height:"90%",
-          borderWidth:"1px",
-          borderColor:infoborderColorMode,
-        }}/>
         {
           !isMobileVersion  &&
             <TokenDetails
@@ -699,74 +748,6 @@ export default function TokenInfo() {
               tokenData = {tokenData}
               width = {"25%"}
             />
-        }
-        {
-          <>
-          <Box  
-          display={"flex"}
-          width={"2rem"}
-          cursor={"pointer"}
-          onClick={onOpen}
-          paddingTop={"0.5rem"}
-          marginRight={"1rem"}
-          >
-            <TokenDetailsDark/>
-            <Drawer
-              isOpen={isOpen}
-              placement = 'right'
-              onClose={onClose}
-              initialFocusRef={firstField}
-              isFullHeight = {false}
-            >
-              <DrawerOverlay/>
-              <DrawerContent minW={{sm:400}} height={"12rem"} >
-                <DrawerBody p = {0} bg = {drawerbgColor}>
-                  <Box
-                    width={"100%"}
-                    height = {"100%"}
-                    display = {"flex"}
-                    flexDirection = {"column"}
-                    justifyContent = {"center"}
-                    padding = {"1rem"}
-                  >
-                    <Box
-                      display={"flex"}
-                      flexDirection={"column"}
-                    >
-                      <p className={style.holder} style={{color:textColor}}>Total Supply</p>
-                      <p className={style.tokenTotalSupply} color={whiteBlackMode}>{tokenData.totalSupply != null ? 
-                        numberWithCommasNoDecimals(tokenData.totalSupply) :
-                        0}</p>
-                    </Box>
-                    <Divider/>
-                    <TokenDetails
-                      holdersCount = {holdersCount}
-                      transactionCount = {transactionCount}
-                      tokenData = {tokenData}
-                      width = {"100%"}
-                    />
-                    <Divider/>
-                    <TokenBalance
-                      balance = {balance}
-                      balanceUSD = {balanceUSD}
-                      tokenData = {tokenData}
-                      width = {"100%"}
-                    />       
-                    <Divider/>
-                    <Box
-                      display={"flex"}
-                      marginTop = {"0.2rem"}
-                    >
-                      <SocialListBox
-                        token={tokenData}
-                      />
-                    </Box>
-                  </Box>
-                </DrawerBody>
-              </DrawerContent>
-            </Drawer>   
-          </Box>
-          </>
         }
       </Box>
     </Box>

@@ -439,10 +439,10 @@ export default function WalletInfo({
                         </a>
                       </Box>
                       <p className={style.tokenBalance} style={{width:"35%",marginRight:"5px", alignItems:"flex-start", paddingLeft:"2px"}}>
-                        {makeShortTokenName(numberWithCommasTwoDecimals(token.balance), 25)}
+                        {makeShortTokenName(numberWithCommasTwoDecimals(token.balance), 13)}
                       </p>
                       <p className={style.tokenBalance} style={{width:"35%", color:priceColor, alignItems:"flex-end"}} >
-                        ({makeShortTokenName(convertBalanceCurrency(token.usdBalance, 2), 20)})
+                        ({makeShortTokenName(convertBalanceCurrency(token.usdBalance, 2), 10)})
                       </p>
                     </Box>
                   </Box>

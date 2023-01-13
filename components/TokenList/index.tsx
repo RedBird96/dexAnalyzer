@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, KeyboardEvent, useMemo } from 'react'
-import { Box, Input, useColorModeValue, useColorMode, InputGroup, InputLeftAddon, InputLeftElement, InputRightElement } from "@chakra-ui/react"
+import { Box, Input, useColorModeValue, useColorMode, InputGroup, InputLeftAddon, InputLeftElement, InputRightElement, Button } from "@chakra-ui/react"
 import {
   getTokenLogoURL,
   getTokenSymbol,
@@ -342,6 +342,8 @@ export default function TokenList({
   
   return (
     <Box className={listClass}>
+      <Button height={"0px"}/>
+
       <Box className = {style.tokenSearch}>
         <InputGroup>
           <InputLeftElement

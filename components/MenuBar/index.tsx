@@ -64,7 +64,7 @@ export default function MenuBar({
         background = {selectMode === PlayMode.Trade ? chartSelectColor : "transparent"}
       >
         <Link href = {'/trade'}>
-            <Box display={"flex"} width={windowDimensions.width < SCREENSM_SIZE ? "2rem" : windowDimensions.width < SCREENNXL_SIZE ? "3rem" : "4rem"}>
+            <Box display={"flex"} width={windowDimensions.width < SCREENSM_SIZE ? "2.5rem" : windowDimensions.width < SCREENNXL_SIZE ? "3rem" : "4rem"}>
             {
               <TradeMenuBar/>
             }
@@ -85,7 +85,7 @@ export default function MenuBar({
         background = {selectMode === PlayMode.Game ? chartSelectColor : "transparent"}
       >
         <Link href = {'/game'}>
-          <Box display={"flex"} width={windowDimensions.width < SCREENSM_SIZE ? "2rem" : windowDimensions.width < SCREENNXL_SIZE ? "3rem" : "4rem"}>
+          <Box display={"flex"} width={windowDimensions.width < SCREENSM_SIZE ? "2.5rem" : windowDimensions.width < SCREENNXL_SIZE ? "3rem" : "4rem"}>
           {
             <GameMenuBar/>
           }
