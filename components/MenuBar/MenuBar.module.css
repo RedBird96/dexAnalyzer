@@ -30,3 +30,13 @@
     align-items:center;
   }
 }
+
+@media only screen and (max-width: 1700px) {
+  .menuBar{
+    display:flex;
+    flex-direction: column;
+    min-width: 4.5rem;
+    height: 100%;
+    align-items:center;
+  }
+}

@@ -26,5 +26,15 @@
 }
 
 .txData {
+  height:40px;
   font-family: "Lato";
+}
+
+
+@media only screen and (max-width: 1700px) {
+  
+  .txData {
+    height:35px;
+    font-family: "Lato";
+  }
 }

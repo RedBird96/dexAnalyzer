@@ -15,7 +15,10 @@ import {
   CoyAddressComfirm,
   TokenDetailsDark,
   DownArrowDark,
-  DownArrowLight
+  DownArrowLight,
+  CoyAddressComfirmMini,
+  CopyAddressIconMiniDark,
+  CopyAddressIconMiniLight
 } from "../../assests/icon"
 import {
   useTokenInfo,
@@ -387,7 +390,7 @@ export default function TokenInfo() {
               windowDimensions.width > SCREENNXL_SIZE ? "50rem" : windowDimensions.width > SCREENMD_SIZE ? "40rem" : "35rem"
             }/>
             <Box display={"flex"} flexDirection={"column"} paddingLeft={"1rem"} alignItems={"flex-start"}>
-              <Box display={"flex"} flexDirection={"row"} paddingTop = {windowDimensions.width > SCREENNXL_SIZE ? "0px" : "3px"}>
+              <Box display={"flex"} flexDirection={"row"} paddingTop = {windowDimensions.width > SCREENNXL_SIZE ? "0px" : "5px"}>
                 <p className={style.tokenName}>{isMobileVersion ? makeShortTokenName(tokenData.symbol, 4) : tokenData.symbol}</p>
                 <p className={style.tokenName} style={{color:"#767676"}}>&nbsp;({isMobileVersion ? `${makeShortTokenName(lpTokenAddress.baseCurrency_name, 4)}/${makeShortTokenName(lpTokenAddress.quoteCurrency_name, 4)} ` :lpTokenAddress.symbol})&nbsp;&nbsp;</p>
                 {
@@ -418,10 +421,12 @@ export default function TokenInfo() {
                 </a>
                 <Box onClick={copyBtnClick}>
                   
-                  {copyStatus ? <CoyAddressComfirm/> :
-                  colorMode.colorMode == "dark" ?
-                  <CopyAddressIconDark cursor={"pointer"}/> :
-                  <CopyAddressIconLight cursor={"pointer"}/> }
+                  {
+                    copyStatus ? windowDimensions.width > SCREENNXL_SIZE ? <CoyAddressComfirm/> : <CoyAddressComfirmMini/> :
+                    colorMode.colorMode == "dark" ?
+                    windowDimensions.width > SCREENNXL_SIZE ? <CopyAddressIconDark cursor={"pointer"}/> : <CopyAddressIconMiniDark cursor={"pointer"}/> :
+                    windowDimensions.width > SCREENNXL_SIZE ? <CopyAddressIconLight cursor={"pointer"}/> : <CopyAddressIconMiniLight cursor={"pointer"}/>
+                  }
                 </Box>
                 
               </Box>            

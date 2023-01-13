@@ -19,7 +19,7 @@ import * as constant from '../../utils/constant'
 import { TokenSide, TransactionType } from '../../utils/type'
 import { appendPastTransactions } from './module'
 import useSize from '../../hooks/useSize'
-import { SCREENMD_SIZE } from '../../utils/constant'
+import { SCREENMD_SIZE, SCREENNXL_SIZE } from '../../utils/constant'
 
 
 export default function TokenTransaction() {
@@ -98,11 +98,11 @@ export default function TokenTransaction() {
         <Table variant='striped' colorScheme='transactionTable' size={"sm"}>
         <Thead position="sticky" top={0} zIndex="docked" backgroundColor={headerColor}>
           <Tr>
-            <Th fontWeight={"medium"} color={"#7C7C7C"} width={"8%"} textTransform={"initial"} paddingLeft={"1.5rem"}>Activity</Th>
-            <Th fontWeight={"medium"} color={"#7C7C7C"} width={"18%"} textTransform={"initial"} paddingLeft={"0.7rem"}>Tokens</Th>
-            <Th fontWeight={"medium"} color={"#7C7C7C"} width={"42%"} textTransform={"initial"} paddingLeft={"10rem"}>Amount</Th>
-            <Th fontWeight={"medium"} color={"#7C7C7C"} width={"24%"} textTransform={"initial"} paddingLeft={"3rem"}>Date</Th>
-            <Th fontWeight={"medium"} color={"#7C7C7C"} width={"16%"} textTransform={"initial"} paddingLeft={"0rem"}>Txn</Th>
+            <Th fontWeight={"medium"} color={"#7C7C7C"} width={"8%"} textTransform={"initial"} paddingLeft={"2rem"} fontSize={windowDimensions.width > SCREENNXL_SIZE ? "0.8rem" : "0.6rem"}>Activity</Th>
+            <Th fontWeight={"medium"} color={"#7C7C7C"} width={"18%"} textTransform={"initial"} paddingLeft={"0.7rem"} fontSize={windowDimensions.width > SCREENNXL_SIZE ? "0.8rem" : "0.6rem"}>Tokens</Th>
+            <Th fontWeight={"medium"} color={"#7C7C7C"} width={"42%"} textTransform={"initial"} paddingLeft={"10rem"} fontSize={windowDimensions.width > SCREENNXL_SIZE ? "0.8rem" : "0.6rem"}>Amount</Th>
+            <Th fontWeight={"medium"} color={"#7C7C7C"} width={"24%"} textTransform={"initial"} paddingLeft={"3rem"} fontSize={windowDimensions.width > SCREENNXL_SIZE ? "0.8rem" : "0.6rem"}>Date</Th>
+            <Th fontWeight={"medium"} color={"#7C7C7C"} width={"16%"} textTransform={"initial"} paddingLeft={"0rem"} fontSize={windowDimensions.width > SCREENNXL_SIZE ? "0.8rem" : "0.6rem"}>Txn</Th>
           </Tr>
         </Thead>
         <Tbody className={style.tbody} style={{overflow:"auto"}}>
@@ -119,29 +119,47 @@ export default function TokenTransaction() {
 
                 return (
                 <Tr key={index} color={color} className={style.txData}>
-                  <Td width={"8%"} paddingLeft={"1.5rem"}>
+                  <Td width={"8%"} paddingLeft={"1.5rem"} paddingTop={"0rem"} paddingBottom={"0rem"}>
                     <Box
                       background={boxColor}
                       width={"50px"}
-                      height={"24px"}
+                      height={windowDimensions.width > SCREENNXL_SIZE ? "24px" : "22px"}
                       display = {"flex"}
                       borderRadius = {"5px"}
                       color={"white"}
                       alignItems={"center"}
                       justifyContent={"center"}
+                      fontSize={windowDimensions.width > SCREENNXL_SIZE ? "0.8rem" : "0.7rem"}
                     >
                       <p>{buy_sell}</p>
                     </Box>
                   </Td>
-                  <Td width={"18%"} paddingLeft={"0.7rem"}>{numberWithCommasNoDecimals(data.baseToken_amount)}</Td>
-                  <Td width={"42%"} paddingLeft={"2rem"} style={{
+                  <Td 
+                    width={"18%"} 
+                    paddingLeft={"0.7rem"} 
+                    paddingTop={"0rem"} 
+                    paddingBottom={"0rem"}
+                    fontWeight='medium'
+                    fontSize={windowDimensions.width > SCREENNXL_SIZE ? "0.8rem" : "0.7rem"}
+                  >
+                    {numberWithCommasNoDecimals(data.baseToken_amount)}
+                  </Td>
+                  <Td
+                    width={"42%"} 
+                    paddingLeft={"2rem"}
+                    paddingTop={"0rem"} 
+                    paddingBottom={"0rem"}
+                    fontWeight='medium'
+                    style={{
                     paddingLeft:"0rem"
                   }}>
                     <Box style={{
                     display:"flex",
                     flexDirection:"row",
                     width:"100%"
-                    }}>
+                    }}
+                    fontSize={windowDimensions.width > SCREENNXL_SIZE ? "0.8rem" : "0.7rem"}
+                    >
                     <p style={{
                       width:"12rem",
                       textAlign:"right"
@@ -153,11 +171,27 @@ export default function TokenTransaction() {
                     }}>{numberWithCommasTwoDecimals(data.quoteToken_amount) + " " + lpTokenAddress.quoteCurrency_name}</p>
                     </Box>
                   </Td>
-                  <Td width={"24%"} paddingLeft={"3rem"}>{date.toLocaleString("en-US")}</Td>
-                  <Td width={"16%"} paddingLeft={"0rem"}>
+                  <Td 
+                    width={"24%"} 
+                    paddingLeft={"3rem"} 
+                    paddingTop={"0rem"} 
+                    paddingBottom={"0rem"}
+                    fontWeight='medium'
+                    fontSize={windowDimensions.width > SCREENNXL_SIZE ? "0.8rem" : "0.7rem"}
+                  >
+                      {date.toLocaleString("en-US")}
+                  </Td>
+                  <Td 
+                    width={"16%"} 
+                    paddingTop={"0rem"} 
+                    paddingBottom={"0rem"}
+                    paddingLeft={"0rem"}
+                    fontWeight='medium'
+                  >
                     <Box
                      _hover={{"textDecoration":"underline"}}
                      cursor="pointer"
+                     fontSize={windowDimensions.width > SCREENNXL_SIZE ? "0.8rem" : "0.7rem"}
                     >
                       <a href={linkAddr} target="_blank" rel="noreferrer noopener">
                         {makeShortTxHash(txHash)}

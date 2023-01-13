@@ -247,8 +247,8 @@
   .tokenAddress {
     font-family: 'Inter';
     font-style: normal;
-    font-size: 0.5rem;
-    line-height:1.5rem;
+    font-size: 0.6rem;
+    line-height:1.3rem;
     color: #A7A7A7;  
     margin-right:0.3rem;
   }
@@ -264,7 +264,7 @@
     font-family: 'Inter';
     font-style: normal;
     font-weight: 700;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     line-height: 1.5rem;
   }  
 
