@@ -76,13 +76,13 @@ export default function Header() {
            </Box> 
           </>:
           <>
-            <Flex minWidth='max-content' alignItems='center' gap="20">
+            <Flex minWidth='max-content' alignItems='center' gap="20" width={"100%"}>
               <Box display={"flex"} flexDirection="row" alignItems={"center"} height={"50px"}>
                 <SiteLogoMini/>
                 <p className={style.logo}>BlockPortal</p>
               </Box>
               <Spacer />
-              <Box display={"flex"} flexDirection="row" >
+              <Box display={"flex"} flexDirection="row" paddingRight={"1rem"} >
                 {
                   colorMode == "dark" ? 
                   <SunMini className={style.themeMode} onClick={toggleColorMode}/>:

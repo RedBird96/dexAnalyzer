@@ -532,8 +532,11 @@ export default function SwapTrade({
   return (
     <Box 
       className={style.tradeMain}
-      width = {mobileVersion ? "25rem" : "93%"}
+      width = {mobileVersion ? "28rem" : "93%"}
     >
+      <Button 
+        height={"0px"}
+      />
       <Box 
         className={style.tradeInputSection}
       >
@@ -554,7 +557,7 @@ export default function SwapTrade({
             showMax = {true}
             token = {fromToken}
             setValue = {handleFromToken}
-            value = {fromTokenValue.toString()}
+            value = {fromTokenValue == 0 ? "" : fromTokenValue.toString()}
           ></InputBox>
         </Box>
         <Box
@@ -595,7 +598,7 @@ export default function SwapTrade({
             showMax = {false}
             token = {toToken}
             setValue = {handleToToken}
-            value = {toTokenValue.toString()}
+            value = {toTokenValue == 0 ? "" : toTokenValue.toString()}
           ></InputBox>
         </Box>
       </Box>
@@ -622,6 +625,7 @@ export default function SwapTrade({
           >
             <InputGroup
               width={"6rem"}
+              
             >
               <Input
                 width = {"90%"}
@@ -636,6 +640,7 @@ export default function SwapTrade({
                   borderColor: mainbg
                 }}
                 placeholder = "0%"
+                fontSize={mobileVersion ? "0.8rem" : "1rem"}
                 isDisabled = {autoSlippage}
                 value = {allowedSlippage}
                 onChange = {handleSlippage}
@@ -645,6 +650,7 @@ export default function SwapTrade({
                 width = {"10%"}
                 borderColor ={mainbg}
                 background = {mainbg}
+                fontSize={mobileVersion ? "0.8rem" : "1rem"}
               >
                 %
               </InputRightAddon>
@@ -670,7 +676,6 @@ export default function SwapTrade({
           </Box>
         </Box>
         {
-          !mobileVersion ?
           <Box 
             className={style.detailComment} 
             background={mainbg}
@@ -703,44 +708,12 @@ export default function SwapTrade({
               <p className = {style.commentText} style= {{ color :"#696969"}}>Price:</p>
               <p className = {style.commentText}>{pricebase.toFixed(5)}&nbsp;{lpTokenAddress.quoteCurrency_name+"/"+lpTokenAddress.baseCurrency_name}</p>
             </Box>
-          </Box> :
-          <Box
-            display = {"flex"}
-            justifyContent = {"center"}
-            minWidth = {"5rem"}
-          >
-            <Button 
-              width={"100%"}
-              borderRadius = {"0.5rem"}
-              height = {"35px"}
-              background = {tokenData.network == constant.BINANCE_NETOWRK ? "#F0B90B" : "#FB118E"}
-              _hover = {{
-                bg: tokenData.network == constant.BINANCE_NETOWRK ? "#F0B90B" : "#FB118E"
-              }}
-              color = {tokenData.network == constant.BINANCE_NETOWRK ? "black" : "white"}
-              onClick = {label == BTN_LABEL.SWAP ? handleConfirm : handleOther}
-              isDisabled = {!showConnect || label == BTN_LABEL.LOADING || label == BTN_LABEL.INSUFFICENT || executing || (label == BTN_LABEL.SWAP && fromTokenValue == 0)}
-            >
-              {
-                executing === true ? "PROCESSING..." :
-                label == BTN_LABEL.LOADING ?
-                "LOADING...":
-                label == BTN_LABEL.CONNECT ?
-                "CONNECT WALLET" :
-                label == BTN_LABEL.SWITCHNETWORK ?
-                "SWITCH NETWORK":
-                label == BTN_LABEL.APPROVE ?
-                "APPROVE" :
-                label == BTN_LABEL.INSUFFICENT ?
-                "INSUFFICIENT FUND":
-                "SWAP"
-              }
-            </Button>
-          </Box>
+          </Box> 
+          
         }
       </Box>
       {
-      !mobileVersion &&
+      !mobileVersion ?
       <Button 
         className={style.buttonSection}
         background = {tokenData.network == constant.BINANCE_NETOWRK ? "#F0B90B" : "#FB118E"}
@@ -765,7 +738,42 @@ export default function SwapTrade({
           "INSUFFICIENT FUND":
           "SWAP"
         }
-      </Button>
+      </Button>:
+      <Box
+        display = {"flex"}
+        justifyContent = {"center"}
+        minWidth = {"5rem"}
+        width={"100%"}
+        height={"3rem"}
+      >
+        <Button 
+          width={"100%"}
+          height={"100%"}
+          borderRadius = {"0.5rem"}
+          background = {tokenData.network == constant.BINANCE_NETOWRK ? "#F0B90B" : "#FB118E"}
+          _hover = {{
+            bg: tokenData.network == constant.BINANCE_NETOWRK ? "#F0B90B" : "#FB118E"
+          }}
+          color = {tokenData.network == constant.BINANCE_NETOWRK ? "black" : "white"}
+          onClick = {label == BTN_LABEL.SWAP ? handleConfirm : handleOther}
+          isDisabled = {!showConnect || label == BTN_LABEL.LOADING || label == BTN_LABEL.INSUFFICENT || executing || (label == BTN_LABEL.SWAP && fromTokenValue == 0)}
+        >
+          {
+            executing === true ? "PROCESSING..." :
+            label == BTN_LABEL.LOADING ?
+            "LOADING...":
+            label == BTN_LABEL.CONNECT ?
+            "CONNECT WALLET" :
+            label == BTN_LABEL.SWITCHNETWORK ?
+            "SWITCH NETWORK":
+            label == BTN_LABEL.APPROVE ?
+            "APPROVE" :
+            label == BTN_LABEL.INSUFFICENT ?
+            "INSUFFICIENT FUND":
+            "SWAP"
+          }
+        </Button>
+      </Box>
       }
     </Box>
   )

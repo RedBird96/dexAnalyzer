@@ -16,7 +16,7 @@ import {
 import { LPTokenPair, TokenSide } from '../../../utils/type'
 import style from '../TokenInfo.module.css'
 import { getTokenPricefromllama } from '../../../api'
-import { NOT_FOUND_TOKEN, SCREENMD_SIZE } from '../../../utils/constant'
+import { NOT_FOUND_TOKEN, SCREENMD_SIZE, SCREENSM_SIZE } from '../../../utils/constant'
 import { useStableCoinPrice } from '../../../hooks/useStableCoinPrice'
 import useSize from '../../../hooks/useSize'
 
@@ -114,7 +114,6 @@ export default function LpTokenInfo({
     setClickDex(count);
     dropListHandler(count);
   }
-
   return (
     <Box 
       display={"flex"} 
@@ -135,13 +134,13 @@ export default function LpTokenInfo({
         paddingBottom={showArrow?"0rem":"0.5rem"}
         _hover={{bg:hoverColor}} 
         onClick={()=> {setLPTokenHandler(lpToken)}}
+        marginRight={windowDimensions.width < SCREENSM_SIZE ? "3rem" : "0rem"}
       >
         <p className={style.marketCap} style={{color:textColor}}>{isMobileVersion ? `${makeShortTokenName(lpToken.baseCurrency_name, 6)}/${makeShortTokenName(lpToken.quoteCurrency_name, 6)}` :lpToken.symbol}&nbsp;(LP)</p>
         <Box _hover={{"textDecoration":"underline"}} 
               cursor="pointer"
         >
-          <a style={{display:"flex", flexDirection:"row", alignItems:"center"}}
-              
+          <a style={{display:"flex", flexDirection: "row", alignItems:"center"}}
               href={lpToken.pairContractURL}
               target="_blank"
               rel="noreferrer noopener"
@@ -160,12 +159,15 @@ export default function LpTokenInfo({
             >
               {reserveCurrency}
             </p>
-            <p
-              className={style.itemvalue} 
-              style={{color:"#00B112"}}
-            >
-              ({isMobileVersion ? makeShortTokenName(convertBalanceCurrency(reserveUSD, 0), 8) : convertBalanceCurrency(reserveUSD, 0)})
-            </p>
+            {
+              windowDimensions.width > 450 &&
+              <p
+                className={style.itemvalue} 
+                style={{color:"#00B112"}}
+              >
+                ({isMobileVersion ? makeShortTokenName(convertBalanceCurrency(reserveUSD, 0), 13) : convertBalanceCurrency(reserveUSD, 0)})
+              </p>
+            }
           </a>
         </Box>
       </Box>

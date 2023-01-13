@@ -49,9 +49,9 @@ export function convertBalanceCurrency(x :any, decimals = 3) {
   return '$'+numberWithCommasNoDecimals(x);
 }
 
-export function makeShortAddress(address: string, limitLen = 7): string {
-  if (address.length > limitLen)
-    return address.substring(0, 9) + "......." + address.substring(31, address.length);
+export function makeShortAddress(address: string, limitLen = 7, showlen = 9): string {
+  if (address.length > limitLen && address.length > showlen)
+    return address.substring(0, showlen + 2) + "......." + address.substring(address.length - showlen, address.length);
   return "";
 }
 

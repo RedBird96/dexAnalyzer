@@ -88,4 +88,29 @@
     margin-top: 0.6rem;
     margin-bottom: 1rem;
   }  
+
+  .headerText {
+    display: flex;
+    font-family: 'Inter';
+    font-weight: 500;
+    font-size: 0.8rem;
+    line-height: 0.2rem;
+    justify-content: space-between;
+  }  
+
+  .commentText {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 0.8rem;
+    line-height: 1rem;
+    margin-right: 0.5rem;
+  }
+
+  .detailComment {
+    display: flex;
+    flex-direction: column;
+    padding:0.5rem 1rem 0rem 1rem;
+    border-radius: 10px;
+  }  
 }

@@ -1,6 +1,7 @@
 export enum Field {
   Input = 'input',
   Output = 'output',
+  Field = "Field"
 }
 export interface SwapState {
   readonly [Field.Input]: {

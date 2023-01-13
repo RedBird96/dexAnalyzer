@@ -220,6 +220,9 @@ export default function WalletInfo({
             paddingRight={"1rem"}
             justifyContent={"flex-end"}
           >
+              <Button 
+                height={"0px"}
+              />
               <ConnectWallet
                 colorMode={colorMode}
                 accentColor='#0085FF'
