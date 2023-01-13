@@ -145,4 +145,14 @@ thead.walletTokenHeadBorderLight th {
     color: #00C514;
   }
 
+  
+.tokenBalance {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 0.8rem;
+  line-height: 1.2rem;  
+}
 }

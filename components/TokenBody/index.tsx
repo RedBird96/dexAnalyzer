@@ -36,6 +36,10 @@ export default function TokenBody({
   const firstField = React.useRef()
 
   useEffect(() => {
+    if (tokenData != undefined && address != tokenData.contractAddress && isOpen)
+      onClose();
+  }, [address])
+  useEffect(() => {
     if (isOpen && windowDimensions.width > SCREEN2XL_SIZE) {
       onClose();
     }

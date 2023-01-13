@@ -23,12 +23,12 @@ const TokenListItem = ({
   tokenData,
   activeToken,
   activeTokenHandler,
-  pinTokenHandler,
+  pinTokenHandler
 }:{
   tokenData: ERC20Token,
   activeToken: ERC20Token,
   activeTokenHandler: (x?: any) => void,
-  pinTokenHandler: (x?: any, y?:boolean) => void,
+  pinTokenHandler: (x?: any, y?:boolean) => void
 }) => {
 
   const colorMode = useColorMode();

@@ -212,7 +212,7 @@
     font-style: normal;
     font-weight: 700;
     font-size: 0.7rem;
-    line-height: 1.8rem;
+    line-height: 1.5rem;
     display: flex;
     flex-direction: row;
   }  
@@ -247,7 +247,7 @@
     font-family: 'Inter';
     font-style: normal;
     font-size: 0.6rem;
-    line-height:1.3rem;
+    line-height:1.5rem;
     color: #A7A7A7;  
     margin-right:0.3rem;
   }
@@ -272,7 +272,7 @@
     font-style: normal;
     font-weight: 700;
     font-size: 0.7rem;
-    line-height: 1.8rem;
+    line-height: 1.4rem;
     display: flex;
     flex-direction: row;
   }  
@@ -340,7 +340,7 @@
     font-family: 'Inter';
     font-style: normal;
     font-weight: 500;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     margin-left: -3.2rem !important;
     line-height: 1.5rem;
   }  

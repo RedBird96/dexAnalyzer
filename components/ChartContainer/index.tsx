@@ -519,7 +519,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       charts_storage_url: ChartContainerProps.chartsStorageUrl,
       //   charts_storage_api_version: ChartContainerProps.chartsStorageApiVersion,
       client_id: ChartContainerProps.clientId,
-      disabled_features: ['header_compare'],
+      disabled_features: ['header_compare', 'header_symbol_search'],
       user_id: ChartContainerProps.userId,
       fullscreen: ChartContainerProps.fullscreen,
       autosize: ChartContainerProps.autosize,
@@ -551,7 +551,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
             showOrder = true;
           }
         });
-				button.innerHTML = 'Trade Show';
+				button.innerHTML = 'My Trades';
 			});
 		});
   }

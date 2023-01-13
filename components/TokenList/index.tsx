@@ -330,14 +330,6 @@ export default function TokenList({
       localStorage.setItem("PinnedToken", newCookieString);
       setListTokens(filterTokens); 
     }
-    //  else if (token.pinSetting == true && listTokens.length >= 2){
-    //   const last = listTokens.at(-1);
-    //   if (last?.pinSetting == false)
-    //     setListTokens(listTokens.filter(
-    //       item => (item.contractAddress+item.network) != 
-    //       (last!.contractAddress + last!.network)
-    //   ));
-    // }
   }
   
   return (

@@ -15,7 +15,10 @@ function TradeLayout({
   
   return (
     <Box display="flex" flexDirection="column" height="100vh">
-      <Header/>
+      <Header
+          network={network}
+          address={address}
+      />
       <Box className={colorMode == "light" ? style.mainBodylight : style.mainBodyblack} >
         <TokenBody
           network={network}

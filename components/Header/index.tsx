@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { 
   Box, 
   Button, 
@@ -31,7 +31,15 @@ import TokenList from '../TokenList'
 import * as constant from '../../utils/constant'
 import { useTokenInfo } from '../../hooks'
 
-export default function Header() {
+export default function Header({
+  network = "",
+  address = ""  
+}:{
+  network?:string,
+  address?:string
+}
+
+) {
   const menuClass = useColorModeValue(
     style.header + " " + style.headerLight,
     style.header + " " + style.headerDark
@@ -46,6 +54,11 @@ export default function Header() {
   const borderColorMode = useColorModeValue("#E2E8F0","#2B2A2A");
   const { isOpen: isSidebarOpen, onOpen: SidebarOpen, onClose: SidebarClose } = useDisclosure();
   const windowDimensions = useSize();
+  console.log('tokenData', tokenData);
+  useEffect(() =>{
+      if (tokenData != undefined && address != tokenData.contractAddress && isSidebarOpen)
+        SidebarClose();
+  },[address])
   return (
     <Box className={menuClass} borderBottom={"1px"} borderBottomColor = {borderColorMode}>
         {

@@ -129,7 +129,7 @@ export default function LpTokenInfo({
         display={"flex"} 
         flexDirection={"column"} 
         width={"100%"} 
-        paddingLeft={"1rem"}
+        paddingLeft={!showArrow ? windowDimensions.width < SCREENSM_SIZE ?"2.5rem" :"1rem" :"1rem"}
         paddingTop={showArrow?"0rem":"0.5rem"}
         paddingBottom={showArrow?"0rem":"0.5rem"}
         _hover={{bg:hoverColor}} 

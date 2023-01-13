@@ -342,19 +342,19 @@ export default function TokenInfo() {
             <Box
               display={"flex"}
               flexDirection={"row"}
-              alignItems={"start"}
+              alignItems={windowDimensions.width < SCREENSM_SIZE ? "start" : "center"}
               width={windowDimensions.width < SCREENSM_SIZE ? "3rem" : "50px"}
               height={windowDimensions.width < SCREENSM_SIZE ? "4rem" : "50px"}
             >
               <img src={tokenData.image} />
             </Box>
             <Box display={"flex"} flexDirection={"column"} paddingLeft={"0.5rem"} alignItems={"flex-start"} width={"100%"}>
-              <Box display={"flex"} flexDirection={"row"} paddingTop = {windowDimensions.width > SCREENNXL_SIZE ? "0px" : "13px"}>
-                <p className={style.tokenName}>{isMobileVersion ? makeShortTokenName(tokenData.symbol, 4) : tokenData.symbol}</p>
+              <Box display={"flex"} flexDirection={"row"} paddingTop = {windowDimensions.width > SCREENSM_SIZE ? "0px" : "10px"}>
+                <p className={style.tokenName}>{isMobileVersion ? makeShortTokenName(tokenData.symbol, 5) : tokenData.symbol}</p>
                 <p className={style.tokenName} 
                    style={{color:"#767676", fontSize:windowDimensions.width < SCREENSM_SIZE ? "12px" : "1.2rem"}}
                 >
-                  &nbsp;({isMobileVersion ? `${makeShortTokenName(lpTokenAddress.baseCurrency_name, 4)}/${makeShortTokenName(lpTokenAddress.quoteCurrency_name, 4)}` :lpTokenAddress.symbol})&nbsp;&nbsp;
+                  &nbsp;({isMobileVersion ? `${makeShortTokenName(lpTokenAddress.baseCurrency_name, 5)}/${makeShortTokenName(lpTokenAddress.quoteCurrency_name, 4)}` :lpTokenAddress.symbol})&nbsp;&nbsp;
                 </p>
                 {
                   !isMobileVersion && 
@@ -582,6 +582,7 @@ export default function TokenInfo() {
             flexDirection={"row"}
             alignItems={"center"}
             width={"25%"}
+            justifyContent={"space-between"}
           >
             <Box
               width = {"60%"}
@@ -602,6 +603,7 @@ export default function TokenInfo() {
                 color="#FFFFFF"
                 fontSize={"0.8rem"}     
                 height={"1.8rem"}       
+                marginRight={"2rem"}
               >
                 TRADE
               </Button>
@@ -643,7 +645,7 @@ export default function TokenInfo() {
         <Box 
           display={"flex"} 
           flexDirection={"row"} 
-          width={isMobileVersion ? "100%" : "83%"} 
+          width={isMobileVersion ? "100%" : "85%"} 
           height={"100%"} 
           alignItems={"center"} 
         >
@@ -671,7 +673,7 @@ export default function TokenInfo() {
             maxWidth={isMobileVersion && "90%"}
             position={"relative"} 
             height={"100%"}
-            top={windowDimensions.width > SCREENNXL_SIZE ? "0.4rem" : "0rem"}
+            top={windowDimensions.width > SCREENNXL_SIZE ? "0.4rem" : "0.1rem"}
           >
             <LpTokenInfo 
               lpToken={lpTokenAddress} 
@@ -687,7 +689,7 @@ export default function TokenInfo() {
                 maxHeight:"15rem", 
                 display:"none", 
                 position:"absolute", 
-                top:windowDimensions.width > SCREENNXL_SIZE ? "3.9rem" : "3.5rem", 
+                top:windowDimensions.width > SCREENNXL_SIZE ? "63px" : "53px", 
                 width:"100%", 
                 flexDirection:"column",
                 overflowY:"auto",
