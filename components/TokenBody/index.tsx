@@ -28,7 +28,7 @@ export default function TokenBody({
   const [isResizing, setIsResizing] = useState(false);
   const {tokenData} = useTokenInfo();
   const windowDimensions = useSize();
-  const [height, setHeight] = useState(110);
+  const [height, setHeight] = useState(200);
   const [chartheight, setChartHeight] = useState(0);
   const resizeBgColor = useColorModeValue("#FFFFFF", "#1C1C1C");
   const borderColorMode = useColorModeValue("#E2E8F0","#2B2A2A");
@@ -47,7 +47,7 @@ export default function TokenBody({
       if (windowDimensions.width < SCREENNXL_SIZE)
         setChartHeight(windowDimensions.height - 290);
       else
-        setChartHeight(windowDimensions.height - 320);
+        setChartHeight(windowDimensions.height - 420);
     }
   }, [windowDimensions, tokenData])
 
@@ -63,10 +63,18 @@ export default function TokenBody({
     (mouseMoveEvent:MouseEventInit ) => {
       if (isResizing) {
         let resizeHeight = windowDimensions.height - mouseMoveEvent.clientY;
-        if (resizeHeight < 100) {
-          resizeHeight = 100;
-        } else if (resizeHeight > 800){
-          resizeHeight = 800;
+        if (windowDimensions.width < SCREENNXL_SIZE) {
+          if (resizeHeight < 110) {
+            resizeHeight = 110;
+          } else if (resizeHeight > 800){
+            resizeHeight = 800;
+          }
+        } else {
+          if (resizeHeight < 200) {
+            resizeHeight = 200;
+          } else if (resizeHeight > 800){
+            resizeHeight = 800;
+          }          
         }
         setHeight(resizeHeight);
         setChartHeight(sidebarRef.current.clientHeight - resizeHeight);
@@ -168,7 +176,7 @@ export default function TokenBody({
               flexDirection={"column"}
               height={height}
               maxHeight={"50rem"}
-              minHeight={windowDimensions.width < SCREENNXL_SIZE ? "5rem" : "10rem"}
+              minHeight={windowDimensions.width < SCREENNXL_SIZE ? "5rem" : "12rem"}
               flexShrink={"0"}
               width={"100%"}
               ref = {transactionRef}
