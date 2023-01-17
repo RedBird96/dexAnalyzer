@@ -78,6 +78,7 @@ export default function TokenInfo() {
   const { isOpen : isToggleOpen, onOpen: ToggleOpen, onClose: ToggleClose , onToggle} = useDisclosure();
   const firstField = useRef()
   const marketCapRef = useRef(null);
+  const [marketinfoWidth, setMarketInfoWidth] = useState<number>(1000);
   const marketinfoRef = useRef(null);
   const {coinPrice} = useStableCoinPrice();
   const infoClass = useColorModeValue(
@@ -333,6 +334,10 @@ export default function TokenInfo() {
 
     setTokneBalanceAndPrice();
   }, [walletTokens, tokenData, lpTokenPrice])
+
+  useEffect(() => {
+    setMarketInfoWidth(marketinfoRef.current.clientWidth);
+  }, [marketinfoRef, windowDimensions]);
   
   return (
     <Box className={infoClass}>
@@ -342,14 +347,14 @@ export default function TokenInfo() {
             <Box
               display={"flex"}
               flexDirection={"row"}
-              alignItems={windowDimensions.width < SCREENSM_SIZE ? "start" : "center"}
-              width={windowDimensions.width < SCREENSM_SIZE ? "3rem" : "50px"}
-              height={windowDimensions.width < SCREENSM_SIZE ? "4rem" : "50px"}
+              alignItems={windowDimensions.width < SCREENMD_SIZE ? "start" : "center"}
+              width={windowDimensions.width < SCREENMD_SIZE ? "3rem" : "50px"}
+              height={windowDimensions.width < SCREENMD_SIZE ? "4rem" : "50px"}
             >
               <img src={tokenData.image} />
             </Box>
             <Box display={"flex"} flexDirection={"column"} paddingLeft={"0.5rem"} alignItems={"flex-start"} width={"100%"}>
-              <Box display={"flex"} flexDirection={"row"} paddingTop = {windowDimensions.width > SCREENSM_SIZE ? "0px" : "10px"}>
+              <Box display={"flex"} flexDirection={"row"} paddingTop = {windowDimensions.width > SCREENSM_SIZE ? "0px" : "10px"} alignItems={"baseline"}>
                 <p className={style.tokenName}>{isMobileVersion ? makeShortTokenName(tokenData.symbol, 5) : tokenData.symbol}</p>
                 <p className={style.tokenName} 
                    style={{color:"#767676", fontSize:windowDimensions.width < SCREENSM_SIZE ? "12px" : "1.2rem"}}
@@ -648,6 +653,7 @@ export default function TokenInfo() {
           width={isMobileVersion ? "100%" : "85%"} 
           height={"100%"} 
           alignItems={"center"} 
+          ref = {marketinfoRef}
         >
           <Box 
             display={"inline-block"} 
@@ -682,6 +688,7 @@ export default function TokenInfo() {
               setLPTokenHandler = {setLpTokenItem}
               isLast = {false}
               lpTokenList = {lpTokenList}
+              marketInfoWidth = {marketinfoWidth}
             />
             <Box 
               id="dexlist" 

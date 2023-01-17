@@ -1,12 +1,13 @@
 import React from 'react'
 import { Box, useColorModeValue } from "@chakra-ui/react"
 import style from './MenuBar.module.css'
-import {GameMenuBar, GameMenuBarMini, TopMenuBar, TopMenuBarMini} from '../../assests/icon'
-import {TradeMenuBar, TradeMenuBarMini} from '../../assests/icon'
+import {GameMenuBar, GameMenuBarMini, TopMenuBar, TopMenuBarMini, ExpandMiniIcon} from '../../assests/icon'
+import {TradeMenuBar, TradeMenuBarMini,ExpandIcon} from '../../assests/icon'
 import { PlayMode } from '../../utils/type'
 import Link from 'next/link'
 import { SCREEN2XL_SIZE, SCREENNXL_SIZE, SCREENSM_SIZE } from '../../utils/constant'
 import useSize from '../../hooks/useSize'
+import { useTokenInfo } from '../../hooks'
 
 export default function MenuBar({
   selectMode,
@@ -16,6 +17,7 @@ export default function MenuBar({
   onOpen: () => void
 }) {
 
+  const {tokenData} = useTokenInfo();
   const windowDimensions = useSize();
   const menuClass = useColorModeValue(
     style.menuBar + " " + style.menuBarLight,
@@ -46,7 +48,8 @@ export default function MenuBar({
       onClick = {onMenuClick}
       >
         {
-          windowDimensions.width < SCREENSM_SIZE ? <TopMenuBarMini/> : <TopMenuBar/>
+          (tokenData == undefined || tokenData.contractAddress == "" || onOpen == null || windowDimensions.width > SCREEN2XL_SIZE) ? windowDimensions.width < SCREENSM_SIZE ? <TopMenuBarMini/> : <TopMenuBar/> : 
+          windowDimensions.width < SCREENNXL_SIZE ? <ExpandMiniIcon/> : <ExpandIcon/>
         }
         
       </Box>

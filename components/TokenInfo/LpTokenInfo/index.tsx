@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import { Box, useColorMode, useColorModeValue } from "@chakra-ui/react"
 import {
   DownArrowDark,
@@ -15,8 +15,7 @@ import {
 } from '../../../utils'
 import { LPTokenPair, TokenSide } from '../../../utils/type'
 import style from '../TokenInfo.module.css'
-import { getTokenPricefromllama } from '../../../api'
-import { NOT_FOUND_TOKEN, SCREENMD_SIZE, SCREENSM_SIZE } from '../../../utils/constant'
+import { SCREENMD_SIZE, SCREENNXL_SIZE, SCREENSM_SIZE } from '../../../utils/constant'
 import { useStableCoinPrice } from '../../../hooks/useStableCoinPrice'
 import useSize from '../../../hooks/useSize'
 
@@ -26,14 +25,16 @@ export default function LpTokenInfo({
   showArrow,
   setLPTokenHandler,
   isLast,
-  lpTokenList
+  lpTokenList,
+  marketInfoWidth=1000,
 }:{
   lpToken: LPTokenPair,
   dropListHandler: (x?: any) => void,
   showArrow: boolean,
-  setLPTokenHandler: (x?: any) => void
-  isLast: boolean
-  lpTokenList: LPTokenPair[]
+  setLPTokenHandler: (x?: any) => void,
+  isLast: boolean,
+  lpTokenList: LPTokenPair[],
+  marketInfoWidth?: number
 }) {
 
   const {coinPrice} = useStableCoinPrice();
@@ -114,6 +115,7 @@ export default function LpTokenInfo({
     setClickDex(count);
     dropListHandler(count);
   }
+  
   return (
     <Box 
       display={"flex"} 
@@ -129,12 +131,12 @@ export default function LpTokenInfo({
         display={"flex"} 
         flexDirection={"column"} 
         width={"100%"} 
-        paddingLeft={!showArrow ? windowDimensions.width < SCREENSM_SIZE ?"2.5rem" :"1rem" :"1rem"}
+        paddingLeft={!showArrow ? windowDimensions.width < SCREENNXL_SIZE ?"2.5rem" :"1rem" :"1rem"}
         paddingTop={showArrow?"0rem":"0.5rem"}
         paddingBottom={showArrow?"0rem":"0.5rem"}
         _hover={{bg:hoverColor}} 
         onClick={()=> {setLPTokenHandler(lpToken)}}
-        marginRight={windowDimensions.width < SCREENSM_SIZE ? "3rem" : "0rem"}
+        marginRight={windowDimensions.width < SCREENNXL_SIZE ? "3rem" : "0rem"}
       >
         <p className={style.marketCap} style={{color:textColor}}>{isMobileVersion ? `${makeShortTokenName(lpToken.baseCurrency_name, 6)}/${makeShortTokenName(lpToken.quoteCurrency_name, 6)}` :lpToken.symbol}&nbsp;(LP)</p>
         <Box _hover={{"textDecoration":"underline"}} 
@@ -160,7 +162,7 @@ export default function LpTokenInfo({
               {reserveCurrency}
             </p>
             {
-              windowDimensions.width > 375 &&
+              marketInfoWidth > 370 &&
               <p
                 className={style.itemvalue} 
                 style={{color:"#00B112"}}

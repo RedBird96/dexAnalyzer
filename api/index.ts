@@ -220,11 +220,14 @@ export async function getTokenHolderCount(address:string, network: number) {
     body: JSON.stringify(data)
   });
 
-  if (response.ok) {
-    const obj = await response.json();
-    return parseInt(obj["result"].result, 16);
+  try{
+    if (response.ok) {
+      const obj = await response.json();
+      return parseInt(obj["result"].result, 16);
+    }
+  } catch(e) {
+    
   }
-
   return 0;
 
 }
@@ -356,8 +359,8 @@ export async function getLPTokenList(address: string, network: number, tokenside
   if (response != constant.NOT_FOUND_TOKEN && response != null) {
     response.forEach((value:any) => {
         lpTokenList.push({
-          name:  value.baseCurrency.symbol + " / " + value.quoteCurrency.symbol,
-          symbol: value.baseCurrency.symbol + " / " + value.quoteCurrency.symbol,
+          name:  value.baseCurrency.symbol + "/" + value.quoteCurrency.symbol,
+          symbol: value.baseCurrency.symbol + "/" + value.quoteCurrency.symbol,
           contractAddress: value.smartContract.address.address,
           price: 0,
           marketCap: "",

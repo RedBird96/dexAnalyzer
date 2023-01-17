@@ -11,7 +11,7 @@ import { ResizerLight, SiteLogo, SiteLogoMini} from '../../assests/icon'
 import { useTokenInfo } from '../../hooks'
 import { PlayMode } from '../../utils/type';
 import useSize from '../../hooks/useSize'
-import { SCREEN2XL_SIZE, SCREENNXL_SIZE, SCREENSM_SIZE } from '../../utils/constant'
+import { SCREEN2XL_SIZE, SCREENMD_SIZE, SCREENNXL_SIZE, SCREENSM_SIZE } from '../../utils/constant'
 
 const ChartContainer = dynamic(() => import("../ChartContainer"), { ssr: false })
 
@@ -44,13 +44,17 @@ export default function TokenBody({
       onClose();
     }
     if (tokenData !=undefined && tokenData.contractAddress != ""){
-      if (windowDimensions.width < SCREENNXL_SIZE)
-        setChartHeight(windowDimensions.height - 290);
-      else
-        setChartHeight(windowDimensions.height - 420);
+      if (windowDimensions.width < SCREENNXL_SIZE){
+        setHeight(110);
+        setChartHeight(sidebarRef.current.clientHeight - 110);
+      }
+      else{
+        setHeight(200);
+        setChartHeight(sidebarRef.current.clientHeight - 200);
+      }
     }
-  }, [windowDimensions, tokenData])
-
+  }, [windowDimensions, tokenData, sidebarRef])
+  
   const startResizing = React.useCallback((_mouseDownEvent: any) => {
     setIsResizing(true);
   }, []);
@@ -103,21 +107,27 @@ export default function TokenBody({
       {
         (windowDimensions.width > SCREENSM_SIZE || tokenData == undefined || tokenData.contractAddress == "") && 
         <>
-          <MenuBar
-            selectMode={PlayMode.Trade}
-            onOpen = {() => {if (windowDimensions.width > SCREENSM_SIZE) {onOpen()}}}
-          />
-          <Box 
-            borderRight={"1px"}
-            borderRightColor = {borderColorMode}
-            minW={{'2xl':470}}
-            display={{base:'none', '2xl':'block'}}
-          >
-            <TokenList
-              network = {network}
-              address = {address}
+          {
+            windowDimensions.width > SCREENSM_SIZE && 
+            <MenuBar
+              selectMode={PlayMode.Trade}
+              onOpen = {() => {if (windowDimensions.width > SCREENSM_SIZE) {onOpen()}}}
             />
-          </Box>
+          }
+          {
+            ((windowDimensions.width > SCREENSM_SIZE && (tokenData == undefined || tokenData.contractAddress == "")) || windowDimensions.width > SCREEN2XL_SIZE) &&
+            <Box 
+              borderRight={"1px"}
+              borderRightColor = {borderColorMode}
+              minW={{'sm':470}}
+              display={{'sm':'block'}}
+            >
+              <TokenList
+                network = {network}
+                address = {address}
+              />
+            </Box>
+          }
         </>
       }
 

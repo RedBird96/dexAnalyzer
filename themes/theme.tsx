@@ -53,6 +53,8 @@ export const theme = extendTheme({
     4: '1.5rem',
   },
   breakpoints: {
+    sm: '600px',
+    md: '1200px',
     xl: '1700px',
     '2xl': '2200px'
   }
