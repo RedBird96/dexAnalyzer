@@ -45,10 +45,10 @@ export default function LpTokenInfo({
   const [reserveUSD, setReserveUSD] = useState<number>(0);
   const [reserveCurrency, setReserveCurrency] = useState<string>("");
   const textColor = useColorModeValue("#5E5E5E","#A7A7A7");
-  const backgroundColor = useColorModeValue("#ffffff","#1C1C1C");
   let hoverColor = useColorModeValue("#005CE5","#3A3A29");
   const whiteBlackMode = useColorModeValue('#FFFFFF', '#000000');
   const infoborderColorMode = useColorModeValue("#E2E8F0","#2B2A2A");
+  const backgroundColor = useColorModeValue("#FFFFFF","#182633");
   const [clickDex, setClickDex] = useState<number>(0);
   const [isMobileVersion, setMobileVersion] = useState<boolean>(false);
   const windowDimensions = useSize();
@@ -72,7 +72,7 @@ export default function LpTokenInfo({
           setReserve(lpTokenAddress.token1_reserve);
           setReserveCurrency(lpTokenAddress.token1_name);
           const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
-                       lpTokenAddress.token1_contractAddress + lpTokenAddress.network);
+                       lpTokenAddress.token1_contractAddress.toLowerCase() + lpTokenAddress.network);
           if (coin != undefined) {
             setReserveUSD(lpTokenAddress.token1_reserve * coin.price);
           }
@@ -80,7 +80,7 @@ export default function LpTokenInfo({
           setReserve(lpTokenAddress.token0_reserve)
           setReserveCurrency(lpTokenAddress.token0_name);
           const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
-                       lpTokenAddress.token0_contractAddress + lpTokenAddress.network);
+                       lpTokenAddress.token0_contractAddress.toLowerCase() + lpTokenAddress.network);
           if (coin != undefined) {
             setReserveUSD(lpTokenAddress.token0_reserve * coin.price);
           }
@@ -90,7 +90,7 @@ export default function LpTokenInfo({
           setReserve(lpToken.token1_reserve)
           setReserveCurrency(lpToken.token1_name);
           const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
-                      lpToken.token1_contractAddress + lpToken.network);
+                      lpToken.token1_contractAddress.toLowerCase() + lpToken.network);
           if (coin != undefined) {
             setReserveUSD(lpToken.token1_reserve * coin.price);
           }
@@ -98,24 +98,26 @@ export default function LpTokenInfo({
           setReserve(lpToken.token0_reserve)
           setReserveCurrency(lpToken.token0_name);
           const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
-                      lpToken.token0_contractAddress + lpToken.network);
+                      lpToken.token0_contractAddress.toLowerCase() + lpToken.network);
           if (coin != undefined) {
             setReserveUSD(lpToken.token0_reserve * coin.price);
           }
         }
       }
     }
-    if (lpTokenAddress.ownerToken == tokenData.contractAddress){
+    if (tokenData != undefined && 
+        lpTokenAddress != undefined && 
+        lpTokenAddress.ownerToken == tokenData.contractAddress
+      ){
       setFunc();
     }
-  }, [lpToken, lpTokenAddress.token0_reserve]);
+  }, [lpToken, lpTokenAddress.token1_reserve]);
 
   const setDexDropShow = () => {
     const count = clickDex+1;
     setClickDex(count);
     dropListHandler(count);
   }
-  
   return (
     <Box 
       display={"flex"} 
@@ -124,8 +126,8 @@ export default function LpTokenInfo({
       justifyContent={"space-between"} 
       alignItems={"center"} 
       paddingRight={showArrow?"1rem":"0rem"}
-      backgroundColor={showArrow?"transparent":backgroundColor}
       cursor={showArrow ? "":"pointer"}
+      backgroundColor={backgroundColor}
     >
       <Box 
         display={"flex"} 

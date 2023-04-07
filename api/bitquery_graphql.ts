@@ -7,7 +7,8 @@ export const getLimitTimeHistoryData = async (
   network: number,
   limit: number,
   before: string,
-  count: number
+  count: number,
+  signalKey?: any
 ) => {
   const query = `
   {
@@ -55,7 +56,8 @@ export const getLimitTimeHistoryData = async (
       headers: {'X-API-KEY': endpoint.BITQUERY_API_KEY,
                 "Content-Type":"application/json"},
       body:raw,
-      redirect:'follow'
+      redirect:'follow',
+      signal:signalKey
     });  
     if (response.status != 200) {
       return constant.NOT_FOUND_TOKEN;
@@ -73,7 +75,8 @@ export const getLimitHistoryData = async (
   quoteAddress: string, 
   network: number,
   before: string,
-  limit: number
+  limit: number,
+  signalKey?: any
 ) => {
   const query = `
   {
@@ -121,7 +124,8 @@ export const getLimitHistoryData = async (
       headers: {'X-API-KEY': endpoint.BITQUERY_API_KEY,
                 "Content-Type":"application/json"},
       body:raw,
-      redirect:'follow'
+      redirect:'follow',
+      signal:signalKey
     });  
     if (response.status != 200) {
       return constant.NOT_FOUND_TOKEN;
@@ -136,7 +140,8 @@ export const getLimitHistoryData = async (
 
 export const getLPPairs = async (
   baseAddress: string, 
-  network: number
+  network: number,
+  signalKey?: any
 ) => {
   const stable_coin1 = network == constant.BINANCE_NETOWRK ? constant.WHITELIST_TOKENS.BSC.BNB : constant.WHITELIST_TOKENS.ETH.ETH;
   const stable_coin2 = network == constant.BINANCE_NETOWRK ? constant.WHITELIST_TOKENS.BSC.USDC : constant.WHITELIST_TOKENS.ETH.USDC;
@@ -182,7 +187,8 @@ export const getLPPairs = async (
     headers: {'X-API-KEY': endpoint.BITQUERY_API_KEY,
               "Content-Type":"application/json"},
     body:raw,
-    redirect:'follow'
+    redirect:'follow',
+    signal:signalKey
   });  
   if (response.status != 200) {
     return constant.NOT_FOUND_TOKEN;
@@ -199,7 +205,8 @@ export const getLPPairs = async (
 
 export const getTransferCount = async (
   address: string, 
-  network: number
+  network: number,
+  signalKey?: any
 ) => {
 
   const query = `
@@ -228,67 +235,14 @@ export const getTransferCount = async (
     headers: {'X-API-KEY': endpoint.BITQUERY_API_KEY,
               "Content-Type":"application/json"},
     body:raw,
-    redirect:'follow'
+    redirect:'follow',
+    signal:signalKey
   });  
   if (response.status != 200) {
     return constant.NOT_FOUND_TOKEN;
   }
   try {
     const text = await response.json();
-    return text["data"].ethereum.transfers;
-  } catch (err:any) {
-    return constant.NOT_FOUND_TOKEN;
-  }
-
-}
-
-
-export const getTokenHolder = async (
-  address: string, 
-  network: number,
-  limit: number,
-  offset: number
-) => {
-
-  const query = `
-  {
-    ethereum(network: ${network == constant.ETHEREUM_NETWORK ? "ethereum" : "bsc"}) {
-      transfers(
-        currency: {is: "${address}"}
-        options: {limitBy: {each: "currency.address", limit: ${limit}, offset: ${offset}}}
-      ) {
-        currency {
-          address
-          name
-          decimals
-        }
-        receiver {
-          address
-          smartContract{
-            contractType
-          }
-        }
-        count(uniq: receivers, amount: {gteq: 1})
-      }
-    }
-  }
-  `;
-
-  const raw = JSON.stringify({query,"variables": "{}"});
-
-  const response = await fetch(endpoint.BITQUERY_ENDPOINT, {
-    method: 'POST',
-    headers: {'X-API-KEY': endpoint.BITQUERY_API_KEY,
-              "Content-Type":"application/json"},
-    body:raw,
-    redirect:'follow'
-  });  
-  if (response.status != 200) {
-    return constant.NOT_FOUND_TOKEN;
-  }
-  try {
-    const text = await response.json();
-    console.log('response text', text);
     return text["data"].ethereum.transfers;
   } catch (err:any) {
     return constant.NOT_FOUND_TOKEN;
@@ -339,75 +293,5 @@ export const getHoldTokenList = async (
   }
 
 }
-
-
-export const getBuySellTransactions = async (
-  address: string,
-  routerAddress: string, 
-  network: number,
-  tokenAddress: string
-) => {
-
-  const query = `
-  {
-    ethereum(network: ${network == constant.ETHEREUM_NETWORK ? "ethereum" : "bsc"}) {
-      dexTrades(
-        taker: {in: ["${address}","${routerAddress}"]}
-        baseCurrency: {is: "${tokenAddress}"}
-      ) {
-        transaction {
-          hash
-        }
-        timeInterval {
-          second
-        }
-        taker {
-          address
-        }
-        maker {
-          address
-        }
-        baseCurrency {
-          symbol
-          address
-        }
-        baseAmount
-        quoteCurrency {
-          symbol
-          address
-        }
-        quoteAmount
-        quotePrice
-        buyCurrency {
-          address
-        }
-      }
-    }
-  }
-  `;
-
-  const raw = JSON.stringify({query,"variables": "{}"});
-
-  const response = await fetch(endpoint.BITQUERY_ENDPOINT, {
-    method: 'POST',
-    headers: {'X-API-KEY': endpoint.BITQUERY_API_KEY,
-              "Content-Type":"application/json"},
-    body:raw,
-    redirect:'follow'
-  });  
-  if (response.status != 200) {
-    return constant.NOT_FOUND_TOKEN;
-  }
-  try {
-    const text = await response.json();
-    return text["data"].ethereum.dexTrades;
-  } catch (err:any) {
-    return constant.NOT_FOUND_TOKEN;
-  }
-
-}
-
-
-
 
 

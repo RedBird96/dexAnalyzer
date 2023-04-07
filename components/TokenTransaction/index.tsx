@@ -24,10 +24,10 @@ import { SCREENMD_SIZE, SCREENNXL_SIZE } from '../../utils/constant'
 
 export default function TokenTransaction() {
   const transactionClass = useColorModeValue(
-    style.tokenTransaction + " " + style.tokenTransactionLight,
-    style.tokenTransaction + " " + style.tokenTransactionDark
+    style.tokenTransaction,
+    style.tokenTransaction
   );
-  const headerColor = useColorModeValue("#FFFFFF", "#1C1C1C");
+  const headerColor = useColorModeValue("#FFFFFF", "#17212B");
   const priceColor = useColorModeValue("#00B112","#00C514");
   const {transactionData, setTransactionData} = useLPTransaction();
   const {lpTokenAddress} = useLPTokenPrice();
@@ -35,8 +35,7 @@ export default function TokenTransaction() {
   const {coinPrice} = useStableCoinPrice();
   const [quotePrice, setquotePrice] = useState(1);
   const [bottomHandle, setBottomHandle] = useState<Boolean>(false);
-  const [isMobileVersion, setMobileVersion] = useState<boolean>(false);
-  const [txTransaction, setTXTransaction] = useState<TransactionType[]>([]);
+  const [txTransaction, setTXTransaction] = useState<TransactionType[]>(transactionData);
   const infoborderColorMode = useColorModeValue("#E2E8F0","#505050");
   const LINK_BSCNETWORK = "https://bscscan.com/tx/";
   const LINK_ETHNETWORK = "https://etherscan.io/tx/";
@@ -45,7 +44,7 @@ export default function TokenTransaction() {
     const bottom = e.target.scrollHeight - e.target.scrollTop <= (e.target.clientHeight + 20);
     if (bottom && !bottomHandle) { 
       setBottomHandle(true);
-      const tempTransaction = await appendPastTransactions(transactionData, lpTokenAddress, false);
+      const tempTransaction = await appendPastTransactions(transactionData, lpTokenAddress, false, tokenData);
       let transaction = transactionData;
       transaction = transaction.concat(tempTransaction);
       setTransactionData(transaction);
@@ -54,27 +53,22 @@ export default function TokenTransaction() {
   }
 
   useEffect(() => {
-    const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
-    lpTokenAddress.quoteCurrency_contractAddress! + lpTokenAddress.network);
-    if (coin != undefined)
-      setquotePrice(coin.price);
-    setTXTransaction(transactionData);
-  }, [transactionData])
-
-  useEffect(() => {
-    if (windowDimensions.width < SCREENMD_SIZE) {
-      setMobileVersion(true);
-    } else {
-      setMobileVersion(false);
+    if (lpTokenAddress.contractAddress.length > 0 && 
+        lpTokenAddress.quoteCurrency_contractAddress != undefined && 
+        lpTokenAddress.quoteCurrency_contractAddress.length > 0
+    ) {
+      const coin = coinPrice.find((value) => value.contractAddress.toLowerCase() + value.network ==
+      lpTokenAddress.quoteCurrency_contractAddress!.toLowerCase() + lpTokenAddress.network);
+      if (coin != undefined)
+        setquotePrice(coin.price);
+      setTXTransaction(transactionData);
     }
-  }, [windowDimensions])
+  }, [transactionData])
   
   useEffect(() => {
     setTXTransaction([]);
     setquotePrice(1);
   }, [lpTokenAddress.contractAddress])
-
-
 
   return (
     <Box className={transactionClass} width = {"100%"}>
@@ -89,13 +83,12 @@ export default function TokenTransaction() {
           height: '4px',
         },
         '&::-webkit-scrollbar-thumb': {
-          backgroundColor: "#3D3D3D",
           borderRadius: '24px',
         },
         }}
         onScroll={handleScroll}
       >
-        <Table variant='striped' colorScheme='transactionTable' size={"sm"}>
+        <Table variant='striped' colorScheme='navy' size={"sm"}>
         <Thead position="sticky" top={0} zIndex="docked" backgroundColor={headerColor}>
           <Tr>
             <Th fontWeight={"medium"} color={"#7C7C7C"} width={"8%"} textTransform={"initial"} paddingLeft={"2rem"} fontSize={windowDimensions.width > SCREENNXL_SIZE ? "0.8rem" : "0.6rem"}>Activity</Th>
@@ -142,7 +135,7 @@ export default function TokenTransaction() {
                     fontWeight='medium'
                     fontSize={windowDimensions.width > SCREENNXL_SIZE ? "0.8rem" : "0.7rem"}
                   >
-                    {numberWithCommasNoDecimals(data.baseToken_amount)}
+                    {data.baseToken_amount < 1 ? numberWithCommasTwoDecimals(data.baseToken_amount, 4) : numberWithCommasNoDecimals(data.baseToken_amount)}
                   </Td>
                   <Td
                     width={"42%"} 

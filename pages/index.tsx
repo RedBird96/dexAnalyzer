@@ -1,3 +1,4 @@
+import { TickerTape } from 'react-ts-tradingview-widgets'
 import TradeLayout from '../components/TradeLayout'
 import { Box } from '@chakra-ui/react'
 

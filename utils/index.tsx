@@ -2,16 +2,29 @@ import BigNumber from "bignumber.js";
 import { memoize } from "lodash";
 import { BIG_TEN } from "./constant";
 
+function addCommas(nStr:string) {
+  nStr += '';
+  var x = nStr.split('.');
+  var x1 = x[0];
+  var x2 = x.length > 1 ? '.' + x[1] : '';
+  var rgx = /(\d+)(\d{3})/;
+  while (rgx.test(x1)) {
+          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+  }
+  return x1 + x2;
+}
+
 /**
  *
  * @param x
  * @returns param value with 2 decimal places
  */
  export function numberWithCommasTwoDecimals(x :any, decimals = 3) {
-  return x
+  return addCommas(x
     .toFixed(decimals)
-    .toString()
-    .replace(/(?<!\..*)(\d)(?=(?:\d{3})+(?:\.|$))/g, '$1,');
+    .toString());
+    // .toString()
+    // .replace(/(?<!\..*)(\d)(?=(?:\d{3})+(?:\.|$))/g, '$1,');
 }
 
 /**
@@ -23,10 +36,11 @@ export function numberWithCommasNoDecimals(x :number) {
   if (x === null) {
     return "";
   }
-  return x
+  return addCommas(x
     .toFixed(0)
-    .toString()
-    .replace(/(?<!\..*)(\d)(?=(?:\d{3})+(?:\.|$))/g, '$1,');
+    .toString());
+    // .toString()
+    // .replace(/(?<!\..*)(\d)(?=(?:\d{3})+(?:\.|$))/g, '$1,');
 }
 
 /**
@@ -51,7 +65,7 @@ export function convertBalanceCurrency(x :any, decimals = 3) {
 
 export function makeShortAddress(address: string, limitLen = 7, showlen = 9): string {
   if (address.length > limitLen && address.length > showlen)
-    return address.substring(0, showlen + 2) + "......." + address.substring(address.length - showlen, address.length);
+    return address.substring(0, showlen) + "..." + address.substring(address.length - showlen + 1, address.length);
   return "";
 }
 
@@ -142,6 +156,18 @@ export function makeTemplateDate(originDate : Date, resolution: number): Date{
   return res;
 }
 
+export const getDecimalCount = (value: number): number =>{
+  if (value == 0)
+    return 0;
+  const text = value.toString();
+  const index = text.indexOf(".");
+  return (text.length - index - 1);
+}
+
+export function truncDigits(inputNumber:number, digits:number):number {
+  const fact = 10 ** digits;
+  return Math.floor(inputNumber * fact) / fact;
+}
 /**
  * Take a formatted amount, e.g. 15 BNB and convert it to full decimal value, e.g. 15000000000000000
  */

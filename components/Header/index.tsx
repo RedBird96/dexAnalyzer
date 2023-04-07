@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { 
   Box, 
   Button, 
@@ -11,14 +11,21 @@ import {
   Spacer, 
   useColorMode, 
   useColorModeValue, 
-  useDisclosure}
-from "@chakra-ui/react"
+  useDisclosure
+} from "@chakra-ui/react"
 import Image from 'next/image'
 import {
-  useMetamask,
   ConnectWallet
 } from '@thirdweb-dev/react'
-import {Moon, Sun, SiteLogo, SiteLogoMini, SunMini, MoonMini, DownArrowDark, DownArrowLight} from "../../assests/icon"
+import {
+  Moon,
+  Sun, 
+  SiteLogoMini, 
+  SunMini, 
+  MoonMini, 
+  DownArrowDark, 
+  DownArrowLight
+} from "../../assests/icon"
 import style from './Header.module.css'
 import useSize from '../../hooks/useSize'
 import { SCREENMD_SIZE, SCREENSM_SIZE } from '../../utils/constant'
@@ -30,6 +37,8 @@ import { PlayMode } from '../../utils/type'
 import TokenList from '../TokenList'
 import * as constant from '../../utils/constant'
 import { useTokenInfo } from '../../hooks'
+import SiteIcon from '../../assests/icon/siteIcon.png'
+import StockSnippet from './TickerTap'
 
 export default function Header({
   network = "",
@@ -51,24 +60,75 @@ export default function Header({
   const {tokenData} = useTokenInfo();
   const firstField = React.useRef();
   const drawerbgColor = useColorModeValue("#FEFEFE", "#1C1C1C");
-  const borderColorMode = useColorModeValue("#E2E8F0","#2B2A2A");
+  const [tickComponent, setTickComponent] = useState(null);
+  const [keyValue, setKeyValue] = useState(0);
   const { isOpen: isSidebarOpen, onOpen: SidebarOpen, onClose: SidebarClose } = useDisclosure();
   const windowDimensions = useSize();
-  console.log('tokenData', tokenData);
+  
+  useMemo(() => {
+    const dt = new Date().getTime();
+    setKeyValue(dt);
+  }, [windowDimensions, colorMode])
   useEffect(() =>{
       if (tokenData != undefined && address != tokenData.contractAddress && isSidebarOpen)
         SidebarClose();
   },[address])
   return (
-    <Box className={menuClass} borderBottom={"1px"} borderBottomColor = {borderColorMode}>
+    <Box className={menuClass}>
         {
           windowDimensions.width > SCREENSM_SIZE ?
           <>
             <Box display={"flex"} flexDirection="row" alignItems={"center"}>
-              <SiteLogo/>
+              <Box
+                display={"flex"} 
+                width={"90px"} 
+                height={"4rem"} 
+                alignItems={"center"} 
+                justifyContent={"center"}
+              >
+                <img src={SiteIcon.src} width={"60"} height={"60px"}/>
+              </Box>
               <p className={style.logo}>BlockPortal</p>
             </Box>
+            {/* {
+              windowDimensions.width > SCREENMD_SIZE &&
+              <Box
+                display={"flex"}
+                width={"100%"}
+                height={"90%"}
+                alignItems={"center"}
+                justifyContent={"center"}
+                paddingRight={"1.5rem"}
+              >
+                <StockSnippet keyValue = {keyValue.toString()}/>
+              </Box>
+            } */}
             <Box display={"flex"} flexDirection="row" alignItems={"center"}>
+            {
+              <Box 
+                width={"260px"} 
+                height={"40px"} 
+                marginRight={"1rem"}
+                background={'linear-gradient(90deg, #6100FF 0%, #6E00DB 53.43%, #A100BB 101.57%)'}
+                color={'white'}
+                style={{
+                  display:'flex',
+                  alignItems:'center',
+                  justifyContent:'center'
+                }}
+                borderRadius={"20px"}
+                cursor={'pointer'}
+                _hover={{
+                  bgGradient: 'linear-gradient(90deg, #904BFF 0%, #9846EA 53.43%, #E22DFF 101.57%);',
+                }}
+              >
+                <a style={{display:"flex"}} href={"/trade/eth/0x3a1bc4014c4c493db3dbfbdd8ee1417113b462bf"}>
+                  <p>BlockPortal Native Token</p>
+                  <p style={{fontWeight:"bold"}}>&nbsp;BPTL</p>
+                   
+                </a>
+              </Box>
+            }
             {
               colorMode == "dark" ? 
               <Sun className={style.themeMode} onClick={toggleColorMode}/>:
@@ -98,7 +158,7 @@ export default function Header({
            </Box> 
           </>:
           <>
-            <Flex minWidth='max-content' alignItems='center' gap="15" width={"100%"}>
+            <Flex minWidth='max-content' alignItems='center' gap="2px" width={"100%"}>
               <Box display={"flex"} flexDirection="row" alignItems={"center"} height={"50px"}>
                 {
                   tokenData != undefined && 
@@ -158,7 +218,34 @@ export default function Header({
                 <p className={style.logo}>BlockPortal</p>
               </Box>
               <Spacer />
-              <Box display={"flex"} flexDirection="row" paddingRight={"1rem"} >
+              <Box 
+                display={"flex"} 
+                flexDirection="row" 
+                paddingRight={"1rem"} 
+                alignItems={"center"} 
+                width={"100%"}
+                justifyContent={"flex-end"}
+              >
+                <Box 
+                  width={"100px"} 
+                  height={"20px"} 
+                  marginRight={"1rem"}
+                  background={'linear-gradient(90deg, #6100FF 0%, #6E00DB 53.43%, #A100BB 101.57%)'}
+                  color={'white'}
+                  style={{
+                    display:'flex',
+                    alignItems:'center',
+                    justifyContent:'center'
+                  }}
+                  borderRadius={"20px"}
+                  cursor={'pointer'}
+                  
+                >
+                  <a style={{fontSize:'8px', display:"flex"}} href={"/trade/eth/0x3a1bc4014c4c493db3dbfbdd8ee1417113b462bf"}>
+                    <p>BlockPortal token</p>
+                    <p style={{fontWeight:"bold"}}>&nbsp;BPTL</p>
+                  </a>
+                </Box>
                 {
                   colorMode == "dark" ? 
                   <SunMini className={style.themeMode} onClick={toggleColorMode}/>:

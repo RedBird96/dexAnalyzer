@@ -38,8 +38,8 @@ export default function InputBox({
   const colorMode = useColorMode();
   const inputRef = useRef(null);
   const windowDimensions = useSize();
-  const borderColor = useColorModeValue("#C3C3C3", "#2E2E2E");
-  const bgColor = useColorModeValue("#efefef", "#121212");
+  const borderColor = useColorModeValue("#EFEFEF", "#0B1116");
+  const bgColor = useColorModeValue("#efefef", "#0B1116");
   const [inputValue, setInputValue] = useState<string>("0");
   const debouncedQuery = useDebounce(inputValue, 200);
 

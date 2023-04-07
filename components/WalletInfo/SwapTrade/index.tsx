@@ -12,13 +12,13 @@ import InputBox from '../InputBox';
 import { ERC20Token, TradeType } from '../../../utils/type';
 import { useDebounce, useLPTokenPrice, useTokenInfo } from '../../../hooks';
 import * as constant from '../../../utils/constant'
-import { getTokenBalance, getTokenLogoURL } from '../../../api';
+import { getCurrentBlockTimestamp, getSRGTax, getTokenBalance, getTokenLogoURL } from '../../../api';
 import { useAccount, useAddress, useConnect, useNetwork, useSigner } from '@thirdweb-dev/react';
 import { Field } from '../../../state/swap/types';
 import { useToken } from '../../../hooks/useTokenList';
 import { useTradeExactInOut, useTradeInExactOut } from '../../../hooks/useTradeInOut';
-import { getBalanceAmount, getDecimalAmount } from '../../../utils';
-import useSwap from '../../../hooks/useSwap';
+import { getBalanceAmount, getDecimalAmount, getDecimalCount, truncDigits } from '../../../utils';
+import useSwap, { useSRGBuy, useSRGSell } from '../../../hooks/useSwap';
 import useInitialize from '../../../hooks/useInitialize';
 import { minimumAmountOut } from '../../../utils/pairs';
 import { useAppDispatch } from '../../../state';
@@ -29,7 +29,7 @@ import { getContract } from '../../../utils/contract';
 import Bep20Abi from '../../../config/BEP20ABI.json'
 import Erc20Abi from '../../../config/ERC20ABI.json'
 import { MaxUint256 } from '@ethersproject/constants';
-import { getAmountIn, getAmountOut } from '../../../utils/router';
+import { getAmountIn, getAmountOut, getBNBAmountOut_SRG, getTokenAmountOut_SRG } from '../../../utils/router';
 import { toNumber } from 'lodash';
 
 enum BTN_LABEL {
@@ -48,14 +48,16 @@ export default function SwapTrade({
   mobileVersion: boolean
 }) {
 
+  const {buyTax, sellTax} = useTokenInfo();
   const {lpTokenPrice} = useLPTokenPrice();
   const address = useAddress();
+  const metasigner = useSigner();
   const {tokenData} = useTokenInfo();
   const colorMode = useColorMode();
   const toast = useToast()
   const {lpTokenAddress} = useLPTokenPrice();
   const borderColor = useColorModeValue("#C3C3C3", "#2E2E2E");
-  const mainbg = useColorModeValue("#efefef", "#121212");
+  const mainbg = useColorModeValue("#EFEFEF", "#0B1116");
   const textColor = useColorModeValue("#5E5E5E","#A7A7A7");
   const slectedColor = useColorModeValue("#005CE5","#3A3A29");
   const [fromTokenValue, setFromTokenValue] = useState<number>(0);
@@ -67,6 +69,7 @@ export default function SwapTrade({
   const [maxToToken, setMaxToToken] = useState<number>(0);
   const [miniValue, setMiniValue] = useState(0);
   const [executing, setExecuting] = useState<boolean>(false);
+  const [isSRG, setIsSRG] = useState<boolean>(false);
   const [fromToken, setFromToken] = useState<ERC20Token>(
     {
       name: "",
@@ -266,7 +269,10 @@ export default function SwapTrade({
     if (connection[0].data.connected && fromToken.name != undefined) {
       if (network[0].data.chain.id != tokenData.network) {
         setLabel(BTN_LABEL.SWITCHNETWORK)
-      } else if (!isApproved) {
+      } else if (!isApproved && 
+        fromToken.contractAddress.toLowerCase() != constant.GELATO_ADDRESS.toLowerCase() &&
+        !isSRG
+      ) {
         setLabel(BTN_LABEL.APPROVE);
       } else if (fromTokenValue > maxFromToken) {
         setLabel(BTN_LABEL.INSUFFICENT);
@@ -278,6 +284,15 @@ export default function SwapTrade({
 
   useEffect(() => {
     const setTokens = async() => {
+
+      if (tokenData.contractAddress.toLowerCase() == constant.WHITELIST_TOKENS.ETH.SRG.toLowerCase() ||
+          tokenData.contractAddress.toLowerCase() == constant.WHITELIST_TOKENS.BSC.SRG.toLowerCase())
+      {
+        setUserSlippageTolerance(15);
+        setIsSRG(true); 
+      } else {
+        setIsSRG(false);
+      }
 
       setInputSide(true);
       if (lpTokenAddress.quoteCurrency_name == "WBNB" || lpTokenAddress.quoteCurrency_name == "WETH") {
@@ -350,7 +365,10 @@ export default function SwapTrade({
   useEffect(() => {
 
     if (fromToken.name != "" && toToken.name != "") {
-      if (!isApproved) {
+      if (!isApproved && 
+          fromToken.contractAddress.toLowerCase() != constant.GELATO_ADDRESS.toLowerCase() &&
+          !isSRG
+      ) {
         setLabel(BTN_LABEL.APPROVE);
       } else if (fromTokenValue > maxFromToken) {
         setLabel(BTN_LABEL.INSUFFICENT);
@@ -362,9 +380,72 @@ export default function SwapTrade({
   }, [fromToken,bestTrade, lpTokenPrice, allowedSlippage, debouncedFromTokenValue, debouncedToTokenValue])
   
   useEffect(() => {
-    getPrice(); 
+    if(isSRG) {
+        getSRGPrice();
+    } else {
+      getPrice(); 
+    }
   }, [debouncedFromTokenValue, debouncedToTokenValue, lpTokenPrice, lpTokenAddress.token0_reserve, lpTokenAddress.token1_reserve])
 
+  const getSRGPrice = async () => {
+    if (inputSide) {
+      if (fromTokenValue != 0) {
+        let toAmount = 0;
+        const value = new BigNumber(fromTokenValue * Math.pow(10, fromToken.decimals));
+        if (lpTokenAddress.baseCurrency_contractAddress.toLowerCase() == fromToken.contractAddress.toLowerCase()) {
+          const res = await getBNBAmountOut_SRG(tokenData.contractAddress, value, tokenData.network);
+          if (res != undefined) {
+            toAmount = parseFloat(utils.formatUnits(res[0]._hex,lpTokenAddress.quoteCurrency_decimals));
+            setToTokenValue(toAmount);
+            setPriceBase(1 / fromTokenValue * toAmount);
+            setPriceQuote(1 / (1 / fromTokenValue * toAmount));
+          }
+        } else {
+          const res = await getTokenAmountOut_SRG(tokenData.contractAddress, value, tokenData.network);
+          if (res != undefined) {
+            toAmount = parseFloat(utils.formatUnits(res[0]._hex,lpTokenAddress.baseCurrency_decimals));
+            setToTokenValue(toAmount);
+            setPriceQuote(1 / fromTokenValue * toAmount);
+            setPriceBase(1 / (1 / fromTokenValue * toAmount));
+          }
+        }
+
+        const outMinAmount = toAmount - toAmount * (allowedSlippage / 100);
+        setMiniValue(outMinAmount);
+      } else {
+        setToTokenValue(0);
+        setMiniValue(0);
+      }
+    } else {
+      if (toTokenValue != 0){
+        let fromAmount = 0;
+        const value = new BigNumber(toTokenValue * Math.pow(10, toToken.decimals));
+        if (lpTokenAddress.baseCurrency_contractAddress.toLowerCase() == toToken.contractAddress.toLowerCase()) {
+          const res = await getBNBAmountOut_SRG(tokenData.contractAddress, value, tokenData.network);
+          if (res != undefined) {
+            fromAmount = parseFloat(utils.formatUnits(res[0]._hex,lpTokenAddress.quoteCurrency_decimals));
+            setFromTokenValue(fromAmount);
+            setPriceBase(1 / toTokenValue * fromAmount);
+            setPriceQuote(1 / (1 / toTokenValue * fromAmount));
+          }     
+        } else {
+          const res = await getTokenAmountOut_SRG(tokenData.contractAddress, value, tokenData.network);
+          if (res != undefined) {
+            fromAmount = parseFloat(utils.formatUnits(res[0]._hex,lpTokenAddress.baseCurrency_decimals));
+            setFromTokenValue(fromAmount);
+            setPriceBase(1 / toTokenValue * fromAmount);
+            setPriceQuote(1 / (1 / toTokenValue * fromAmount));
+          }          
+        }
+
+        const outMinAmount = toTokenValue - toTokenValue * (allowedSlippage / 100);
+        setMiniValue(outMinAmount);
+
+      }else {
+        setZero();
+      }
+    } 
+  }
   const getPrice = async() => {
     if (inputSide) {
       if (fromTokenValue != 0) {
@@ -499,8 +580,86 @@ export default function SwapTrade({
   const handleSlippage = (e: { target: { value: string; }; }) => {
     const value = e.target.value.toLowerCase();
     setUserSlippageTolerance(parseFloat(value));
+    if (isSRG) {
+      if (inputSide) {
+        const outMinAmount = toTokenValue - toTokenValue * (parseFloat(value) / 100);
+        setMiniValue(outMinAmount);
+      } else {
+        const outMinAmount = fromTokenValue + fromTokenValue * (parseFloat(value) / 100);
+        setMiniValue(outMinAmount);
+      }
+    }
   }
 
+  const handleSRGSwap = async () => {
+    let res;
+    setExecuting(true);
+    try{
+      if (fromToken.contractAddress.toLowerCase() == tokenData.contractAddress.toLowerCase()) { // sell
+        const timestamp = await getCurrentBlockTimestamp(tokenData.network);
+        const deadline = timestamp + 1000 * 60 * 5;
+        // const minValue = new BigNumber(miniValue * Math.pow(10, tokenData.decimals));
+        const minValue = ethers.utils.parseUnits(
+          getDecimalCount(miniValue) < 6 ? miniValue.toString() : truncDigits(miniValue, 6).toString(), 
+          tokenData.decimals
+        );
+        const tokenAmount = ethers.utils.parseUnits(
+          getDecimalCount(fromTokenValue) < 6 ? fromTokenValue.toString() : truncDigits(fromTokenValue, 6).toString(), 
+          fromToken.decimals
+        );
+        res = await useSRGSell({
+          address:tokenData.contractAddress, 
+          network:tokenData.network, 
+          signer:metasigner, 
+          tokenAmount, 
+          deadline,
+          minBNBOut:minValue
+        });
+      } else { //buy
+        const timestamp = await getCurrentBlockTimestamp(tokenData.network);
+        const deadline = timestamp + 1000 * 60 * 5;
+        const minValue = ethers.utils.parseUnits(
+          getDecimalCount(miniValue) < 6 ? miniValue.toString() : truncDigits(miniValue, 6).toString(), 
+          tokenData.decimals
+        );
+        const bnbAmount = ethers.utils.parseUnits(
+          getDecimalCount(fromTokenValue) < 6 ? fromTokenValue.toString() : truncDigits(fromTokenValue, 6).toString(), 
+          fromToken.decimals
+        );
+        res = await useSRGBuy({
+          address:tokenData.contractAddress, 
+          network:tokenData.network, 
+          signer:metasigner, 
+          bnbAmount, 
+          minTokenOut:minValue, 
+          deadline
+        });
+      }
+      if (res) {
+        toast({
+          title: `Transaction approved`,
+          status: 'success',
+          position: 'bottom-right',
+          isClosable: true,
+        })
+      } else {
+        toast({
+          title: `Transaction failed`,
+          status: 'warning',
+          position: 'bottom-right',
+          isClosable: true,
+        })     
+      }
+    } catch(e) {
+      toast({
+        title: `Transaction failed`,
+        status: 'warning',
+        position: 'bottom-right',
+        isClosable: true,
+      })   
+    }
+    setExecuting(false);
+  }
   const handleOther = () => {
     if (label == BTN_LABEL.SWITCHNETWORK) {
       account[0].data.connector.switchChain(tokenData.network);
@@ -511,9 +670,24 @@ export default function SwapTrade({
     }
   }
 
-  const handleAutoSlippage = () => {
+  const handleAutoSlippage = async () => {
     if (!autoSlippage) {
-      setUserSlippageTolerance(10);
+      if (isSRG) {
+        if (inputSide) {
+          const outMinAmount = toTokenValue - toTokenValue * 0.15;
+          setMiniValue(outMinAmount);
+        } else {
+          const outMinAmount = fromTokenValue + fromTokenValue * 0.15;
+          setMiniValue(outMinAmount);
+        }
+        setUserSlippageTolerance(15);
+      } else {
+        if (fromToken.contractAddress.toLowerCase() != lpTokenAddress.baseCurrency_contractAddress.toLowerCase()) {
+          setUserSlippageTolerance(buyTax + 0.5);
+        } else {
+          setUserSlippageTolerance(sellTax + 0.5);
+        }
+      }
     }
 
     setAutoSlippage(!autoSlippage);
@@ -557,7 +731,7 @@ export default function SwapTrade({
             showMax = {true}
             token = {fromToken}
             setValue = {handleFromToken}
-            value = {fromTokenValue == 0 ? "" : fromTokenValue.toString()}
+            value = {fromTokenValue.toString()}
           ></InputBox>
         </Box>
         <Box
@@ -598,7 +772,7 @@ export default function SwapTrade({
             showMax = {false}
             token = {toToken}
             setValue = {handleToToken}
-            value = {toTokenValue == 0 ? "" : toTokenValue.toString()}
+            value = {toTokenValue.toString()}
           ></InputBox>
         </Box>
       </Box>
@@ -651,6 +825,7 @@ export default function SwapTrade({
                 borderColor ={mainbg}
                 background = {mainbg}
                 fontSize={mobileVersion ? "0.8rem" : "1rem"}
+                paddingLeft={0}
               >
                 %
               </InputRightAddon>
@@ -666,7 +841,7 @@ export default function SwapTrade({
               width = {"4rem"}
               alignItems = {"center"}
               justifyContent = {"center"}
-              height = {"100%"}
+              height = {"35px"}
               cursor = {"pointer"}
               background = {autoSlippage ? slectedColor : "transparent"}
               onClick = {handleAutoSlippage}
@@ -716,12 +891,12 @@ export default function SwapTrade({
       !mobileVersion ?
       <Button 
         className={style.buttonSection}
-        background = {tokenData.network == constant.BINANCE_NETOWRK ? "#F0B90B" : "#FB118E"}
+        background = {'#00CE52'}
         _hover = {{
-          bg: tokenData.network == constant.BINANCE_NETOWRK ? "#F0B90B" : "#FB118E"
+          bg: '#00CE52'
         }}
         color = {tokenData.network == constant.BINANCE_NETOWRK ? "black" : "white"}
-        onClick = {label == BTN_LABEL.SWAP ? handleConfirm : handleOther}
+        onClick = {label == BTN_LABEL.SWAP ? isSRG ? handleSRGSwap : handleConfirm : handleOther}
         isDisabled = {!showConnect || label == BTN_LABEL.LOADING || label == BTN_LABEL.INSUFFICENT || executing || (label == BTN_LABEL.SWAP && fromTokenValue == 0)}
       >
         {
@@ -750,12 +925,12 @@ export default function SwapTrade({
           width={"100%"}
           height={"100%"}
           borderRadius = {"0.5rem"}
-          background = {tokenData.network == constant.BINANCE_NETOWRK ? "#F0B90B" : "#FB118E"}
+          background = {'#00CE52'}
           _hover = {{
-            bg: tokenData.network == constant.BINANCE_NETOWRK ? "#F0B90B" : "#FB118E"
+            bg: '#00CE52'
           }}
           color = {tokenData.network == constant.BINANCE_NETOWRK ? "black" : "white"}
-          onClick = {label == BTN_LABEL.SWAP ? handleConfirm : handleOther}
+          onClick = {label == BTN_LABEL.SWAP ? isSRG ? handleSRGSwap : handleConfirm : handleOther}
           isDisabled = {!showConnect || label == BTN_LABEL.LOADING || label == BTN_LABEL.INSUFFICENT || executing || (label == BTN_LABEL.SWAP && fromTokenValue == 0)}
         >
           {

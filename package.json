@@ -5,7 +5,6 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "export": "next build & next export",
     "start": "next start",
     "lint": "next lint"
   },
@@ -54,6 +53,7 @@
     "react": "18.2.0",
     "react-app-rewired": "^2.2.1",
     "react-dom": "18.2.0",
+    "react-icons": "^4.7.1",
     "react-redux": "^8.0.5",
     "react-resize-panel": "^0.3.5",
     "react-resize-panel-ts": "^0.0.5",

@@ -4,11 +4,13 @@ import { Contract } from '@ethersproject/contracts';
 import { useCallback, useMemo } from 'react';
 import { maximumAmountIn, minimumAmountOut } from '../utils/pairs';
 import { Trade, TradeType } from '../utils/type';
-import { BINANCE_NETOWRK, BNBToken, ETHERToken, WHITELIST_TOKENS } from '../utils/constant';
+import { BINANCE_NETOWRK, BNBToken, BSCRPC_URL, ETHEREUM_NETWORK, ETHERToken, ETHRPC_URL, WHITELIST_TOKENS } from '../utils/constant';
 import isZero, { calculateGasMargin } from '../utils/tx';
+import SRGToken from '../config/SRGToken.json';
 import { getRouterContract } from '../utils/contract';
 import { useAddress, useSigner } from '@thirdweb-dev/react';
 import { useTokenInfo } from './useTokenInfo';
+import { ethers } from 'ethers';
 
 interface SwapParameters {
   methodName: string;
@@ -148,7 +150,6 @@ const useSwap = (
       })
     );
     
-    console.log('before successfulEstimation', swapCalls, estimateCalls);
     const successfulEstimation = estimateCalls.find(
       (el): el is SuccessfulSwapCall => 'gasEstimate' in el
     );
@@ -158,7 +159,6 @@ const useSwap = (
     if (!successfulEstimation) {
       throw new Error(errorEstimation.gasError.reason);
     }
-    console.log('successfulEstimation', successfulEstimation);
     const {
       call: {
         contract,
@@ -179,5 +179,72 @@ const useSwap = (
   };
   
 };
+
+export const useSRGBuy = async ({
+  address,
+  network,
+  signer,
+  bnbAmount,
+  minTokenOut,
+  deadline
+}:{
+  address:string,
+  network:number
+  signer:any,
+  bnbAmount:BigNumber,
+  minTokenOut:BigNumber,
+  deadline:number
+}) => {
+
+  let TokenContract:ethers.Contract;
+  if (network == ETHEREUM_NETWORK) {
+    const provider = new ethers.providers.JsonRpcProvider(ETHRPC_URL, ETHEREUM_NETWORK);
+    TokenContract = new ethers.Contract(address, SRGToken , provider)
+  } else if (network == BINANCE_NETOWRK) {
+    const provider = new ethers.providers.JsonRpcProvider(BSCRPC_URL, BINANCE_NETOWRK);
+    TokenContract = new ethers.Contract(address, SRGToken, provider)
+  }
+
+  try{
+    const estimateGasLimit = await TokenContract.connect(signer).estimateGas._buy(minTokenOut, deadline, {value:bnbAmount});
+    const transaction = await TokenContract.connect(signer)._buy(minTokenOut, deadline, {value:bnbAmount, gasLimit:estimateGasLimit});
+    const response = await transaction.wait();
+    return Boolean(response);
+  } catch(ex) {
+    console.log(ex);
+  }
+  return false;
+}
+
+export const useSRGSell = async ({
+  address,
+  network,
+  signer,
+  tokenAmount,
+  deadline,
+  minBNBOut
+}:{
+  address:string,
+  network:number
+  signer:any,
+  tokenAmount:BigNumber,
+  deadline:number,
+  minBNBOut:BigNumber
+}) => {
+
+  let TokenContract:ethers.Contract;
+  if (network == ETHEREUM_NETWORK) {
+    const provider = new ethers.providers.JsonRpcProvider(ETHRPC_URL, ETHEREUM_NETWORK);
+    TokenContract = new ethers.Contract(address, SRGToken , provider)
+  } else if (network == BINANCE_NETOWRK) {
+    const provider = new ethers.providers.JsonRpcProvider(BSCRPC_URL, BINANCE_NETOWRK);
+    TokenContract = new ethers.Contract(address, SRGToken, provider)
+  }
+
+  const estimateGasLimit = await TokenContract.connect(signer).estimateGas._sell(tokenAmount, deadline, minBNBOut);
+  const transaction = await TokenContract.connect(signer)._sell(tokenAmount, deadline, minBNBOut, {gasLimit:estimateGasLimit});
+  const response = await transaction.wait();
+  return Boolean(response);
+}
 
 export default useSwap;

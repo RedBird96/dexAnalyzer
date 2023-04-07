@@ -1,13 +1,17 @@
-import { Box, useColorModeValue } from "@chakra-ui/react";
+import { Box, Stat, StatArrow, StatHelpText, StatLabel, StatNumber, useColorModeValue } from "@chakra-ui/react";
 import { ERC20Token } from "../../utils/type";
 import style from './TokenInfo.module.css'
 
 export default function TokenDetails({
+  label1,
+  label2,
   holdersCount,
   transactionCount,
   tokenData,
   width
 }:{
+  label1: string,
+  label2: string,
   holdersCount: number,
   transactionCount: number,
   tokenData: ERC20Token,
@@ -22,7 +26,7 @@ export default function TokenDetails({
     <Box display={"flex"} flexDirection={"row"} width={width} alignItems={"center"}>
       <Box display={"flex"} flexDirection={"row"} width={"100%"} paddingLeft={"0.1rem"} justifyContent={"space-between"}>
         <Box display={"flex"} flexDirection={"column"} width={"55%"}>
-          <p className={style.holder} style={{color:textColor}}>Holders</p>
+          <p className={style.holder} style={{color:textColor}}>{label1}</p>
           <Box _hover={{"textDecoration":"underline"}} cursor="pointer" >
             <a 
               className={style.itemvalue} 
@@ -35,8 +39,8 @@ export default function TokenDetails({
             </a>
           </Box>
         </Box>
-        <Box display={"flex"} marginRight={"2rem"} flexDirection={"column"}>
-          <p className={style.holder} style={{color:textColor}}>Transactions</p>
+        <Box display={"flex"} marginRight={"2rem"} flexDirection={"column"} width={"40%"}>
+          <p className={style.holder} style={{color:textColor}}>{label2}</p>
           <Box _hover={{"textDecoration":"underline"}} cursor="pointer" >
             <a 
               className={style.itemvalue} 

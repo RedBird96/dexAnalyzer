@@ -3,7 +3,6 @@
   flex-direction: row;
   border-style: solid;
   box-sizing: border-box;
-  background-color: rgb(244, 244, 244);
   height:100vh;
 }
 .mainBodyblack{
@@ -11,7 +10,6 @@
   flex-direction: row;
   border-style: solid;
   box-sizing: border-box;
-  background-color: rgb(45, 50, 56);
   height:100vh;
 }
 .gridBox {

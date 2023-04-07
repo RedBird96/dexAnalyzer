@@ -25,6 +25,10 @@ export default function SocialListBox({
       display={"flex"}
       flexDirection={"row"}
       alignItems={"center"}
+      borderBottom={'1px'}
+      width={'100%'}
+      borderBottomColor={'#1C2936'}
+      pb={'10px'}
     >
       {
         token.website != "" && token.website != undefined && 

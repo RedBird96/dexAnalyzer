@@ -5,19 +5,25 @@ import { AbiItem } from 'web3-utils'
 import ERC20TokenABI from '../config/ERC20ABI.json'
 import BEP20TokenABI from '../config/ERC20ABI.json'
 import EtherscanClient, {Action} from './ethers/etherscan-client';
-import {ERC20Token, LPTokenPair, TokenSide} from '../utils/type'
+import {ERC20Token, LPTokenPair, TokenSide, TransactionType} from '../utils/type'
+import SRGToken from '../config/SRGToken.json';
 import UniswapV2Pair from '../config/IUniswapV2Pair.json';
 import PancakeswapV2Pair from '../config/IPancakeswapV2Pair.json';
 import {
   getHoldTokenList, 
   getTransferCount, 
-  getLPPairs, 
-  getBuySellTransactions
+  getLPPairs
 } from "./bitquery_graphql";
 import * as constant from '../utils/constant'
 import * as endpoint from '../utils/endpoints'
 import { makeTemplateDate } from "../utils";
-import { NODEREAL_BSC_API_KEY, NODEREAL_ETH_API_KEY, NODREAL_BSC_ENDPOINT, NODREAL_ETH_ENDPOINT } from "../utils/endpoints";
+import { 
+  NODEREAL_BSC_API_KEY, 
+  NODEREAL_ETH_API_KEY, 
+  NODREAL_BSC_ENDPOINT, 
+  NODREAL_ETH_ENDPOINT 
+} from "../utils/endpoints";
+import { Call, multicallv2 } from "../utils/multicall";
 
 const ETH_MAINNET_CONNECTION = {
   apiKey: endpoint.ETHERSCAN_API_KEY,
@@ -160,6 +166,14 @@ export async function getCurrentBlockNumber(network: number) {
 
 }
 
+export async function getCurrentBlockTimestamp(network: number) {
+
+  const provider = new ethers.providers.JsonRpcProvider(network == constant.ETHEREUM_NETWORK ? constant.ETHRPC_URL : constant.BSCRPC_URL);
+  const blockNumber = await provider.getBlockNumber();
+  const timestamp = (await provider.getBlock(blockNumber)).timestamp;
+  return timestamp;
+}
+
 export async function getLastTransactionsLogsByTopic(address:string, network: number) {
   
   const backTime = 1800;
@@ -185,15 +199,141 @@ export async function getLastTransactionsLogsByTopic(address:string, network: nu
   return constant.NOT_FOUND_TOKEN;
 }
 
-export async function getTokenTransactionCount(address:string, network: number) {
+export async function getSRGBuySellTransactions(address:string, network:number, fromBlock: number) {
 
-  const response = await getTransferCount(address, network);
-  if (response != constant.NOT_FOUND_TOKEN) {
-    try{
-      const transfercnt = response[0].countBigInt;
-      return transfercnt;
-    }catch {
+  const backTime = 36000;
+  let tempTransaction: TransactionType[] = [];
+  let txArr:any[] = [];
+  let client, response_buy, response_sell;
+  if (network == constant.ETHEREUM_NETWORK) {
+    client = new EtherscanClient(ETH_MAINNET_CONNECTION);
+  } else if (network == constant.BINANCE_NETOWRK) {
+    client = new EtherscanClient(BSC_MAINNET_CONNECTION);
+  }
 
+  try{
+    const blockCount = network == constant.ETHEREUM_NETWORK ? backTime / 12 : backTime / 3;
+    const buyTopic = "0x7ce543d1780f3bdc3dac42da06c95da802653cd1b212b8d74ec3e3c33ad7095c";
+    const sellTopic = "0x9be8a5ca22b7e6e81f04b5879f0248227bb770114291bd47dfaee4c3a82ad60e";
+    response_buy = await client.call(Action.logs_getLogs, {
+      fromBlock:fromBlock - blockCount,
+      toBlock:'latest',
+      topic0: buyTopic,
+      address:address
+    });
+    response_sell = await client.call(Action.logs_getLogs, {
+      fromBlock:fromBlock - blockCount, 
+      toBlock:'latest',
+      topic0: sellTopic,
+      address:address
+    });    
+
+    const regex = new RegExp("^0+(?!$)",'g');
+
+    if (response_buy.message == "OK" && response_buy.result.length > 0) {
+      response_buy.result.forEach((value:any, index:number) => {
+            
+        const timeStamp = parseInt(value.timeStamp, 16);
+        const time = new Date(timeStamp * 1000).toISOString();
+        let param_data = value.data;
+        param_data = param_data.slice(2, param_data.length);
+        let datas:string[] = param_data.split(/(.{64})/).filter((O: any)=>O)
+        datas[0] = datas[0].replaceAll(regex, "");
+        datas[1] = datas[1].replaceAll(regex, "");
+        datas[2] = datas[2].replaceAll(regex, "");
+
+        const transaction_hash = value.transactionHash;
+        const tokens = parseInt(datas[0], 16) / Math.pow(10, 9);
+        const beans = parseInt(datas[1], 16) / Math.pow(10, 18);
+        const dollarBuy = parseInt(datas[2], 16) / Math.pow(10, 24);
+        
+        const item = {
+          buy_sell: "Buy",
+          baseToken_amount: tokens,
+          quoteToken_amount: beans,
+          quoteToken_symbol: network == constant.ETHEREUM_NETWORK ? "WETH" : "WBNB",
+          transaction_hash: transaction_hash,
+          transaction_local_time: time.replace('T', ' ').slice(0, 19),
+          transaction_utc_time: time,
+        } as TransactionType;
+
+        tempTransaction.push(item);
+
+      });
+    }
+
+    if (response_sell.message == "OK" && response_sell.result.length > 0) {
+      response_sell.result.forEach((value:any, index:number) => {
+            
+        const timeStamp = parseInt(value.timeStamp, 16);
+        const time = new Date(timeStamp * 1000).toISOString();
+        let param_data = value.data;
+        param_data = param_data.slice(2, param_data.length);
+        let datas:string[] = param_data.split(/(.{64})/).filter((O: any)=>O)
+        datas[0] = datas[0].replaceAll(regex, "");
+        datas[1] = datas[1].replaceAll(regex, "");
+        datas[2] = datas[2].replaceAll(regex, "");
+
+        const transaction_hash = value.transactionHash;
+        const tokens = parseInt(datas[0], 16) / Math.pow(10, 9);
+        const beans = parseInt(datas[1], 16) / Math.pow(10, 18);
+        const dollarBuy = parseInt(datas[2], 16) / Math.pow(10, 24);
+        
+        const item = {
+          buy_sell: "Sell",
+          baseToken_amount: tokens,
+          quoteToken_amount: beans,
+          quoteToken_symbol: network == constant.ETHEREUM_NETWORK ? "WETH" : "WBNB",
+          transaction_hash: transaction_hash,
+          transaction_local_time: time.replace('T', ' ').slice(0, 19),
+          transaction_utc_time: time,
+        } as TransactionType;
+
+        tempTransaction.push(item);
+
+      });    
+
+      tempTransaction = tempTransaction.sort((value1:TransactionType, value2:TransactionType) => {
+        if (value1.transaction_local_time > value2.transaction_local_time){
+          return -1;
+        }
+        return 1;
+      })
+    }
+
+  } catch( e:any) {
+
+  }
+
+  // console.log('tempTransaction', tempTransaction);
+  return tempTransaction;
+}
+
+export async function getTokenTransactionCount(address:string, network: number, tokenData:ERC20Token) {
+
+  if (address.toLowerCase() == constant.WHITELIST_TOKENS.ETH.SRG.toLowerCase() ||
+     address.toLowerCase() == constant.WHITELIST_TOKENS.BSC.SRG.toLowerCase()) {
+      let TokenContract:ethers.Contract;
+      if (network == constant.ETHEREUM_NETWORK) {
+        const provider = new ethers.providers.JsonRpcProvider(constant.ETHRPC_URL, constant.ETHEREUM_NETWORK);
+        TokenContract = new ethers.Contract(address, SRGToken , provider)
+      } else if (network == constant.BINANCE_NETOWRK) {
+        const provider = new ethers.providers.JsonRpcProvider(constant.BSCRPC_URL, constant.BINANCE_NETOWRK);
+        TokenContract = new ethers.Contract(address, SRGToken, provider)
+      }
+    
+      const resTx = await TokenContract!.totalTx();
+      const txCount = parseInt(resTx._hex);
+      return txCount;
+  } else {
+    const response = await getTransferCount(address, network, tokenData.controller?.signal);
+    if (response != constant.NOT_FOUND_TOKEN) {
+      try{
+        const transfercnt = response[0].countBigInt;
+        return transfercnt;
+      }catch {
+
+      }
     }
   }
   return 0;
@@ -254,7 +394,32 @@ export async function getTokenInfoFromTokenName() {
 
 export async function getTokenSymbol(address: string, network: number) {
 
-  let name, symbol, decimal, totalSupply;
+  let name, symbol, decimal, totalSupply, txCount;
+  let TokenContract:ethers.Contract;
+  if (network == constant.ETHEREUM_NETWORK) {
+    const provider = new ethers.providers.JsonRpcProvider(constant.ETHRPC_URL, constant.ETHEREUM_NETWORK);
+    TokenContract = new ethers.Contract(address, address.toLowerCase() == constant.WHITELIST_TOKENS.ETH.SRG.toLowerCase() ? SRGToken : ERC20TokenABI, provider)
+  } else if (network == constant.BINANCE_NETOWRK) {
+    const provider = new ethers.providers.JsonRpcProvider(constant.BSCRPC_URL, constant.BINANCE_NETOWRK);
+    TokenContract = new ethers.Contract(address, address.toLowerCase() == constant.WHITELIST_TOKENS.BSC.SRG.toLowerCase() ? SRGToken : BEP20TokenABI, provider)
+  }
+  try {
+    decimal = await TokenContract!.decimals()
+    symbol = await TokenContract!.symbol()
+    name = await TokenContract!.name()
+    totalSupply = await TokenContract!.totalSupply()
+    if (address.toLowerCase() == constant.WHITELIST_TOKENS.ETH.SRG.toLowerCase() || address.toLowerCase() == constant.WHITELIST_TOKENS.BSC.SRG.toLowerCase()) {
+      txCount = await TokenContract!.totalTx()
+    }
+  } catch (err:any) {
+    return constant.NOT_FOUND_TOKEN;
+  }
+  return [name, symbol, decimal, parseInt(totalSupply)/Math.pow(10, decimal), parseInt(txCount?._hex)];
+}
+
+export async function getTokenTotalSupply(address:string, network: number, decimal: number) {
+  
+  let totalSupply;
   let TokenContract:ethers.Contract;
   if (network == constant.ETHEREUM_NETWORK) {
     const provider = new ethers.providers.JsonRpcProvider(constant.ETHRPC_URL, constant.ETHEREUM_NETWORK);
@@ -264,14 +429,11 @@ export async function getTokenSymbol(address: string, network: number) {
     TokenContract = new ethers.Contract(address, BEP20TokenABI, provider)
   }
   try {
-    decimal = await TokenContract!.decimals()
-    symbol = await TokenContract!.symbol()
-    name = await TokenContract!.name()
     totalSupply = await TokenContract!.totalSupply()
   } catch (err:any) {
-    return constant.NOT_FOUND_TOKEN;
+    return 0;
   }
-  return [name, symbol, decimal, parseInt(totalSupply)/Math.pow(10, decimal)];
+  return parseInt(totalSupply)/Math.pow(10, decimal);
 }
 
 const getTokenId = async (address: string): Promise<string[] | undefined> => {
@@ -305,7 +467,7 @@ export async function getTokenSocialInfofromCoingeckoAPI(address: string, networ
   const response = await fetch(url)
   if (response.ok) {
     const obj = await response.json();
-    console.log('social response', obj);
+    //console.log('social response', obj);
     let website = "", facebook = "", twitter = "", discord="", github = "", telegram = "", instagram = "", medium = "", reddit = "";
 
     try{
@@ -348,14 +510,14 @@ export async function getTokenPricefromCoingeckoAPI(addresses: string, network: 
   return undefined    
 }
 
-export async function getLPTokenList(address: string, network: number, tokenside: number): Promise<LPTokenPair[]> {
+export async function getLPTokenList(address: string, network: number, tokenside: number, tokenData: ERC20Token): Promise<LPTokenPair[]> {
       
   let response;
   let lpTokenList: LPTokenPair[] = [];
   const NETWORKURL = network == constant.ETHEREUM_NETWORK ? 
     "https://etherscan.io/token/" :
     "https://bscscan.com/token/";
-  response = await getLPPairs(address, network);
+  response = await getLPPairs(address, network, tokenData.controller?.signal);
   if (response != constant.NOT_FOUND_TOKEN && response != null) {
     response.forEach((value:any) => {
         lpTokenList.push({
@@ -394,28 +556,48 @@ export async function getLPTokenList(address: string, network: number, tokenside
 export async function getLPTokenReserve(address: string, network: number) {
 
   let PairContractHttp;
-  if (network == constant.ETHEREUM_NETWORK) {
-    const web3Http = new Web3(constant.ETHRPC_URL);
-    PairContractHttp = new web3Http.eth.Contract(
-      UniswapV2Pair as AbiItem[],
-      address
-    );   
+  if (address.toLowerCase() == constant.WHITELIST_TOKENS.ETH.SRG.toLowerCase() || 
+      address.toLowerCase() == constant.WHITELIST_TOKENS.BSC.SRG.toLowerCase()) {
+    if (network == constant.ETHEREUM_NETWORK) {
+      const web3Http = new Web3(constant.ETHRPC_URL);
+      PairContractHttp = new web3Http.eth.Contract(
+        SRGToken as AbiItem[],
+        address
+      );   
+    } else {
+      const web3Http = new Web3(constant.BSCRPC_URL);
+      PairContractHttp = new web3Http.eth.Contract(
+        SRGToken as AbiItem[],
+        address
+      );       
+    }
+
+    const liquidity = await PairContractHttp.methods.getLiquidity().call();
+    return [0, liquidity / Math.pow(10, 18),"", "", ""];
   } else {
-    const web3Http = new Web3(constant.BSCRPC_URL);
-    PairContractHttp = new web3Http.eth.Contract(
-      PancakeswapV2Pair as AbiItem[],
-      address
-    );       
+    if (network == constant.ETHEREUM_NETWORK) {
+      const web3Http = new Web3(constant.ETHRPC_URL);
+      PairContractHttp = new web3Http.eth.Contract(
+        UniswapV2Pair as AbiItem[],
+        address
+      );   
+    } else {
+      const web3Http = new Web3(constant.BSCRPC_URL);
+      PairContractHttp = new web3Http.eth.Contract(
+        PancakeswapV2Pair as AbiItem[],
+        address
+      );       
+    }
+    const _reserves = await PairContractHttp.methods.getReserves().call();
+    const _factory = await PairContractHttp.methods.factory().call();
+    const token0 = await PairContractHttp.methods.token0().call();
+    const token1 = await PairContractHttp.methods.token1().call();
+    // return data in Big Number
+    return [parseInt(_reserves._reserve0), 
+            parseInt(_reserves._reserve1),
+            _factory,
+            token0, token1];
   }
-  const _reserves = await PairContractHttp.methods.getReserves().call();
-  const _factory = await PairContractHttp.methods.factory().call();
-  const token0 = await PairContractHttp.methods.token0().call();
-  const token1 = await PairContractHttp.methods.token1().call();
-  // return data in Big Number
-  return [parseInt(_reserves._reserve0), 
-          parseInt(_reserves._reserve1),
-          _factory,
-          token0, token1];
 }
 
 export async function getTokenPricefromllama(address: string, network: number) {
@@ -519,43 +701,7 @@ export async function getLPTransactionListFromWallet(
   }
 
   return array;
-
-  // let array:any[] = [];
-  // console.log('call transaction')
-  // const res = await getBuySellTransactions(address, network == constant.ETHEREUM_NETWORK ? constant.UNISWAP_ROUTER.v2 : constant.PANCAKESWAP_ROUTER.v2 ,network, tokenAddress);
-
-  // console.log('getBuySellTransactions')
-
-  // if (res == constant.NOT_FOUND_TOKEN || res ==  null) 
-  //   return constant.NOT_FOUND_TOKEN;
-  // if (res.length != 0 ) {
-  //   res.forEach((value:any) => {
-  //     if (value["taker"].address.toLowerCase() == address.toLowerCase() || value["maker"].address.toLowerCase() == address.toLowerCase()) {
-  //       const time = new Date(value["timeInterval"].second + " UTC");
-  //       const cuTime = makeTemplateDate(time, resolution);
-  //       if (value["buyCurrency"].address == tokenAddress) {
-  //         array.push({
-  //           intervalTime:cuTime.getTime(),
-  //           time:time.getTime(),
-  //           buy_sell:"sell",
-  //           amount:value["baseAmount"]
-  //         })
-  //       } else {
-  //         array.push({
-  //           intervalTime:cuTime.getTime(),
-  //           time:time.getTime(),
-  //           buy_sell:"buy",
-  //           amount:value["baseAmount"]
-  //         })
-  //       }
-  //     }
-  //   });
-  // }
   
-  // array = array.sort((value1:any, value2:any) => {
-  //   return value1.time - value2.time
-  // })
-  // return array;
 }
 
 export async function getTokenBalance(tokenAddress:string, walletAdderss:string, network:number) {
@@ -583,4 +729,602 @@ export async function getTokenBalance(tokenAddress:string, walletAdderss:string,
     return constant.NOT_FOUND_TOKEN;
   }
 
+}
+
+export async function getTokenByAddressOrName(tokenString:string, choose_network = 0) {
+
+  let tokenArray:ERC20Token[] = [];
+  let url = "";
+  if (choose_network == 0) {
+    url = `https://dolphin-app-5z4bf.ondigitalocean.app/get?url=https%3A%2F%2Fwww.dextools.io%2Fshared%2Fsearch%2Fv2%3Fchains%3Dbsc%2Cether%26query%3D${tokenString}%26type%3Dtoken`;
+  } else if (choose_network == constant.ETHEREUM_NETWORK) {
+    url = `https://dolphin-app-5z4bf.ondigitalocean.app/get?url=https%3A%2F%2Fwww.dextools.io%2Fshared%2Fsearch%2Fv2%3Fchains%3Dether%26query%3D${tokenString}%26type%3Dtoken`;
+  } else if (choose_network == constant.BINANCE_NETOWRK) {
+    url = `https://dolphin-app-5z4bf.ondigitalocean.app/get?url=https%3A%2F%2Fwww.dextools.io%2Fshared%2Fsearch%2Fv2%3Fchains%3Dbsc%26query%3D${tokenString}%26type%3Dtoken`;
+  }
+  const response = await fetch(url, {
+    method: 'GET',
+    headers:{'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'}
+  });
+  
+  try{
+    if (response.ok) {
+      const obj = await response.json();
+      const contents = JSON.parse(obj.contents);
+      const results = contents["results"];
+      if (results != undefined && results.length > 0) {
+        for (const value of results) {
+          if (value.id.chain == "bsc") {
+            const address = value.id.token;
+            const findItem = tokenArray.find((value) => 
+              value.contractAddress.toLowerCase() == address.toLowerCase() && value.network == constant.BINANCE_NETOWRK);
+            if (findItem != undefined)
+              continue;
+            const BSCLINK = " https://bscscan.com/";
+            const name = value.token.name;
+            const symbol = value.token.symbol;
+            const decimal = value.token.decimals;
+            let totalSupply = -1;
+            let logo = "";
+            let social = ["","","","","","","","", ""];
+            if (value.token.totalSupply != undefined){
+              totalSupply = parseInt(value.token.totalSupply) / Math.pow(10, decimal);
+            } else {
+              totalSupply = await getTokenTotalSupply(address, constant.BINANCE_NETOWRK, decimal);
+            }
+            if (value.token.logo != undefined) {
+              logo = await getTokenLogoURL(address, constant.BINANCE_NETOWRK, symbol);
+            } else {
+              logo = "https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png";
+            }
+            if (value.token.links != undefined) {
+              social = await getTokenSocialInfofromCoingeckoAPI(address, constant.BINANCE_NETOWRK);            
+            }
+            tokenArray.push({
+              name: name,
+              contractAddress: address,
+              price: 0,
+              marketCap: "",
+              totalSupply: totalSupply,
+              holdersCount: 0,
+              balance: 0,
+              decimals: decimal,
+              symbol: symbol,
+              image: logo,
+              txCount: 0,
+              network: constant.BINANCE_NETOWRK,
+              pinSetting: false,
+              website: social![0],
+              twitter: social![1],
+              facebook: social![2],
+              discord: social![3],
+              github: social![4],
+              telegram: social![5],
+              instagra: social![6],
+              medium: social![7],
+              reddit: social![8],
+              contractCodeURL: BSCLINK + "address/" + address +"#code",
+              contractBalanceWalletURL: BSCLINK + "token/" + address + "?a=",
+              contractBalanceURL: BSCLINK + "token/" + address + "#balances",
+              contractPage:BSCLINK + "token/" + address
+            } as ERC20Token);
+          } else if (value.id.chain == "ether") {
+            const address = value.id.token;
+            const findItem = tokenArray.find((value) => 
+              value.contractAddress.toLowerCase() == address.toLowerCase() && value.network == constant.ETHEREUM_NETWORK);
+            if (findItem != undefined)
+            continue;
+            const ETHLINK = "  https://etherscan.io/";
+            const name = value.token.name;
+            const symbol = value.token.symbol;
+            const decimal = parseInt(value.token.decimals);
+            let totalSupply = -1;
+            let logo = "";
+            let social = ["","","","","","","","", ""];
+            if (value.token.totalSupply != undefined){
+              totalSupply = parseInt(value.token.totalSupply) / Math.pow(10, decimal);
+            } else {
+              totalSupply = await getTokenTotalSupply(address, constant.ETHEREUM_NETWORK, decimal);
+            }
+            if (value.token.logo != undefined) {
+              logo = await getTokenLogoURL(address, constant.ETHEREUM_NETWORK, symbol);
+            } else {
+              logo = "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png";
+            }
+            if (value.token.links != undefined) {
+              social = await getTokenSocialInfofromCoingeckoAPI(address, constant.ETHEREUM_NETWORK);            
+            }
+            tokenArray.push({
+              name: name,
+              contractAddress: address,
+              price: 0,
+              marketCap: "",
+              totalSupply: totalSupply,
+              holdersCount: 0,
+              balance: 0,
+              decimals: decimal,
+              symbol: symbol,
+              image: logo,
+              network: constant.ETHEREUM_NETWORK,
+              pinSetting: false,
+              website: social![0],
+              twitter: social![1],
+              facebook: social![2],
+              discord: social![3],
+              github: social![4],
+              telegram: social![5],
+              instagra: social![6],
+              medium: social![7],
+              reddit: social![8],
+              contractCodeURL: ETHLINK + "address/" + address +"#code",
+              contractBalanceWalletURL: ETHLINK + "token/" + address + "?a=",
+              contractBalanceURL: ETHLINK + "token/" + address + "#balances",
+              contractPage:ETHLINK + "token/" + address
+            } as ERC20Token);
+          }
+        }
+      }
+    }
+  } catch(e) {
+
+  }
+  return tokenArray;
+}
+
+export async function getSRGTimestamp(address:string, network:number) {
+  
+  let txCount = await getTokenTransactionCount(address, network, null);
+  let reserveCalls: Call[] = [];
+  let responseArr:any[] = [];
+  const MAX_COUNT = 2000;
+  let offset = 0;
+  let count = 0;
+  // console.log('getSRGTimestamp', txCount);
+  while(count < txCount) {
+    
+    if (txCount <= MAX_COUNT) {
+      count = txCount;
+    } else {
+      count += MAX_COUNT;
+      if (count > txCount) {
+        count = txCount;
+      }
+    }
+
+    // console.log('while', offset, count);
+    reserveCalls = [];
+    for(let index = offset + 1; index <= count; index++) {
+      reserveCalls.push({
+        name: 'txTimeStamp',
+        address: address,
+        params: [index],
+      })
+
+    }
+    const timeStampArr = await multicallv2(SRGToken, reserveCalls, network);  
+    responseArr = responseArr.concat(timeStampArr);
+
+    offset = count;
+  }
+
+  responseArr.forEach((value:any, index:number) => {
+    responseArr[index] = parseInt(value[0]._hex, 16);
+  })
+
+  // console.log('responseArr', responseArr);
+  return responseArr;
+
+
+}
+export async function getSRGTx(
+  address:string, 
+  network:number, 
+  fromTimestamp:number, 
+  toTimestamp:number, 
+  txArray:any[]
+):Promise<any[]> {
+
+  let candleArray:any[] = [];
+  let volumeArray:any[] = [];
+  let reserveCalls: Call[] = [];
+  const MAX_COUNT = 2000;
+  let offset = 0;
+  let count = 0;
+  
+  // console.log('from to timeStamp', fromTimestamp, toTimestamp);
+  const fromIndex = txArray.findIndex((value:any) => value >= fromTimestamp);
+  const toIndex = txArray.findLastIndex((value:any) => value <= toTimestamp);
+
+  // console.log('from to Index', fromIndex, toIndex);
+  while(count + fromIndex < toIndex) {
+
+    if (toIndex - fromIndex <= MAX_COUNT) {
+      count = toIndex - fromIndex + 1;
+    } else {
+      count += MAX_COUNT;
+      if (count + fromIndex > toIndex) {
+        count = toIndex - fromIndex + 1;
+      }
+    }
+
+    // console.log('offset count', offset, count + fromIndex);
+    reserveCalls = [];
+    
+    for(let index = fromIndex + offset; index < count + fromIndex; index++) {
+      reserveCalls.push({
+      name: 'candleStickData',
+      address: address,
+      params: [txArray[index]],
+      })
+    }
+    // console.log('reserveCall', reserveCalls);
+    const txArr = await multicallv2(SRGToken, reserveCalls, network);  
+    // console.log('txArr', txArr);
+    reserveCalls = [];
+    for(let index = fromIndex + offset; index < count + fromIndex; index++) {
+        reserveCalls.push({
+        name: 'tVol',
+        address: address,
+        params: [txArray[index]],
+        })
+    }
+    const volArr = await multicallv2(SRGToken, reserveCalls, network);   
+    candleArray = candleArray.concat(txArr);
+    volumeArray = volumeArray.concat(volArr);
+
+    offset = count;
+  }
+  
+  return [candleArray, volumeArray];
+
+}
+
+export async function getSRGTax(address:string, network: number, buySell: boolean):Promise<number> {
+ 
+  let TokenContract:ethers.Contract;
+  if (network == constant.ETHEREUM_NETWORK) {
+    const provider = new ethers.providers.JsonRpcProvider(constant.ETHRPC_URL, constant.ETHEREUM_NETWORK);
+    TokenContract = new ethers.Contract(address, SRGToken , provider)
+  } else if (network == constant.BINANCE_NETOWRK) {
+    const provider = new ethers.providers.JsonRpcProvider(constant.BSCRPC_URL, constant.BINANCE_NETOWRK);
+    TokenContract = new ethers.Contract(address, SRGToken, provider)
+  }
+
+  let fee = 0, resMul:any;
+  if (buySell) { // buy
+    resMul = await TokenContract!.buyMul();
+  } else { //sell
+    resMul = await TokenContract!.sellMul();
+  }
+  fee = parseInt(resMul._hex, 16) / 100;
+  return fee;
+
+}
+
+export async function testTxHash(txhash:string, fromDecimal: number, toDecimal: number, price:number) {
+
+  const TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+  const DEPOSIT_TOPIC = "0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c";
+  const web3Http = new Web3(constant.BSCRPC_URL); 
+  const res  = await web3Http.eth.getTransactionReceipt(txhash);
+  const logs = res.logs;
+  const fromMaker = res.from;
+  let fromAmount = 0;
+  let toAmount = 0;
+  logs.forEach((log) => {
+    if (log.topics[0].toLowerCase() == TRANSFER_TOPIC.toLowerCase()) {
+      const from = "0x" + log.topics[1].substring(26, log.topics[1].length);
+      const to = "0x" + log.topics[2].substring(26, log.topics[1].length);
+      if (from.toLowerCase() == fromMaker.toLowerCase()) {
+        const value = parseFloat(ethers.utils.formatUnits(log.data, fromDecimal));
+        fromAmount += value;
+      }
+      if (to.toLowerCase() == fromMaker.toLowerCase()) {
+        const value = parseFloat(ethers.utils.formatUnits(log.data, toDecimal));
+        toAmount += value;
+      }
+    }
+  })
+  const expectToAmount = fromAmount * price;
+}
+
+export async function getTaxPercentageStable(
+  txhash:string, 
+  network:number, 
+  fromDecimal: number, 
+  toDecimal: number, 
+  price: number, 
+  buy_sell:string,
+  baseContract: string
+) {
+
+  let stableaddr = "";
+  const TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+  const DEPOSIT_TOPIC = "0xe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c";
+  let web3Http;
+  if (network == constant.ETHEREUM_NETWORK) {
+    web3Http = new Web3(constant.ETHRPC_URL);
+    stableaddr = constant.WHITELIST_TOKENS.ETH.ETH;
+  } else {
+    web3Http = new Web3(constant.BSCRPC_URL);
+    stableaddr = constant.WHITELIST_TOKENS.BSC.BNB;
+  }
+
+  const txHashDetail = await web3Http.eth.getTransactionReceipt(txhash);
+  try{
+    const logs = txHashDetail.logs;
+    const fromMaker = txHashDetail.from;
+    let fromAmount = 0;
+    let toAmount = 0;
+    let desposited = false;
+    logs.forEach((tx:any) => {
+      if (buy_sell == "Buy") {
+        if (tx.topics[0].toLowerCase() == DEPOSIT_TOPIC.toLowerCase()) {
+          const value = parseFloat(ethers.utils.formatUnits(tx.data, fromDecimal));
+          fromAmount = value;
+          desposited = true;
+        }
+        if (tx.topics[0].toLowerCase() == TRANSFER_TOPIC.toLowerCase()) {
+          if (tx.address.toLowerCase() == stableaddr.toLowerCase() && !desposited) {
+            const value = parseFloat(ethers.utils.formatUnits(tx.data, fromDecimal));
+            fromAmount += value;
+          } else {
+            const to = "0x" + tx.topics[2].substring(26, tx.topics[1].length);
+            if (fromMaker.toLowerCase() == to.toLowerCase() && baseContract.toLowerCase() == tx.address.toLowerCase()) {
+              const value = parseFloat(ethers.utils.formatUnits(tx.data, toDecimal));
+              toAmount += value;
+            }
+          }
+        }
+      } else {
+        if (tx.topics[0].toLowerCase() == TRANSFER_TOPIC.toLowerCase()) {
+          const from = "0x" + tx.topics[1].substring(26, tx.topics[1].length);
+          const to = "0x" + tx.topics[2].substring(26, tx.topics[1].length);
+          if (fromMaker.toLowerCase() == from.toLowerCase() && baseContract.toLowerCase() == tx.address.toLowerCase()) {
+            const value = parseFloat(ethers.utils.formatUnits(tx.data, fromDecimal));
+            fromAmount += value;
+          }
+          if (tx.address.toLowerCase() == stableaddr.toLowerCase()) {
+            const value = parseFloat(ethers.utils.formatUnits(tx.data, toDecimal));
+            toAmount += value;
+          }
+        }
+      }
+    })
+
+    let expectToAmount = fromAmount * price;
+    if (buy_sell == "Buy")
+      expectToAmount = fromAmount / price;
+    let percent = (1 - (toAmount / expectToAmount)) * 100;
+    if (percent < 0 || percent > 10 || expectToAmount == 0)
+      percent = 10;
+    return percent;
+
+  } catch(e) {
+
+  }
+  return 10;
+}
+
+export async function getTaxPercentage(
+  txhash:string, 
+  network:number, 
+  fromDecimal: number, 
+  toDecimal: number, 
+  price: number, 
+  buy_sell:string,
+  quoteContract:string,
+  baseContract:string
+) {
+  
+  const TRANSFER_TOPIC = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+  let web3Http;
+  if (network == constant.ETHEREUM_NETWORK) {
+    web3Http = new Web3(constant.ETHRPC_URL);
+  } else {
+    web3Http = new Web3(constant.BSCRPC_URL);
+  }
+
+  const txHashDetail = await web3Http.eth.getTransactionReceipt(txhash);
+  try {
+    const logs = txHashDetail.logs;
+    const fromMaker = txHashDetail.from;
+    let fromAmount = 0;
+    let toAmount = 0;
+    logs.forEach((log) => {
+      if (log.topics[0].toLowerCase() == TRANSFER_TOPIC.toLowerCase()) {
+        const from = "0x" + log.topics[1].substring(26, log.topics[1].length);
+        const to = "0x" + log.topics[2].substring(26, log.topics[1].length);
+        if (from.toLowerCase() == fromMaker.toLowerCase() && quoteContract.toLowerCase() == log.address.toLowerCase()) {
+          const value = parseFloat(ethers.utils.formatUnits(log.data, fromDecimal));
+          fromAmount += value;
+        }
+        if (to.toLowerCase().toLowerCase() == fromMaker.toLowerCase().toLowerCase() && baseContract.toLowerCase() == log.address.toLowerCase()) {
+          const value = parseFloat(ethers.utils.formatUnits(log.data, toDecimal));
+          toAmount += value;
+        }
+      }
+    })
+    let expectToAmount = fromAmount * price;
+    if (buy_sell == "Buy")
+      expectToAmount = fromAmount / price;
+    let percent = (1 - (toAmount / expectToAmount)) * 100;
+    if (percent < 0 || percent > 10 || expectToAmount == 0)
+      percent = 10;
+    return percent;
+  } catch(e){
+
+  }
+  return 10;
+}
+
+
+export async function getBuySellTaxFromTx(
+  transactionData: TransactionType[], 
+  lpTokenInfo: LPTokenPair
+) {
+
+  let buyTax = 10, sellTax = 10;
+  const firstTx = transactionData[0];
+  const tokenSide = lpTokenInfo.tokenside;
+  const isStablePair = lpTokenInfo.quoteCurrency_contractAddress?.toLowerCase() == constant.WHITELIST_TOKENS.ETH.ETH?.toLowerCase() || 
+                       lpTokenInfo.quoteCurrency_contractAddress?.toLowerCase() == constant.WHITELIST_TOKENS.BSC.BNB?.toLowerCase() ? true : false;
+  let calReserve0 = lpTokenInfo.token0_reserve;;
+  let calReserve1 = lpTokenInfo.token1_reserve;;
+  let prePrice = 0;
+
+  if (firstTx.buy_sell == "Buy") {
+    if (tokenSide == TokenSide.token0) {
+      calReserve0 += firstTx.baseToken_amount;
+      calReserve1 -= firstTx.quoteToken_amount;
+      prePrice = calReserve1 / calReserve0;
+    } else {
+      calReserve0 += firstTx.quoteToken_amount;
+      calReserve1 -= firstTx.baseToken_amount;
+      prePrice = calReserve0 / calReserve1;
+    }    
+    let res;
+    if (isStablePair)
+      res = await getTaxPercentageStable(
+        firstTx.transaction_hash, 
+        lpTokenInfo.network, 
+        lpTokenInfo.quoteCurrency_decimals, 
+        lpTokenInfo.baseCurrency_decimals, 
+        prePrice, 
+        firstTx.buy_sell,
+        lpTokenInfo.baseCurrency_contractAddress
+      );
+    else
+      res = await getTaxPercentage(
+        firstTx.transaction_hash, 
+        lpTokenInfo.network, 
+        lpTokenInfo.quoteCurrency_decimals, 
+        lpTokenInfo.baseCurrency_decimals, 
+        prePrice, 
+        firstTx.buy_sell,
+        lpTokenInfo.quoteCurrency_contractAddress,
+        lpTokenInfo.baseCurrency_contractAddress
+      );
+    if (res != 0)
+      buyTax = res;
+  } else {
+    if (tokenSide == TokenSide.token0) {
+      calReserve0 -= firstTx.baseToken_amount;
+      calReserve1 += firstTx.quoteToken_amount;
+      prePrice = calReserve1 / calReserve0;
+    } else {
+      calReserve0 -= firstTx.quoteToken_amount;
+      calReserve1 += firstTx.baseToken_amount;
+      prePrice = calReserve0 / calReserve1;
+    }
+    let res;
+    if (isStablePair)
+      res = await getTaxPercentageStable(
+        firstTx.transaction_hash, 
+        lpTokenInfo.network, 
+        lpTokenInfo.baseCurrency_decimals, 
+        lpTokenInfo.quoteCurrency_decimals, 
+        prePrice, 
+        firstTx.buy_sell,
+        lpTokenInfo.baseCurrency_contractAddress
+      );
+    else
+      res = await getTaxPercentage(
+        firstTx.transaction_hash, 
+        lpTokenInfo.network, 
+        lpTokenInfo.baseCurrency_decimals, 
+        lpTokenInfo.quoteCurrency_decimals, 
+        prePrice, 
+        firstTx.buy_sell,
+        lpTokenInfo.quoteCurrency_contractAddress,
+        lpTokenInfo.baseCurrency_contractAddress
+      );
+    if (res != 0)
+      sellTax = res;
+  }
+
+  for (let index = 1; index < transactionData.length; index ++) {
+    const tx = transactionData[index];
+    if (tx.buy_sell == "Buy") {
+      if (tokenSide == TokenSide.token0) {
+        calReserve0 += tx.baseToken_amount;
+        calReserve1 -= tx.quoteToken_amount;
+        prePrice = calReserve1 / calReserve0;
+      } else {
+        calReserve0 += tx.quoteToken_amount;
+        calReserve1 -= tx.baseToken_amount;
+        prePrice = calReserve0 / calReserve1;
+      }   
+      if (tx.buy_sell != firstTx.buy_sell) {
+        let res;
+        if (isStablePair)
+          res = await getTaxPercentageStable(
+            tx.transaction_hash, 
+            lpTokenInfo.network, 
+            lpTokenInfo.quoteCurrency_decimals, 
+            lpTokenInfo.baseCurrency_decimals, 
+            prePrice, 
+            tx.buy_sell,
+            lpTokenInfo.baseCurrency_contractAddress
+          );
+        else
+          res = await getTaxPercentage(
+            tx.transaction_hash, 
+            lpTokenInfo.network, 
+            lpTokenInfo.quoteCurrency_decimals, 
+            lpTokenInfo.baseCurrency_decimals, 
+            prePrice, 
+            tx.buy_sell,
+            lpTokenInfo.quoteCurrency_contractAddress,
+            lpTokenInfo.baseCurrency_contractAddress
+          );
+        if (res != 0)
+          buyTax = res;
+        
+        break;
+      }
+    } else {
+      if (tokenSide == TokenSide.token0) {
+        calReserve0 -= tx.baseToken_amount;
+        calReserve1 += tx.quoteToken_amount;
+        prePrice = calReserve1 / calReserve0;
+      } else {
+        calReserve0 -= tx.quoteToken_amount;
+        calReserve1 += tx.baseToken_amount;
+        prePrice = calReserve0 / calReserve1;
+      }
+      if (tx.buy_sell != firstTx.buy_sell) {
+        let res;
+        if (isStablePair)
+          res = await getTaxPercentageStable(
+            tx.transaction_hash, 
+            lpTokenInfo.network, 
+            lpTokenInfo.baseCurrency_decimals, 
+            lpTokenInfo.quoteCurrency_decimals, 
+            prePrice, 
+            tx.buy_sell,
+            lpTokenInfo.baseCurrency_contractAddress
+          );
+        else
+          res = await getTaxPercentage(
+            tx.transaction_hash, 
+            lpTokenInfo.network,
+            lpTokenInfo.baseCurrency_decimals, 
+            lpTokenInfo.quoteCurrency_decimals, 
+            prePrice, 
+            tx.buy_sell,
+            lpTokenInfo.quoteCurrency_contractAddress,
+            lpTokenInfo.baseCurrency_contractAddress
+          );
+        if (res != 0)
+          sellTax = res;
+
+        break;
+      }
+    }
+  }
+
+  buyTax = Math.floor(buyTax);
+  sellTax = Math.floor(sellTax);  
+  return [buyTax, sellTax];
 }

@@ -8,10 +8,10 @@
   align-items: center;
 }
 .tokenListLight {
-  background-color: #FBFBFB;
+  background-color: #FFFFFF;
 }
 .tokenListDark {
-  background-color: #262626;
+  background-color: #182633;
 }
 .tokenSearch {
   width: 90% !important;
@@ -55,7 +55,7 @@
 }
 
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 1700px) {
 
   .tokenSearch {
     width: 90% !important;

@@ -9,10 +9,10 @@
 }
 
 .walletInfoDark {
-  background-color: #262626;
+  background-color: #182633;
 }
 .walletInfoLight {
-  background-color: #FBFBFB;
+  background-color: #FFFFFF;
 }
 .walletTitle {
   display: flex;
@@ -20,13 +20,13 @@
   align-items: center;
   justify-content: center;
   width:100%;
-  min-height:4.8rem;
+  min-height:4.5rem;
 }
 .walletTitleDark {
-  background-color: #121212;
+  background-color: #182633;
 }
 .walletTitleLight {
-  background-color: #FBFBFB;
+  background-color: #FFFFFF;
 
 }
 
@@ -99,6 +99,11 @@
   font-weight: 400;
   font-size: 0.8rem;
   line-height: 1.2rem;  
+}
+
+.tokenTotalSupply {
+  font-size: 13px;
+  line-height: 16px;
 }
 
 .refreshBtn {

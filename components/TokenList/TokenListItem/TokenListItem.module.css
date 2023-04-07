@@ -12,9 +12,17 @@
 .tokenName {
   font-family: 'Inter';
   font-style: normal;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.tokenSymbol {
+  font-family: 'Inter';
+  font-style: normal;
   font-weight: 500;
   font-size: 1rem;
 }
+
 .tokenAddress {
   font-family: 'Inter';
   font-style: normal;
@@ -27,7 +35,7 @@
 
   .tokenListInfo {
     display: flex;
-    min-height: 3.5rem;
+    min-height: 65px;
     flex-direction: row;
     align-items: center;
     width: 100%;
@@ -42,6 +50,14 @@
     font-weight: 500;
     font-size: 0.8rem;
   }
+
+  .tokenSymbol {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 0.8rem;
+  }
+
   .tokenAddress {
     font-family: 'Inter';
     font-style: normal;
@@ -49,4 +65,19 @@
     font-size: 0.5rem;
   }
 
+}
+
+
+@media only screen and (max-width: 600px) {
+
+  .tokenListInfo {
+    display: flex;
+    min-height: 3.5rem;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    cursor: pointer;
+  }
 }

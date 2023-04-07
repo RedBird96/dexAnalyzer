@@ -4,6 +4,7 @@
   min-width: 5.4rem;
   height: 100%;
   align-items:center;
+  justify-content: space-between;
 }
 
 .menuImg {
@@ -13,11 +14,11 @@
 }
 
 .menuBarLight {
-  background-color: #0085FF;
+  background-color: #FFFFFF;
 
 }
 .menuBarDark {
-  background-color: #121212;
+  background-color: #17212B;
 }
 
 @media only screen and (max-width: 1700px) {

@@ -4,6 +4,12 @@ import { ERC20Token } from '../utils/type'
 interface TokenInfoInterface {
   tokenData: ERC20Token;
   setTokenData: (token: ERC20Token) => void;
+  listTokens: ERC20Token[];
+  setListTokens: (tokens: ERC20Token[]) => void;
+  buyTax: number;
+  setBuyTax: (tax:number) => void;
+  sellTax: number;
+  setSellTax: (tax: number) => void;
 }
 
 const TokenInfoContext: React.Context<null | TokenInfoInterface> =
@@ -23,15 +29,25 @@ export function TokenInfoProvider({children}:any) {
     balance: 0,
     usdBalance: 0,
     decimals: 6,
-    image: "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png"
+    image: "",
+    controller: undefined
   } as ERC20Token
   
   const [token, setToken] = useState<ERC20Token>(temp);
+  const [tokenList, setTokenList] = useState<ERC20Token[]>([]);
+  const [buyTax, setBuyTax] = useState(0);
+  const [sellTax, setSellTax] = useState(0);
   return(
     <TokenInfoContext.Provider
       value={{
         tokenData:token,
         setTokenData: setToken,
+        listTokens: tokenList,
+        setListTokens: setTokenList,
+        buyTax: buyTax,
+        setBuyTax: setBuyTax,
+        sellTax: sellTax,
+        setSellTax: setSellTax
       }}
       >
         {children}

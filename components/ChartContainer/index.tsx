@@ -13,16 +13,18 @@ import {
   getCookie,
   deleteCookie
 } from '../../utils'
+import SRGToken from '../../config/SRGToken.json';
 import { useLPTokenPrice, useLPTransaction, useTokenInfo } from '../../hooks'
 import { getLimitTimeHistoryData } from '../../api/bitquery_graphql'
 import { TokenSide } from '../../utils/type'
 import { makeTemplateDate } from '../../utils'
-import { getLastTransactionsLogsByTopic, getLPTransactionListFromWallet } from '../../api'
+import { getLastTransactionsLogsByTopic, getLPTransactionListFromWallet, getSRGTimestamp, getSRGTx } from '../../api'
 import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
 import { ConvertEventtoTransaction } from '../TokenTransaction/module'
 import * as constant from '../../utils/constant'
-import { slice } from 'lodash'
 import { useAddress } from '@thirdweb-dev/react'
+import { ethers } from 'ethers'
+import { Call, multicallv2 } from '../../utils/multicall'
 
 // eslint-disable-next-line import/extensions
 
@@ -39,7 +41,7 @@ export interface ChartContainerProps {
   fullscreen: ChartingLibraryWidgetOptions['fullscreen']
   autosize: ChartingLibraryWidgetOptions['autosize']
   studiesOverrides: ChartingLibraryWidgetOptions['studies_overrides']
-  containerId: ChartingLibraryWidgetOptions['container_id']
+  container: ChartingLibraryWidgetOptions['container']
   height: number
   resize: boolean
 }
@@ -82,6 +84,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
   const [tokendetails, setTokenDetails] = React.useState({
     pair: ' ',
   })
+  let timeStampArr: any[] = [];
   let priceData: any[] = [];
   let showOrder = false;
   let lastBarsCache: any;
@@ -111,7 +114,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
         currentBaseReserve = lpTokenAddress.token1_reserve;
         currentQuoteReserve = lpTokenAddress.token0_reserve;
       }
-      const currentTime = new Date(data[0].timeInterval.second + " UTC");
+      const currentTime = new Date(data[0].timeInterval.second.replace(" ", "T") + "Z");
       
       // console.log("reserve", currentBaseReserve, currentQuoteReserve);
       for (let index = res.length - 1; index > 0; index--){
@@ -151,7 +154,12 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
 
 
   const feed = {
-    onReady: (callback: any) => {
+    onReady: async (callback: any) => {
+      
+      if (tokenData.contractAddress.toLowerCase() == constant.WHITELIST_TOKENS.BSC.SRG.toLowerCase() ||
+        tokenData.contractAddress.toLowerCase() == constant.WHITELIST_TOKENS.ETH.SRG.toLowerCase()) {
+        timeStampArr = await getSRGTimestamp(tokenData.contractAddress, tokenData.network);
+      }
       setTimeout(() => callback(configurationData), 0)
     },
     searchSymbols: async (userInput: any, exchange: any, symbolType: any, onResultReadyCallback: any) => {
@@ -168,7 +176,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
         session: '24x7',        
         description: lpTokenAddress.symbol,
         locale: getLanguageFromURL() || 'en',
-        exchange: lpTokenAddress.tokenside == TokenSide.token0 ? lpTokenAddress.token0_name : lpTokenAddress.token1_name,
+        exchange: "blockportal.app",
         minmov: 1,
         pricescale: 1000000,
         has_intraday: true,
@@ -191,9 +199,10 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       try {
         let bars: any = []
         let bar_data:any[] = [];
+        let resolution_num = resolution;
         const CANDLE_FETCH_COUNT = 400;
         const { from, to, firstDataRequest } = periodParams
-        
+
         if (lpTokenAddress.ownerToken == undefined || lpTokenAddress.ownerToken == "") {
           onHistoryCallback([], {
             noData: true,
@@ -201,135 +210,196 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
           return;
         }
 
+        if (resolution == "1D") {
+          resolution_num = 1440;
+        }
         // console.log('getBars firstDataRequest', new Date(from * 1000).toISOString(), new Date(to * 1000).toISOString(),  firstDataRequest);
         // if (checksumAddress) {
         //   // setLoader(true);
-        //   if (!firstDataRequest) {
-        //     // "noData" should be set if there is no data in the requested period.
-        //     onHistoryCallback([], {
-        //       noData: true,
-        //     })
-        //     return
-        //   }
+          // if (!firstDataRequest) {
+          //   // "noData" should be set if there is no data in the requested period.
+          //   onHistoryCallback([], {
+          //     noData: true,
+          //   })
+          //   return
+          // }
         // }
 
         // console.log('from to', new Date(from * 1000).toISOString(), new Date(to * 1000).toISOString(), resolution);
         
         // console.log('lp info', lpTokenAddress.token0_reserve, lpTokenAddress.token1_reserve);
 
-        if (firstDataRequest) {
+        if (tokenData.contractAddress.toLowerCase() == constant.WHITELIST_TOKENS.ETH.SRG.toLowerCase() || 
+            tokenData.contractAddress.toLowerCase() == constant.WHITELIST_TOKENS.BSC.SRG.toLowerCase()) {
 
-          const current = new Date();
-          const calcTime = new Date();
-          calcTime.setMinutes(current.getMinutes() - CANDLE_FETCH_COUNT * resolution);
-          const end = new Date(current.toUTCString()).toISOString().slice(0, 19);
-          const start = new Date(calcTime.toUTCString()).toISOString().slice(0, 19);
-          bar_data = await getLimitTimeHistoryData(
-            lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token1_contractAddress : lpTokenAddress.token0_contractAddress, 
-            lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token0_contractAddress : lpTokenAddress.token1_contractAddress, 
-            lpTokenAddress.network,
-            CANDLE_FETCH_COUNT,
-            end,
-            resolution * 60
-          );     
-          await AddRecentData(bar_data);
-          bar_data = bar_data.reverse();
-          priceData = bar_data;
-        } else {
-          let subData:any[] = [];
-          let exist:boolean = false;
-          const lastEle = priceData.at(0);
-          const lastTime = new Date(lastEle.timeInterval.second + " UTC");
-          if (to >= lastTime.getTime() / 1000) {
-            let fromIndex = 0;
-            const toIndex = priceData.findIndex((value, index) => {
-              const compareval = new Date(value.timeInterval.second + " UTC").getTime();
-              if (compareval > to) {
-                return index;
+            const decimal = tokenData.network == constant.ETHEREUM_NETWORK ? 15 : 27;
+            const volumeDecimal = tokenData.network == constant.ETHEREUM_NETWORK ? 6 : 18;
+            const fromInd = priceData.findIndex((value:any) => parseInt(value.time._hex) < from);
+            
+            if (firstDataRequest) {
+              priceData = [];
+            } else if (!firstDataRequest && timeStampArr.length < 2000) {
+              if (timeStampArr.length < 2000) {
+                onHistoryCallback([], {
+                  noData: true,
+                })
               }
-            });
-            if (from >= lastTime.getTime() / 1000) {
-              exist = true;
-              fromIndex = priceData.findIndex((value, index) => {
-                const compareval = new Date(value.timeInterval.second + " UTC").getTime();
-                if (compareval > from) {
-                  return index;
+            }
+
+            if (fromInd < 1) {
+              const startInd = timeStampArr.length > 2000 ? to - CANDLE_FETCH_COUNT * resolution_num * 60 : timeStampArr[0];
+              // console.log('from to', from, startInd, to);
+              const txArr = await getSRGTx(tokenData.contractAddress, tokenData.network, startInd > from ? from : startInd,  to, timeStampArr);
+              bar_data = txArr[0];
+              const volume = txArr[1];
+              priceData = bar_data.concat(priceData);
+              bar_data?.forEach((value:any, index:number) => {
+                const volumeInd = ethers.utils.formatEther(volume[index][0]._hex);
+                if (index == bar_data.length - 1) {
+                  const obj = {
+                    time: parseInt(value.time) * 1000,
+                    low: parseInt(value.low._hex) / Math.pow(10, decimal),
+                    high: parseInt(value.high._hex) / Math.pow(10, decimal),
+                    open: parseInt(value.open._hex) / Math.pow(10, decimal),
+                    close: parseInt(value.close._hex) / Math.pow(10, decimal),
+                    isBarClosed: false,
+                    isLastBar: true,
+                    volume: parseInt(volumeInd) / Math.pow(10, volumeDecimal),
+                  }
+                  bars = [...bars, obj];
+                } else {
+                  const obj = {
+                    time: parseInt(value.time) * 1000,
+                    low: parseInt(value.low._hex) / Math.pow(10, decimal),
+                    high: parseInt(value.high._hex) / Math.pow(10, decimal),
+                    open: parseInt(value.open._hex) / Math.pow(10, decimal),
+                    close: parseInt(value.close._hex) / Math.pow(10, decimal),
+                    isBarClosed: true,
+                    isLastBar: false,
+                    volume: parseInt(volumeInd) / Math.pow(10, volumeDecimal),
+                  }
+                  bars = [...bars, obj];
                 }
               });
-              if (fromIndex > 1)
-                fromIndex = fromIndex - 1;
+              
+              if(bars.length > 0 && firstDataRequest) {
+                lastBarsCache = bars[bars.length - 1];
+                preReserve1 = lpTokenAddress.token1_reserve;  
+              }
             }
-            if (toIndex > 1) {
-              subData = priceData.slice(fromIndex, toIndex - 1)
-              subData = subData.reverse();
-            }
-          }
-          if (!exist) {
+        } else {
+          if (firstDataRequest) {
+
+            const current = new Date();
+            const end = new Date(current.toUTCString()).toISOString().slice(0, 19);
             bar_data = await getLimitTimeHistoryData(
               lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token1_contractAddress : lpTokenAddress.token0_contractAddress, 
               lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token0_contractAddress : lpTokenAddress.token1_contractAddress, 
               lpTokenAddress.network,
-              CANDLE_FETCH_COUNT / 2,
-              lastTime.toISOString().slice(0, 19),
-              resolution * 60
+              CANDLE_FETCH_COUNT,
+              end,
+              resolution_num * 60,
+              tokenData.controller?.signal
             );     
-            if (bar_data.length == 0) {
-              onHistoryCallback([], {
-                noData: true,
-              })             
-              return; 
-            }
-            bar_data = bar_data.concat(subData);  
+            await AddRecentData(bar_data);
             bar_data = bar_data.reverse();
-            priceData = bar_data.concat(priceData);
+            priceData = bar_data;
           } else {
-            bar_data = subData;
-            bar_data = bar_data.reverse();
+            let subData:any[] = [];
+            let exist:boolean = false;
+            const lastEle = priceData.at(0);
+            const lastTime = new Date(lastEle.timeInterval.second.replace(" ", "T") + "Z");
+            if (to >= lastTime.getTime() / 1000) {
+              let fromIndex = 0;
+              const toIndex = priceData.findIndex((value, index) => {
+                const compareval = new Date(value.timeInterval.second.replace(" ", "T") + "Z").getTime();
+                if (compareval > to) {
+                  return index;
+                }
+              });
+              if (from >= lastTime.getTime() / 1000) {
+                exist = true;
+                fromIndex = priceData.findIndex((value, index) => {
+                  const compareval = new Date(value.timeInterval.second.replace(" ", "T") + "Z").getTime();
+                  if (compareval > from) {
+                    return index;
+                  }
+                });
+                if (fromIndex > 1)
+                  fromIndex = fromIndex - 1;
+              }
+              if (toIndex > 1) {
+                subData = priceData.slice(fromIndex, toIndex - 1)
+                subData = subData.reverse();
+              }
+            }
+            if (!exist) {
+              bar_data = await getLimitTimeHistoryData(
+                lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token1_contractAddress : lpTokenAddress.token0_contractAddress, 
+                lpTokenAddress.tokenside == TokenSide.token1 ? lpTokenAddress.token0_contractAddress : lpTokenAddress.token1_contractAddress, 
+                lpTokenAddress.network,
+                CANDLE_FETCH_COUNT / 2,
+                lastTime.toISOString().slice(0, 19),
+                resolution_num * 60,
+                tokenData.controller?.signal
+              );     
+              if (bar_data.length == 0) {
+                onHistoryCallback([], {
+                  noData: true,
+                })             
+                return; 
+              }
+              bar_data = bar_data.concat(subData);  
+              bar_data = bar_data.reverse();
+              priceData = bar_data.concat(priceData);
+            } else {
+              bar_data = subData;
+              bar_data = bar_data.reverse();
+            }
+          }
+          let price = 1;
+          const coin = coinPrice.find((coinToken:any) => coinToken.contractAddress.toLowerCase() + coinToken.network ==
+                        lpTokenAddress.quoteCurrency_contractAddress! + lpTokenAddress.network);
+          // // console.log('after before ', after, before);
+  
+          if (coin != undefined)
+            price = coin.price;
+  
+          bar_data?.forEach((value:any)  => {
+            const currentTime = new Date(value.timeInterval.second.replace(" ", "T") + "Z");
+            const pre = bars.at(-1);
+            if (pre == undefined || currentTime.getTime() != pre.time) {
+              let open_price = 0.0;
+              if(pre != undefined) {
+                open_price = bars[bars.length -1].close;
+              }
+              const obj = {
+                time: currentTime.getTime(),
+                low: value.low * price,
+                high: value.high * price,
+                open: open_price == 0? (parseFloat(value.open) * price) : open_price,
+                close: parseFloat(value.close) * price,
+                isBarClosed: true,
+                isLastBar: false,
+                volume: value.quoteAmount * price,
+              }
+              bars = [...bars, obj]
+            } else {
+              const lastIndex = bars.length - 1;
+              bars[lastIndex].close = parseFloat(value.close) * price;
+              bars[lastIndex].high = Math.max(value.high * price, bars[lastIndex].high);
+              bars[lastIndex].low = Math.min(value.low * price, bars[lastIndex].low);
+              bars[lastIndex].volume += (value.quoteAmount * price);
+            }
+          });
+          if(bars.length>0 && firstDataRequest) {
+            lastBarsCache = bars[bars.length - 1];
+            preReserve0 = lpTokenAddress.token0_reserve;
+            preReserve1 = lpTokenAddress.token1_reserve;
+            
           }
         }
-        let price = 1;
-        const coin = coinPrice.find((coinToken:any) => coinToken.contractAddress.toLowerCase() + coinToken.network ==
-                      lpTokenAddress.quoteCurrency_contractAddress! + lpTokenAddress.network);
-        // // console.log('after before ', after, before);
 
-        if (coin != undefined)
-          price = coin.price;
-
-        bar_data?.forEach((value:any)  => {
-          const currentTime = new Date(value.timeInterval.second + " UTC");
-          const pre = bars.at(-1);
-          if (pre == undefined || currentTime.getTime() != pre.time) {
-            let open_price = 0.0;
-            if(pre != undefined) {
-              open_price = bars[bars.length -1].close;
-            }
-            const obj = {
-              time: currentTime.getTime(),
-              low: value.low * price,
-              high: value.high * price,
-              open: open_price == 0? (parseFloat(value.open) * price) : open_price,
-              close: parseFloat(value.close) * price,
-              isBarClosed: true,
-              isLastBar: false,
-              volume: value.quoteAmount * price,
-            }
-            bars = [...bars, obj]
-          } else {
-            const lastIndex = bars.length - 1;
-            bars[lastIndex].close = parseFloat(value.close) * price;
-            bars[lastIndex].high = Math.max(value.high * price, bars[lastIndex].high);
-            bars[lastIndex].low = Math.min(value.low * price, bars[lastIndex].low);
-            bars[lastIndex].volume += (value.quoteAmount * price);
-          }
-        });
-        if(bars.length>0 && firstDataRequest) {
-          lastBarsCache = bars[bars.length - 1];
-          preReserve0 = lpTokenAddress.token0_reserve;
-          preReserve1 = lpTokenAddress.token1_reserve;
-          
-        }
-
-        // console.log('bars', bars);
         onHistoryCallback(bars, {
           noData: false,
         })
@@ -339,7 +409,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
         onErrorCallback(error)
       }
     },
-    subscribeBars: (
+    subscribeBars: async (
       symbolInfo: any,
       resolution: any,
       onRealtimeCallback: any,
@@ -347,74 +417,139 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       onResetCacheNeededCallback: any,
     ) => {
       currentResolutions = resolution
+      const isSRG = tokenData.contractAddress.toLowerCase() == constant.WHITELIST_TOKENS.ETH.SRG.toLowerCase() ||
+        tokenData.contractAddress.toLowerCase() == constant.WHITELIST_TOKENS.BSC.SRG.toLowerCase();
+      const timeInterval = isSRG ? 1000 * 3 : 1000 * 1;
       myInterval = setInterval(async function () {
-        const currentReserve0 = lpTokenAddress.token0_reserve;
-        const currentReserve1 = lpTokenAddress.token1_reserve;
-        if (preReserve0 != currentReserve0 || preReserve1 != currentReserve1) {
-          const resolutionMapping: any = {
-            '1': 60000,
-            '5': 300000,
-            '10': 600000,
-            '15': 900000,
-            '30': 1800000,
-            '60': 3600000,
-            '1H': 3600000,
-            '1D': 24 * 3600000,
-            '1W': 7 * 24 * 3600000,
-            '1M': 30 * 24 * 3600000,
-          }
-          if (lastBarsCache === undefined) return
-          const time = new Date();
-          const cuTime = makeTemplateDate(time, currentResolutions);
-          const isNew = cuTime.getTime() - lastBarsCache.time >= resolutionMapping[currentResolutions]
-          
-          let price = 1;
-          const coin = coinPrice.find((coinToken:any) => coinToken.contractAddress.toLowerCase() + coinToken.network ==
-                        lpTokenAddress.quoteCurrency_contractAddress! + lpTokenAddress.network)
-          if (coin != undefined)
-            price = coin.price;
-
-          const temp = lastBarsCache;
-          let currentPrice = 0;
-
-          let volume = 0;
-          if (lpTokenAddress.tokenside == TokenSide.token0) {
-            currentPrice = currentReserve1 / currentReserve0 * price;
-            volume += (Math.abs(currentReserve1 - preReserve1)) * price
-          } else {
-            currentPrice = currentReserve0 / currentReserve1 * price;
-            volume += (Math.abs(currentReserve0 - preReserve0)) * price
-          }
-          // console.log('bar should be updated', time.toUTCString(), cuTime, currentPrice, temp);
-          if (isNew) {
-            lastBarsCache.time = cuTime.getTime()
-            lastBarsCache.open = temp.close
-            lastBarsCache.high = currentPrice
-            lastBarsCache.low = currentPrice
-            lastBarsCache.close = currentPrice
-            lastBarsCache.volume = volume;
-            priceData = priceData.concat(lastBarsCache);
-            lastBarsCache.isLastBar = false;
-            lastBarsCache.isBarClosed = true;
-          } else {
-            if (lastBarsCache.low > currentPrice) {
-              lastBarsCache.low = currentPrice
-            }
-            if (lastBarsCache.high < currentPrice) {
-              lastBarsCache.high = currentPrice
-            }
-            lastBarsCache.close = currentPrice;
-            lastBarsCache.volume += volume;
-            lastBarsCache.isLastBar = true;
-            lastBarsCache.isBarClosed = false;
-          }
-          onRealtimeCallback(lastBarsCache)
-          preReserve0 = currentReserve0;
-          preReserve1 = currentReserve1;
-          // console.log('lastBarsCache', lastBarsCache);
+        const candleTime = new Date();
+        const resolutionMapping: any = {
+          '1': 60000,
+          '5': 300000,
+          '10': 600000,
+          '15': 900000,
+          '30': 1800000,
+          '60': 3600000,
+          '1H': 3600000,
+          '1D': 24 * 3600000,
+          '1W': 7 * 24 * 3600000,
+          '1M': 30 * 24 * 3600000,
         }
+        if (tokenData.contractAddress.toLowerCase() == constant.WHITELIST_TOKENS.ETH.SRG.toLowerCase() ||
+           tokenData.contractAddress.toLowerCase() == constant.WHITELIST_TOKENS.BSC.SRG.toLowerCase()) {
+            
+          const currentReserve1 = lpTokenAddress.token1_reserve;
+          if (currentReserve1 != preReserve1) {
+            if (lastBarsCache === undefined) return;
+            const time = new Date();
+            const cuTime = makeTemplateDate(time, currentResolutions);
+            const isNew = cuTime.getTime() - lastBarsCache.time >= resolutionMapping[currentResolutions]
 
-      }, 1000 * 1)
+            const temp = lastBarsCache;
+
+            const reserveCalls: Call[] = [
+              {
+                name: 'calculatePrice',
+                address: tokenData.contractAddress,
+                params: [],
+              },
+              {
+                name: 'getBNBPrice',
+                address: tokenData.contractAddress,
+                params: [],
+              }
+            ];
+            const response = await multicallv2(SRGToken, reserveCalls, tokenData.network);
+            
+            const bnbPrice = response[1] / Math.pow(10, tokenData.network == constant.ETHEREUM_NETWORK ? 6 : 18);
+            let currentPrice = response[0] / Math.pow(10, 9) * bnbPrice;
+            let volume = (Math.abs(currentReserve1 - preReserve1)) * bnbPrice;
+
+            if (isNew) {
+              lastBarsCache.time = cuTime.getTime()
+              lastBarsCache.open = temp.close
+              lastBarsCache.high = currentPrice
+              lastBarsCache.low = currentPrice
+              lastBarsCache.close = currentPrice
+              lastBarsCache.volume = volume;
+              priceData = priceData.concat(lastBarsCache);
+              lastBarsCache.isLastBar = false;
+              lastBarsCache.isBarClosed = true;
+
+            } else {
+              if (lastBarsCache.low > currentPrice) {
+                lastBarsCache.low = currentPrice
+              }
+              if (lastBarsCache.high < currentPrice) {
+                lastBarsCache.high = currentPrice
+              }
+              lastBarsCache.close = currentPrice;
+              lastBarsCache.volume += volume;
+              lastBarsCache.isLastBar = true;
+              lastBarsCache.isBarClosed = false;
+            }
+            onRealtimeCallback(lastBarsCache)
+            
+            preReserve1 = currentReserve1;
+          }
+
+        } else {
+          const currentReserve0 = lpTokenAddress.token0_reserve;
+          const currentReserve1 = lpTokenAddress.token1_reserve;
+          if (preReserve0 != currentReserve0 || preReserve1 != currentReserve1) {
+            // console.log('lpTokenAddress', lpTokenAddress);
+            if (lastBarsCache === undefined) return
+            const time = new Date();
+            const cuTime = makeTemplateDate(time, currentResolutions);
+            const isNew = cuTime.getTime() - lastBarsCache.time >= resolutionMapping[currentResolutions]
+            // console.log('isNew', isNew, lastBarsCache);
+            let price = 1;
+            const coin = coinPrice.find((coinToken:any) => coinToken.contractAddress.toLowerCase() + coinToken.network ==
+                          lpTokenAddress.quoteCurrency_contractAddress! + lpTokenAddress.network)
+            if (coin != undefined)
+              price = coin.price;
+
+            const temp = lastBarsCache;
+            let currentPrice = 0;
+
+            let volume = 0;
+            if (lpTokenAddress.tokenside == TokenSide.token0) {
+              currentPrice = currentReserve1 / currentReserve0 * price;
+              volume += (Math.abs(currentReserve1 - preReserve1)) * price
+            } else {
+              currentPrice = currentReserve0 / currentReserve1 * price;
+              volume += (Math.abs(currentReserve0 - preReserve0)) * price
+            }
+            // console.log('bar should be updated', time.toUTCString(), cuTime, currentPrice, temp);
+            if (isNew) {
+              lastBarsCache.time = cuTime.getTime()
+              lastBarsCache.open = temp.close
+              lastBarsCache.high = currentPrice
+              lastBarsCache.low = currentPrice
+              lastBarsCache.close = currentPrice
+              lastBarsCache.volume = volume;
+              priceData = priceData.concat(lastBarsCache);
+              lastBarsCache.isLastBar = false;
+              lastBarsCache.isBarClosed = true;
+            } else {
+              if (lastBarsCache.low > currentPrice) {
+                lastBarsCache.low = currentPrice
+              }
+              if (lastBarsCache.high < currentPrice) {
+                lastBarsCache.high = currentPrice
+              }
+              lastBarsCache.close = currentPrice;
+              lastBarsCache.volume += volume;
+              lastBarsCache.isLastBar = true;
+              lastBarsCache.isBarClosed = false;
+            }
+            onRealtimeCallback(lastBarsCache)
+            preReserve0 = currentReserve0;
+            preReserve1 = currentReserve1;
+            // console.log('lastBarsCache', lastBarsCache);
+          }
+      }
+
+      }, timeInterval)
        
     },
     unsubscribeBars: (subscriberUID: any) => {
@@ -511,7 +646,6 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       //   datafeed: new (window as any).Datafeeds.UDFCompatibleDatafeed(props.datafeedUrl),
       datafeed: feed,
       interval: initInterval as ChartingLibraryWidgetOptions['interval'],
-      container_id: ChartContainerProps.containerId as ChartingLibraryWidgetOptions['container_id'],
       library_path: ChartContainerProps.libraryPath as string,
       container: 'dexAnalyzer_chart_container',
       locale: getLanguageFromURL() || 'en',
@@ -519,6 +653,7 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
       charts_storage_url: ChartContainerProps.chartsStorageUrl,
       //   charts_storage_api_version: ChartContainerProps.chartsStorageApiVersion,
       client_id: ChartContainerProps.clientId,
+      enabled_features: ["hide_left_toolbar_by_default"],
       disabled_features: ['header_compare', 'header_symbol_search'],
       user_id: ChartContainerProps.userId,
       fullscreen: ChartContainerProps.fullscreen,
@@ -557,12 +692,18 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
   }
   
   React.useEffect(() => {
-    lastBarsCache = undefined;
-    const saveResolution = getCookie("chartInterval");
-    getWidget(saveResolution)
-    return(() => {
-        return setCookie("chartInterval", currentResolutions);
-    })
+    const initLoad = async() => {
+      
+      lastBarsCache = undefined;
+      const saveResolution = getCookie("chartInterval");
+      getWidget(saveResolution)
+      return(() => {
+          return setCookie("chartInterval", currentResolutions);
+      })
+    }
+    if (lpTokenAddress.contractAddress.length > 0) {
+      initLoad();
+    }
   }, [lpTokenAddress.contractAddress])
 
   React.useEffect(() => {
@@ -573,6 +714,19 @@ const ChartContainer: React.FC<Partial<ChartContainerProps>> = (props) => {
         return setCookie("chartInterval", currentResolutions);
     })
   }, [colorMode])
+
+  React.useMemo(() => {
+    // const loadTimestamp = async() => {
+      
+    //   if (tokenData.contractAddress.toLowerCase() == constant.WHITELIST_TOKENS.BSC.SRG.toLowerCase() ||
+    //       tokenData.contractAddress.toLowerCase() == constant.WHITELIST_TOKENS.ETH.SRG.toLowerCase()) {
+    //       timeStampArr = await getSRGTimestamp(tokenData.contractAddress, tokenData.network);
+    //   }
+    // }
+
+    // loadTimestamp();
+    
+  }, [tokenData])
 
   return (
     <div style={{

@@ -13,7 +13,7 @@ export const NODREAL_BSC_ENDPOINT = "https://bsc-mainnet.nodereal.io/v1/";
 export const NODREAL_ETH_ENDPOINT = "https://eth-mainnet.nodereal.io/v1/";
 
 export const ETHPLORER_API_KEY = 'EK-32KDR-3MoJfLq-QoUAU';
-export const BITQUERY_API_KEY = 'BQYOlzIJkKcaiJFbq1u8GrBCLxbkBB1G';
+export const BITQUERY_API_KEY = 'BQYg54T1yJhicory0u2h6mipIqMR4WLy';
 export const COINMARKETCAP_API_KEY = 'd27ab07a-3853-4402-8d56-651767ba4da5';
 export const ETHERSCAN_API_KEY = 'DF8U1AYKKAW8NHQQJ2H34W6B49H38JI9SU';
 export const BSCSCAN_API_KEY = '9JXFSN6Y82GSADZZRHHNDD29AMYFMB7XYS';

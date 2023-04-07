@@ -4,6 +4,7 @@ import {
   PANCAKESWAP_ROUTER, 
   UNISWAP_ROUTER 
 } from './constant';
+import SRGToken from '../config/SRGToken.json';
 import PancakeRouterAbi from '../config/Pancakerouter02.json'
 import UniswapRouterAbi from '../config/IUniswapV2Router.json'
 import { Call, multicallv2 } from './multicall';
@@ -60,6 +61,48 @@ export const getAmountIn = async(
   return reserves[0];
 }
 
+
+export const getBNBAmountOut_SRG = async(
+  address: string,
+  tokenAmount: BigNumber,
+  network: number
+): Promise<any> => {
+  
+  const amountIn = tokenAmount.toString(10);
+  const reserveCalls: Call[] = [
+    {
+      name: 'getBNBAmountOut',
+      address: address,
+      params: [
+        amountIn
+      ],
+    }
+  ];
+  const reserves = await multicallv2(SRGToken, reserveCalls, network);
+  if (reserves.length < 0) return null;
+  return reserves[0];
+}
+
+export const getTokenAmountOut_SRG = async(
+  address: string,
+  tokenAmount: BigNumber,
+  network: number
+): Promise<any> => {
+  
+  const amountBNBIn = tokenAmount.toString(10);
+  const reserveCalls: Call[] = [
+    {
+      name: 'getTokenAmountOut',
+      address: address,
+      params: [
+        amountBNBIn
+      ],
+    }
+  ];
+  const reserves = await multicallv2(SRGToken, reserveCalls, network);
+  if (reserves.length < 0) return null;
+  return reserves[0];
+}
 
 export const getPairPrice = async (
   quoteToken: string,

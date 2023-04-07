@@ -15,6 +15,7 @@ export interface ERC20Token {
   usdBalance: number;
   decimals: number;
   holdersCount: number;
+  txCount?: number;
   image: string;
   owner: string;
   totalSupply: number;
@@ -33,6 +34,7 @@ export interface ERC20Token {
   contractBalanceWalletURL?: string;
   contractBalanceURL?: string;
   contractPage?: string;
+  controller?: AbortController;
 }
 
 export enum SearchStatus {

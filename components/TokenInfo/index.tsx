@@ -1,12 +1,26 @@
 import React, {useState, useEffect, useMemo, useRef} from 'react'
-import { Box, Button, Divider, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, VStack, useBreakpoint, useBreakpointValue, useColorMode, useColorModeValue, useDisclosure  } from "@chakra-ui/react"
+import { 
+  Avatar,
+  Box, 
+  Button, 
+  Divider, 
+  Drawer, 
+  DrawerBody, 
+  DrawerContent, 
+  DrawerOverlay, 
+  HStack, 
+  Tag, 
+  TagLabel, 
+  TagRightIcon, 
+  VStack, 
+  useColorMode, 
+  useColorModeValue, 
+  useDisclosure  
+} from "@chakra-ui/react"
 import {
   CopyAddressIconDark,
   CopyAddressIconLight,
   CoyAddressComfirm,
-  TokenDetailsDark,
-  DownArrowDark,
-  DownArrowLight,
   CoyAddressComfirmMini,
   CopyAddressIconMiniDark,
   CopyAddressIconMiniLight,
@@ -20,7 +34,6 @@ import {
 } from '../../hooks'
 import { 
   convertBalanceCurrency,
-  numberWithCommasTwoDecimals,
   numberWithCommasNoDecimals,
   makeShortTokenName,
   makeShortAddress
@@ -31,12 +44,13 @@ import {
   getLPTokenList,
   getTokenBurnAmount,
   getTokenBalance,
-  getTokenHolderCount
+  getTokenHolderCount,
+  getBuySellTaxFromTx
 } from '../../api'
 import style from './TokenInfo.module.css'
 import * as constant from '../../utils/constant'
 import LpTokenInfo from './LpTokenInfo'
-import { LPTokenPair, PlayMode, TokenSide } from '../../utils/type'
+import { ERC20Token, LPTokenPair, PlayMode, TokenSide } from '../../utils/type'
 import { useStableCoinPrice } from '../../hooks/useStableCoinPrice'
 import { useAddress } from '@thirdweb-dev/react'
 import SocialListBox from './SocialListBox'
@@ -45,20 +59,24 @@ import { SCREENMD_SIZE, SCREENNXL_SIZE, SCREENSM_SIZE } from '../../utils/consta
 import TokenDetails from './TokenDetails'
 import TokenBalance from './TokenBalance'
 import SwapTrade from '../WalletInfo/SwapTrade'
-import TokenList from '../TokenList'
-import MenuBar from '../MenuBar'
 import WalletInfo from '../WalletInfo'
-import { isMotionValue } from 'framer-motion'
+import Card from '../Card/card'
+import { MdContentPaste, MdFileCopy, MdSettings, MdStar } from 'react-icons/md'
 
 
-export default function TokenInfo() {
+export default function TokenInfo({
+  tokenData
+}:{
+  tokenData: ERC20Token
+}) {
 
   const colorMode = useColorMode();
-  const {tokenData} = useTokenInfo();
+  const {buyTax, sellTax, setBuyTax, setSellTax} = useTokenInfo();
   const {walletTokens} = useWalletTokenBalance();
   const {lpTokenPrice, lpTokenAddress ,setLPTokenAddress} = useLPTokenPrice();
   const [tokenPriceshow, setTokenPriceShow] = useState<number>(0.0);
   
+  const {transactionData} = useLPTransaction();
   const [isMobileVersion, setMobileVersion] = useState<boolean>(false);
   const [lpTokenList, setLPTokenList] = useState<LPTokenPair[]>([]);
   const [lpTokenPinList, setLPTokenPinList] = useState<LPTokenPair[]>([]);
@@ -73,11 +91,9 @@ export default function TokenInfo() {
   const [transactionCount, setTransactionCount] = useState<number>(0);
   const windowDimensions = useSize();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isOpen: isSidebarOpen, onOpen: SidebarOpen, onClose: SidebarClose } = useDisclosure();
   const { isOpen : isMobileToggleOpen, onOpen: MobileToggleOpen, onClose: MobileToggleClose , onToggle: onMobileToggle} = useDisclosure();
   const { isOpen : isToggleOpen, onOpen: ToggleOpen, onClose: ToggleClose , onToggle} = useDisclosure();
-  const firstField = useRef()
-  const marketCapRef = useRef(null);
+  const firstField = useRef();
   const [marketinfoWidth, setMarketInfoWidth] = useState<number>(1000);
   const marketinfoRef = useRef(null);
   const {coinPrice} = useStableCoinPrice();
@@ -88,19 +104,15 @@ export default function TokenInfo() {
 
   const address = useAddress();
   const textColor = useColorModeValue("#5E5E5E","#A7A7A7");
-  const infoborderColorMode = useColorModeValue("#E2E8F0","#2B2A2A");
+  const infoborderColorMode = useColorModeValue("#E2E8F0","#233545");
   const whiteBlackMode = useColorModeValue('#FFFFFF', '#000000');
 
   const setLPTokenListInfo = async() => {
+
     const findInd = lpTokenPinList.findIndex((value) => value.ownerToken?.toLowerCase() == tokenData.contractAddress.toLowerCase());
     if (findInd != -1) {
       setLPTokenAddress(lpTokenPinList[findInd]);
     }
-    const token0_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token1);
-    // const token1_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token0);
-    
-    setLPTokenList([]);
-    const lptoken_Res = token0_Res;//token0_Res.concat(token1_Res);
     const emptyLP = {
       name:"/",
       symbol:"/",
@@ -119,9 +131,43 @@ export default function TokenInfo() {
       token1_reserve: 0,
       token0_contractAddress: "",
       token1_contractAddress: "",
+      quoteCurrency_contractAddress:"",
       tokenside: TokenSide.token1,
-      protocolType: "",
-    } as LPTokenPair;
+      protocolType: ""
+    } as LPTokenPair;    
+    let token0_Res:any[] = [];
+    if (tokenData.contractAddress.toLowerCase() == constant.WHITELIST_TOKENS.ETH.SRG.toLowerCase() || 
+        tokenData.contractAddress.toLowerCase() == constant.WHITELIST_TOKENS.BSC.SRG.toLowerCase()) {
+      token0_Res.push({
+        name: tokenData.network == constant.ETHEREUM_NETWORK ? "SRG/WETH" : "SRG/WBNB",
+        symbol: tokenData.network == constant.ETHEREUM_NETWORK ? "SRG/WETH" : "SRG/WBNB",
+        contractAddress: tokenData.contractAddress,
+        price: 0,
+        marketCap: "",
+        totalSupply: 0,
+        holdersCount: 0,
+        balance: 0,
+        decimals: tokenData.decimals,
+        quoteCurrency_contractAddress:"",
+        image: "",
+        network: tokenData.network,
+        token0_name: tokenData.symbol,
+        token1_name: tokenData.network == constant.ETHEREUM_NETWORK ? "WETH" : "WBNB",
+        token0_reserve: 0,
+        token1_reserve: 0,
+        token0_contractAddress: tokenData.contractAddress,
+        token1_contractAddress: tokenData.network == constant.ETHEREUM_NETWORK ? constant.WHITELIST_TOKENS.ETH.ETH : constant.WHITELIST_TOKENS.BSC.BNB,
+        tokenside: TokenSide.token1,
+        protocolType: ""
+      } as LPTokenPair)
+    } else {
+      token0_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token1, tokenData);
+    }
+    // const token1_Res = await getLPTokenList(tokenData.contractAddress, tokenData.network, TokenSide.token0);
+    
+    setLPTokenList([]);
+    const lptoken_Res = token0_Res;//token0_Res.concat(token1_Res);
+
     let index = 0;
     if (lptoken_Res.length == 0) {
       setLPTokenAddress(emptyLP);       
@@ -129,79 +175,104 @@ export default function TokenInfo() {
     }
     let lpToken_temp: LPTokenPair[] = [];
     let selectLP_temp : LPTokenPair = emptyLP;
-    for await (const value of lptoken_Res) {
-      if (value.protocolType == "Uniswap v3")
-        continue;
-      const res = await getLPTokenReserve(value.contractAddress, value.network);
-      if (res[2].toLowerCase() != constant.PANCAKESWAP_FACTORY.v2.toLowerCase() && res[2].toLowerCase() != constant.UNISWAP_FACTORY.v2.toLowerCase())
-        continue;
+    if (tokenData.contractAddress.toLowerCase() == constant.WHITELIST_TOKENS.ETH.SRG.toLowerCase() ||
+        tokenData.contractAddress.toLowerCase() == constant.WHITELIST_TOKENS.BSC.SRG.toLowerCase()) {
+      const res = await getLPTokenReserve(tokenData.contractAddress, tokenData.network);
+      selectLP_temp = token0_Res[0];
+      selectLP_temp.baseCurrency_contractAddress = tokenData.contractAddress;
+      selectLP_temp.baseCurrency_decimals = tokenData.decimals;
+      selectLP_temp.baseCurrency_name = tokenData.symbol;
+      selectLP_temp.quoteCurrency_contractAddress = token0_Res[0].token1_contractAddress;
+      selectLP_temp.quoteCurrency_name = token0_Res[0].token1_name;
+      selectLP_temp.quoteCurrency_decimals = 18;
+      selectLP_temp.ownerToken = tokenData.contractAddress;
+      selectLP_temp.token1_reserve = res[1];
+    } else {
+      for await (const value of lptoken_Res) {
+        if (value.protocolType == "Uniswap v3")
+          continue;
+        const res = await getLPTokenReserve(value.contractAddress, value.network);
+        if (res[2].toLowerCase() != constant.PANCAKESWAP_FACTORY.v2.toLowerCase() && res[2].toLowerCase() != constant.UNISWAP_FACTORY.v2.toLowerCase())
+          continue;
 
-      if (res[3].toLowerCase() == tokenData.contractAddress.toLowerCase()) {
-        value.tokenside = TokenSide.token0;
-      } else if (res[4].toLowerCase() == tokenData.contractAddress.toLowerCase()) {
-        value.tokenside = TokenSide.token1;
+        if (res[3].toLowerCase() == tokenData.contractAddress.toLowerCase()) {
+          value.tokenside = TokenSide.token0;
+        } else if (res[4].toLowerCase() == tokenData.contractAddress.toLowerCase()) {
+          value.tokenside = TokenSide.token1;
+        }
+        if (value.baseCurrency_contractAddress?.toLowerCase() == res[3].toLowerCase()) {
+
+          value.token0_contractAddress = value.baseCurrency_contractAddress!;
+          value.token0_decimal = value.baseCurrency_decimals!;
+          value.token0_name = value.baseCurrency_name!;
+
+          value.token1_contractAddress = value.quoteCurrency_contractAddress!;
+          value.token1_decimal = value.quoteCurrency_decimals!;
+          value.token1_name = value.quoteCurrency_name!;
+
+        } else {
+
+          value.token1_contractAddress = value.baseCurrency_contractAddress!;
+          value.token1_decimal = value.baseCurrency_decimals!;
+          value.token1_name = value.baseCurrency_name!;
+
+          value.token0_contractAddress = value.quoteCurrency_contractAddress!;
+          value.token0_decimal = value.quoteCurrency_decimals!;
+          value.token0_name = value.quoteCurrency_name!;
+
+        }
+        value.token0_reserve = res[0] / Math.pow(10, value.token0_decimal!);
+        value.token1_reserve = res[1] / Math.pow(10, value.token1_decimal!);
+
+        if (tokenData.contractAddress.toLowerCase() == value.token0_contractAddress.toLowerCase()){
+          value.price = value.token1_reserve / value.token0_reserve;  
+        } else {
+          value.price = value.token0_reserve / value.token1_reserve;  
+        }
+
+        let price = 1;
+        const coin = coinPrice.find((coinToken:any) => coinToken.contractAddress.toLowerCase() + coinToken.network ==
+                      value.token1_contractAddress + value.network);
+        
+        if (coin != undefined)
+          price = coin.price;
+
+        if (index == 0) {
+          selectLP_temp = value;
+        }
+        else if (value.token0_reserve> selectLP_temp.token0_reserve) {
+          lpToken_temp.push(selectLP_temp);
+          selectLP_temp = value;
+        }
+        else {
+          lpToken_temp.push(value);
+        }
+        index ++;
+
       }
-      if (value.baseCurrency_contractAddress?.toLowerCase() == res[3].toLowerCase()) {
-
-        value.token0_contractAddress = value.baseCurrency_contractAddress!;
-        value.token0_decimal = value.baseCurrency_decimals!;
-        value.token0_name = value.baseCurrency_name!;
-
-        value.token1_contractAddress = value.quoteCurrency_contractAddress!;
-        value.token1_decimal = value.quoteCurrency_decimals!;
-        value.token1_name = value.quoteCurrency_name!;
-
-      } else {
-
-        value.token1_contractAddress = value.baseCurrency_contractAddress!;
-        value.token1_decimal = value.baseCurrency_decimals!;
-        value.token1_name = value.baseCurrency_name!;
-
-        value.token0_contractAddress = value.quoteCurrency_contractAddress!;
-        value.token0_decimal = value.quoteCurrency_decimals!;
-        value.token0_name = value.quoteCurrency_name!;
-
-      }
-      value.token0_reserve = res[0] / Math.pow(10, value.token0_decimal!);
-      value.token1_reserve = res[1] / Math.pow(10, value.token1_decimal!);
-
-      if (tokenData.contractAddress.toLowerCase() == value.token0_contractAddress.toLowerCase()){
-        value.price = value.token1_reserve / value.token0_reserve;  
-      } else {
-        value.price = value.token0_reserve / value.token1_reserve;  
-      }
-
-      let price = 1;
-      const coin = coinPrice.find((coinToken:any) => coinToken.contractAddress.toLowerCase() + coinToken.network ==
-                    value.token1_contractAddress + value.network);
-      
-      if (coin != undefined)
-        price = coin.price;
-
-      if (index == 0) {
-        selectLP_temp = value;
-      }
-      else if (value.token0_reserve> selectLP_temp.token0_reserve) {
-        lpToken_temp.push(selectLP_temp);
-        selectLP_temp = value;
-      }
-      else {
-        lpToken_temp.push(value);
-      }
-      index ++;
-
-    }
+    } 
     setLPTokenAddress(selectLP_temp);
     setLPTokenList(lpToken_temp);    
   }
   const setTokenInfo = async() => {
     const burn_res = await getTokenBurnAmount(tokenData.contractAddress, tokenData.network);
-    const res = await getTokenTransactionCount(tokenData.contractAddress, tokenData.network);
     const holderCnt = await getTokenHolderCount(tokenData.contractAddress, tokenData.network);
-    setHoldersCount(holderCnt);
+    const res = await getTokenTransactionCount(tokenData.contractAddress, tokenData.network, tokenData);
     setTransactionCount(res);
+    setHoldersCount(holderCnt);
     if (!isNaN(burn_res))
       setBurnAmount(burn_res);
+  }
+
+  const setBuySellTax = async() => {
+    // if (buyTax == 0 && sellTax == 0) {
+      const res = await getBuySellTaxFromTx(
+        transactionData, 
+        lpTokenAddress
+      );
+      setBuyTax(res[0]);
+      setSellTax(res[1]);
+    // }
   }
 
   const setLpTokenItem = (clickLp: LPTokenPair) => {
@@ -288,19 +359,22 @@ export default function TokenInfo() {
     }, 2000)
   }
 
-  useEffect(() => {
-    addPinLPToken();
-    setLPTokenListInfo();
-    setTokenInfo();
-    setDexDropShow(0);
+  useMemo(() => {
+    if (tokenData != undefined && tokenData.contractAddress.length > 0) {
+      addPinLPToken();
+      setLPTokenListInfo();
+      setDexDropShow(0);
+    }
   }, [tokenData])
 
-  useEffect(() => {
-    getLastLpTokenList();
+  useMemo(() => {
+    if (typeof window !== 'undefined') {
+      getLastLpTokenList();
+    }
   }, [])
  
-  useEffect(() => {
-    if (windowDimensions.width < SCREENMD_SIZE) {
+  useMemo(() => {
+    if (windowDimensions.width < SCREENMD_SIZE && windowDimensions.width > 0) {
       setMobileVersion(true);
     } else {
       setMobileVersion(false);
@@ -308,14 +382,19 @@ export default function TokenInfo() {
     }
   }, [windowDimensions])
   
-  useEffect(() => {
-
+  useMemo(() => {
+    if (transactionData.length > 0 && lpTokenAddress.token0_reserve != 0) {
+      setTokenInfo();
+      setBuySellTax();
+    }
+  }, [transactionData, lpTokenAddress])
+  
+  useMemo(() => {
     const setTokneBalanceAndPrice = async() => {
       let tp = 0.0;
       if (lpTokenPrice.lpBaseTokenAddress.toLowerCase() == tokenData.contractAddress.toLowerCase()) {
         tp = lpTokenPrice.tokenPrice;
       }
-
       const bal = await getTokenBalance(
         tokenData.contractAddress,
         address, 
@@ -332,7 +411,8 @@ export default function TokenInfo() {
       setTokenPriceShow(tp);
     }
 
-    setTokneBalanceAndPrice();
+    if (lpTokenPrice != undefined && tokenData != undefined)
+      setTokneBalanceAndPrice();
   }, [walletTokens, tokenData, lpTokenPrice])
 
   useEffect(() => {
@@ -343,7 +423,7 @@ export default function TokenInfo() {
     <Box className={infoClass}>
       <Box className={style.tokenSocialInfo} borderBottom={"1px"} borderBottomColor = {infoborderColorMode}>
         <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "95%" : "85%"} alignItems={"center"} justifyContent={"space-between"} paddingLeft={"1.5rem"}>
-          <Box display={"flex"} flexDirection={"row"} width={isMobileVersion ? "100%" : "59%"} alignItems={"center"}>
+          <Box display={"flex"} flexDirection={"row"} width={"100%"} alignItems={"center"}>
             <Box
               display={"flex"}
               flexDirection={"row"}
@@ -353,20 +433,28 @@ export default function TokenInfo() {
             >
               <img src={tokenData.image} />
             </Box>
-            <Box display={"flex"} flexDirection={"column"} paddingLeft={"0.5rem"} alignItems={"flex-start"} width={"100%"}>
-              <Box display={"flex"} flexDirection={"row"} paddingTop = {windowDimensions.width > SCREENSM_SIZE ? "0px" : "10px"} alignItems={"baseline"}>
-                <p className={style.tokenName}>{isMobileVersion ? makeShortTokenName(tokenData.symbol, 5) : tokenData.symbol}</p>
+            {/* <Box display={"flex"} flexDirection={"column"} paddingLeft={"0.5rem"} alignItems={"flex-start"} width={"100%"}> */}
+            
+            <VStack paddingTop = {windowDimensions.width > SCREENNXL_SIZE ? "0px" : "10px"} alignItems={'flex-start'} marginLeft={'10px'}>
+              <HStack>
                 <p className={style.tokenName} 
-                   style={{color:"#767676", fontSize:windowDimensions.width < SCREENSM_SIZE ? "12px" : "1.2rem"}}
+                  style={{color:"#767676", fontSize:windowDimensions.width < SCREENSM_SIZE ? "12px" : "1.2rem"}}
                 >
-                  &nbsp;({isMobileVersion ? `${makeShortTokenName(lpTokenAddress.baseCurrency_name, 5)}/${makeShortTokenName(lpTokenAddress.quoteCurrency_name, 4)}` :lpTokenAddress.symbol})&nbsp;&nbsp;
+                  {isMobileVersion ? `${makeShortTokenName(lpTokenAddress.baseCurrency_name, 5)}/${makeShortTokenName(lpTokenAddress.quoteCurrency_name, 4)}` :lpTokenAddress.symbol}
                 </p>
-                {
-                  !isMobileVersion && 
-                  <p className={style.tokenPrice} style={{color:priceColor}}>{convertBalanceCurrency( tokenPriceshow, 9)}</p>
-                }
-              </Box>
-              {
+                <Tag borderRadius={'full'} bg={'navy.400'}>
+                  <TagLabel className={style.tokenAddress}>{makeShortAddress(tokenData?.contractAddress!, 7, 4)}</TagLabel>
+                  <TagRightIcon as={MdFileCopy} cursor={'pointer'} onClick={copyBtnClick}/>
+                </Tag>
+                <Avatar as={MdStar} cursor={'pointer'} width={'24px'} height={'24px'} bg={'#203243'} p={'3px'} color={'yellow'}></Avatar>
+              </HStack>
+              <p className={style.tokenName} style={{marginTop:'0px'}}>{tokenData.name}</p>
+              {/* {
+                !isMobileVersion && 
+                <p className={style.tokenPrice} style={{color:priceColor}}>{convertBalanceCurrency( tokenPriceshow, 9)}</p>
+              } */}
+            </VStack>
+              {/* {
                 !isMobileVersion?
                 <Box 
                   display={"flex"} 
@@ -565,15 +653,22 @@ export default function TokenInfo() {
                     </Drawer>
                   </Box>                     
                 </Box> 
-              }
-            </Box>
+              } */}
           </Box>
-          {
+          {/* {
             !isMobileVersion && 
             <SocialListBox
               token={tokenData}
             />
-          }
+          } */}
+          <TokenDetails
+              label1={'Holders'}
+              label2={'Transactions'}
+              holdersCount = {holdersCount}
+              transactionCount = {transactionCount}
+              tokenData = {tokenData}
+              width = {"25%"}
+            />
         </Box>
         
         {
@@ -587,9 +682,14 @@ export default function TokenInfo() {
             flexDirection={"row"}
             alignItems={"center"}
             width={"25%"}
-            justifyContent={"space-between"}
           >
-            <Box
+            <p 
+              className={style.tokenPrice} 
+              style={{color:priceColor}}
+            >
+              {tokenPriceshow < 1 ? convertBalanceCurrency( tokenPriceshow, 9) : convertBalanceCurrency( tokenPriceshow, 2)}
+            </p>
+            {/* <Box
               width = {"60%"}
               display={"flex"}
               flexDirection={"column"}         
@@ -631,13 +731,13 @@ export default function TokenInfo() {
                     height={"100%"}
                   >
                     <WalletInfo
-                     tradeVisible={true}
-                     hoverMenu = {true}
+                    tradeVisible={true}
+                    hoverMenu = {true}
                     />
                   </Box>
                 </DrawerBody>
               </DrawerContent>
-            </Drawer>            
+            </Drawer>             */}
           </Box>
         }
       </Box>
@@ -658,24 +758,25 @@ export default function TokenInfo() {
           <Box 
             display={"inline-block"} 
             flexDirection={"column"} 
-            width={!isMobileVersion && "28%"} 
-            paddingLeft={isMobileVersion ? "0rem" : windowDimensions.width < SCREENNXL_SIZE ? "3.5rem" : "4rem"} 
+            width={!isMobileVersion && "20%"} 
             paddingRight={isMobileVersion && "2.5rem"} 
             minWidth={isMobileVersion && "5%"}
             float={"right"}
           >
             <p className={style.marketCap} style={{color:textColor}} >Market Cap</p>
-            <p className={style.tokenMarketCap} style={{color:priceColor}}>{isMobileVersion ? makeShortTokenName(convertBalanceCurrency((tokenData.totalSupply-burnAmount) * tokenPriceshow, 0), 14) :convertBalanceCurrency((tokenData.totalSupply-burnAmount) * tokenPriceshow, 0)}</p>
+            <p 
+              className={style.tokenMarketCap} 
+              style={{color:priceColor}}
+            >
+              {isMobileVersion ? 
+              makeShortTokenName(convertBalanceCurrency((tokenData.totalSupply-burnAmount) * tokenPriceshow, 0), 14) :
+              convertBalanceCurrency((tokenData.totalSupply-burnAmount) * tokenPriceshow, 0)}
+            </p>
           </Box>
-          <div style={{
-            height:"90%",
-            borderWidth:"0.5px",
-            borderColor:infoborderColorMode,
-          }}/>
           <Box
             display={"flex"} 
             flexDirection={"column"} 
-            width={isMobileVersion ? "auto" : "40%"}  
+            width={isMobileVersion ? "auto" : "30%"}  
             maxWidth={isMobileVersion && "90%"}
             position={"relative"} 
             height={"100%"}
@@ -727,19 +828,22 @@ export default function TokenInfo() {
           {
             !isMobileVersion &&
             <>
-              <div style={{
-                marginRight:"1rem",
-                height:"90%",
-                borderWidth:"1px",
-                borderColor:infoborderColorMode,
-              }}/> 
               <TokenBalance
                 balance = {balance}
                 balanceUSD = {balanceUSD}
                 tokenData = {tokenData}
-                width = {"39%"}
+                width = {"29%"}
               />
               
+              <TokenDetails
+                label1={'Buy'}
+                label2={'Sell'}
+                holdersCount = {holdersCount}
+                transactionCount = {transactionCount}
+                tokenData = {tokenData}
+                width = {"20%"}
+              />
+
               <div style={{
                 marginRight:"1rem",
                 height:"90%",
@@ -752,6 +856,8 @@ export default function TokenInfo() {
         {
           !isMobileVersion  &&
             <TokenDetails
+              label1={'24h Change'}
+              label2={'25h Vol'}
               holdersCount = {holdersCount}
               transactionCount = {transactionCount}
               tokenData = {tokenData}
